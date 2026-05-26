@@ -84,6 +84,11 @@
     "typescript-eslint": "^8.59.2",
     "vitest": "^4.1.5"
   },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix"
+    ]
+  },
   "The 'pnpm' field in package.json is no longer read by pnpm - pnpm": {
     "onlyBuiltDependencies": [
       "esbuild"

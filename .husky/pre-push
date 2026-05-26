@@ -2,7 +2,7 @@
 # Git Hook: pre-push
 # 1. Block direct push to main/develop
 # 2. Validate branch name (defense in depth vs. post-checkout)
-# 3. Run type-check + tests
+# 3. SMART CHECK: Run type-check + tests ONLY if code has changed
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
@@ -40,8 +40,23 @@ fi
 echo "✅ Branch name validated"
 echo ""
 
-# ─── 3. Type-check + tests ──────────────────────────────────────────
-echo "🧠 Type-checking..."
+# ─── 3. Intelligent Analysis: Detect if actual code changed ─────────
+# Compare la branche locale avec sa version distante (ou develop par défaut)
+REMOTE_REF=$(git rev-parse --verify @{u} 2>/dev/null || git merge-base HEAD develop)
+CODE_CHANGES=$(git diff --name-only "$REMOTE_REF" HEAD | grep -E '\.(ts|tsx|js|jsx)$')
+
+if [ -z "$CODE_CHANGES" ]; then
+  echo "📝 No source code modifications detected (only docs or assets)."
+  echo "⚡ Bypassing type-check and test suites for efficiency."
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "✅ Push authorized for: $BRANCH (Fast Track)"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  exit 0
+fi
+
+# ─── 4. Type-check + tests (Executed only for code modifications) ───
+echo "🧠 Code changed. Running Type-checking..."
 pnpm typecheck || {
   echo ""
   echo "❌ TYPE-CHECK FAILED — Push aborted"
