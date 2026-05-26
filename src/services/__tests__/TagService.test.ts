@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CreateTagDto } from '@/dto/tag/CreateTagDto';
 import { UpdateTagDto } from '@/dto/tag/UpdateTagDto';
 import { Tag } from '@/entities/Tag';
-import { TagErrorFactory } from '@/exceptions/entities/TagErrorFactory';
+import { TagErrorFactory } from '@/exceptions/TagErrorFactory';
 import type { ITagRepository } from '@/interfaces/repositories/ITagRepository';
 import { TagService } from '@/services/TagService';
 

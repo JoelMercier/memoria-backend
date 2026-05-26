@@ -1,32 +1,99 @@
-import type { NextFunction, Request, Response } from 'express';
-import { ChangePasswordDto } from '@/dto/user/ChangePasswordDto';
-import { DeleteAccountDto } from '@/dto/user/DeleteAccountDto';
-import { ResponseUserDto } from '@/dto/user/ResponseUserDto';
-import { UpdateProfileDto } from '@/dto/user/UpdateProfileDto';
-import { UserErrorFactory } from '@/exceptions/entities/UserErrorFactory';
-import type { IUserController } from '@/interfaces/controllers/IUserController';
+// ——— fichier : src/controllers/UserController.ts
+
+import type { NextFunction,
+              Request,
+              Response           } from 'express';
+import      { UserId             } from '@/domain/value-objects/IdMetier';
+import      { ChangePasswordDto  } from '@/dto/user/ChangePasswordDto';
+import      { DeleteAccountDto   } from '@/dto/user/DeleteAccountDto';
+import      { ResponseUserDto    } from '@/dto/user/ResponseUserDto';
+import      { UpdateProfileDto   } from '@/dto/user/UpdateProfileDto';
+import      { UserErrorFactory   } from '@/exceptions/UserErrorFactory';
+import type { IUserController    } from '@/interfaces/controllers/IUserController';
 import type { IUserExportService } from '@/interfaces/services/IUserExportService';
-import type { IUserService } from '@/interfaces/services/IUserService';
-import { ApiResponseFactory } from '@/utils/ApiResponseFactory';
-import { RequestIdGenerator } from '@/utils/RequestIdGenerator';
+import type { IUserService       } from '@/interfaces/services/IUserService';
+import      { ApiResponseFactory } from '@/utils/ApiResponseFactory';
+import      { RequestIdGenerator } from '@/utils/RequestIdGenerator';
 
+/**
+ * 🎛️ Classe UserController
+ * -----------------------
+ * Contrôleur HTTP Express pour la gestion des comptes utilisateurs et de la conformité RGPD.
+ * Sécurise les actions de profil en convertissant les jetons d'infrastructure en types nominaux.
+ *
+ * @class UserController
+ * @implements {IUserController}
+ * @author Joël, Gaïa & Co
+ */
 export class UserController implements IUserController {
-  public constructor(
-    private readonly userService: IUserService,
-    private readonly userExportService: IUserExportService
-  ) {}
 
-  private getUserId(req: Request): string {
-    const id: string | undefined = req.user?.id;
-    if (!id) throw UserErrorFactory.invalidCredentials();
-    return id;
+  /** 🧠 Service applicatif de gestion des profils */
+  private readonly m_rUserService : IUserService;
+
+  /** 🧠 Service applicatif d'extraction et d'export des données privées */
+  private readonly m_rUserExportService : IUserExportService;
+
+  /**
+   * Initialise le contrôleur avec ses services dépendants (DI).
+   *
+   * @constructor
+   * @param {IUserService} userService - Service des utilisateurs
+   * @param {IUserExportService} userExportService - Service d'exportation RGPD
+   */
+  public constructor(
+    userService       : IUserService,
+    userExportService : IUserExportService
+  ) {
+    this.m_rUserService       = userService;
+    this.m_rUserExportService = userExportService;
   }
 
+  /**
+   * 🛡️ Accesseur privé vers le service des utilisateurs.
+   *
+   * @private
+   * @returns {IUserService} L'instance du service.
+   */
+  private get userService(): IUserService {
+    return this.m_rUserService;
+  }
+
+  /**
+   * 🛡️ Accesseur privé vers le service d'exportation.
+   *
+   * @private
+   * @returns {IUserExportService} L'instance du service.
+   */
+  private get userExportService(): IUserExportService {
+    return this.m_rUserExportService;
+  }
+
+  /**
+   * 🔏 Extrait l'identifiant utilisateur depuis la session HTTP Express.
+   * Scelle l'identité sous l'armure du type nominal du domaine.
+   *
+   * @private
+   * @param {Request} req - La requête HTTP
+   * @throws {UserErrorFactory} Si les identifiants de session sont altérés ou absents
+   * @returns {UserId} L'identifiant immuable fortement typé
+   */
+  private getUserId(req: Request): UserId {
+    const id : string | undefined = req.user?.id;
+    if (!id) {
+      throw UserErrorFactory.invalidCredentials();
+    }
+    return id as unknown as UserId;
+  }
+
+  /**
+   * 🎛️ PUT /users/profile
+   * Modifie les informations publiques ou de contact du profil utilisateur.
+   */
   public async updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const requestId: string = RequestIdGenerator.getFromRequest(req);
-      const userId: string = this.getUserId(req);
-      const dto = new UpdateProfileDto(req.body);
+      const requestId : string           = RequestIdGenerator.getFromRequest(req);
+      const userId    : UserId           = this.getUserId(req);
+      const dto       : UpdateProfileDto = new UpdateProfileDto(req.body);
 
       const user = await this.userService.updateProfile(userId, dto);
 
@@ -44,11 +111,15 @@ export class UserController implements IUserController {
     }
   }
 
+  /**
+   * 🔏 PATCH /users/password
+   * Valide et applique le renouvellement sécurisé du mot de passe de l'acteur.
+   */
   public async changePassword(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const requestId: string = RequestIdGenerator.getFromRequest(req);
-      const userId: string = this.getUserId(req);
-      const dto = new ChangePasswordDto(req.body);
+      const requestId : string            = RequestIdGenerator.getFromRequest(req);
+      const userId    : UserId            = this.getUserId(req);
+      const dto       : ChangePasswordDto = new ChangePasswordDto(req.body);
 
       await this.userService.changePassword(userId, dto);
 
@@ -60,29 +131,38 @@ export class UserController implements IUserController {
     }
   }
 
+  /**
+   * 🗑️ DELETE /users/account
+   * Clôture et purge définitivement le compte de l'utilisateur après confirmation.
+   */
   public async deleteAccount(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const requestId: string = RequestIdGenerator.getFromRequest(req);
-      const userId: string = this.getUserId(req);
-      const dto = new DeleteAccountDto(req.body);
+      const requestId : string           = RequestIdGenerator.getFromRequest(req);
+      const userId    : UserId           = this.getUserId(req);
+      const dto       : DeleteAccountDto = new DeleteAccountDto(req.body);
 
       await this.userService.deleteAccount(userId, dto);
 
-      res.status(200).json(ApiResponseFactory.success('Compte supprimé', undefined, requestId));
+      res
+        .status(200)
+        .json(ApiResponseFactory.success('Compte supprimé', undefined, requestId));
     } catch (err) {
       next(err);
     }
   }
 
+  /**
+   * 📦 GET /users/export
+   * Génère une archive au format JSON contenant toutes les données personnelles de l'acteur (RGPD).
+   */
   public async exportData(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const requestId: string = RequestIdGenerator.getFromRequest(req);
-      const userId: string = this.getUserId(req);
+      const requestId : string = RequestIdGenerator.getFromRequest(req);
+      const userId    : UserId = this.getUserId(req);
 
       const exportData = await this.userExportService.exportUserData(userId);
 
-      // Header pour suggérer un téléchargement au navigateur (le frontend peut respecter ou non)
-      const dateStr: string = new Date().toISOString().slice(0, 10);
+      const dateStr : string = new Date().toISOString().slice(0, 10);
       res.setHeader('Content-Disposition', `attachment; filename="memoria-export-${dateStr}.json"`);
 
       res

@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-import { TokenError } from '@/exceptions/security/TokenError';
+import { TokenError } from '@/exceptions/TokenError';
 import type { IBlacklistService } from '@/interfaces/security/IBlacklistService';
 import type { ITokenManager } from '@/interfaces/security/ITokenManager';
 

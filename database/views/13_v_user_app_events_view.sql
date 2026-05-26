@@ -1,4 +1,4 @@
-CREATE VIEW v_user_app_events AS
+CREATE or replace VIEW v_user_app_events AS
 SELECT
   id_event,
   user_id,

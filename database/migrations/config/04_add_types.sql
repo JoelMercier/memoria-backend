@@ -26,8 +26,7 @@ BEGIN
 END
 $$;
 
-COMMENT ON TYPE public.role_enum IS
-'Rôles des utilisateurs pour la gestion des droits Access Control Level (ACL)';
+COMMENT ON TYPE public.role_enum IS 'Rôles des utilisateurs pour la gestion des droits Access Control Level (ACL)';
 
 -- ============================================================================
 -- AUTH PROVIDER ENUM
@@ -52,8 +51,7 @@ BEGIN
 END
 $$;
 
-COMMENT ON TYPE public.auth_provider_enum IS
-'Fournisseur d authentification';
+COMMENT ON TYPE public.auth_provider_enum IS 'Fournisseur d authentification';
 
 -- ============================================================================
 -- CONTENT TYPE ENUM
@@ -79,8 +77,7 @@ BEGIN
 END
 $$;
 
-COMMENT ON TYPE public.content_type_enum IS
-'Types de contenu';
+COMMENT ON TYPE public.content_type_enum IS 'Types de contenu';
 
 -- ============================================================================
 -- EVENT CATEGORY ENUM
@@ -105,8 +102,7 @@ BEGIN
 END
 $$;
 
-COMMENT ON TYPE public.event_category_enum IS
-'Catégories principales des événements système';
+COMMENT ON TYPE public.event_category_enum IS 'Catégories principales des événements système';
 
 -- ============================================================================
 -- SEVERITY ENUM
@@ -131,5 +127,4 @@ BEGIN
 END
 $$;
 
-COMMENT ON TYPE public.severity_enum IS
-'Niveaux de gravité pour les événements de type monitoring/audit';
+COMMENT ON TYPE public.severity_enum IS 'Niveaux de gravité pour les événements de type monitoring/audit';

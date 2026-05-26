@@ -1,34 +1,86 @@
-import type { AuthProviderEnum } from '@/constants/enums/AuthProviderEnum';
-import type { RoleEnum } from '@/constants/enums/RoleEnum';
-import type { IUser } from '@/interfaces/entities/user/IUser';
+// ——— fichier : src/dto/user/ResponseUserDto.ts
 
+import { UserId } from '@/domain/value-objects/IdMetier';
+import type { IUser  } from '@/interfaces/entities/user/IUser';
+
+/**
+ * 👥 Classe ResponseUserDto
+ * -------------------------
+ * Objet de transfert de données (DTO) purgeant l'empreinte cryptographique
+ * du mot de passe avant l'exposition des profils utilisateurs sur le réseau Web.
+ *
+ * @class ResponseUserDto
+ * @author Joël, Gaïa & Co
+ */
 export class ResponseUserDto {
-  public readonly id: string;
-  public readonly email: string;
-  public readonly pseudo: string;
-  public readonly role: RoleEnum;
-  public readonly authProvider: AuthProviderEnum;
-  public readonly settingsUser: Record<string, unknown>;
-  public readonly gdprConsent: boolean;
-  public readonly createdAt?: Date;
-  public readonly updatedAt?: Date;
 
+  /** 🆔 Identifiant unique et fortement typé de l'utilisateur (UserId) */
+  public readonly id : UserId;
+
+  /** 📧 Adresse e-mail de correspondance unique */
+  public readonly email : string;
+
+  /** 👤 Pseudonyme public d'affichage */
+  public readonly pseudo : string;
+
+  /** 🗂️ Jeton textuel du rôle hiérarchique de sécurité (Code SQL minuscules) */
+  public readonly role : string;
+
+  /** 🌐 Jeton textuel du fournisseur d'authentification d'origine (Code SQL minuscules) */
+  public readonly authProvider : string;
+
+  /** 🗄️ Dictionnaire de configuration des préférences de l'interface */
+  public readonly settingsUser : Record<string, any>;
+
+  /** 🛡️ Statut légal du consentement aux règles de protection des données (RGPD) */
+  public readonly gdprConsent : boolean;
+
+  /** ⏱️ Horodatage précis de la création du compte utilisateur */
+  public readonly createdAt? : Date;
+
+  /** ⏱️ Horodatage précis de la dernière modification du compte utilisateur */
+  public readonly updatedAt? : Date;
+
+  /**
+   * Initialise de manière immuable le payload de transfert à partir du contrat IUser.
+   * Exploite les getters métiers capitalisés officiels de l'interface ou les accesseurs de structure.
+   *
+   * @constructor
+   * @param {IUser} user - L'interface métier immuable de référence
+   */
   private constructor(user: IUser) {
-    this.id = user.getId();
-    this.email = user.getEmail();
-    this.pseudo = user.getPseudo();
-    this.role = user.getRole();
-    this.authProvider = user.getAuthProvider();
-    this.settingsUser = user.getSettingsUser();
-    this.gdprConsent = user.hasGdprConsent();
-    this.createdAt = user.getCreatedAt();
-    this.updatedAt = user.getUpdatedAt();
+    // Raccordement chirurgical nominal et protection contre les reliques archéologiques
+    this.id           = user.idUser;
+    this.email        = user.Email;
+    this.pseudo       = user.Pseudo;
+    this.role         = user.Role.code;
+    this.authProvider = user.AuthProvider.code;
+    this.settingsUser = user.SettingsUser;
+    this.gdprConsent  = user.GdprConsent;
+    this.createdAt    = user.createdAt;
+    this.updatedAt    = user.updatedAt;
   }
 
+  /**
+   * 🗺️ Factory Individuelle : Transforme un contrat IUser en DTO d'exposition sécurisé.
+   *
+   * @static
+   * @function fromUser
+   * @param {IUser} user - L'entité vivante issue des services ou repositories
+   * @returns {ResponseUserDto} Le sac de données passif expurgé du mot de passe
+   */
   public static fromUser(user: IUser): ResponseUserDto {
     return new ResponseUserDto(user);
   }
 
+  /**
+   * 🗺️ Factory de Collection : Transforme un tableau de contrats en liste de DTOs sécurisés.
+   *
+   * @static
+   * @function fromUsers
+   * @param {IUser[]} users - Le tableau de profils à convertir
+   * @returns {ResponseUserDto[]} La collection de DTOs formatée
+   */
   public static fromUsers(users: IUser[]): ResponseUserDto[] {
     return users.map((u): ResponseUserDto => ResponseUserDto.fromUser(u));
   }

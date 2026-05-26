@@ -2,15 +2,11 @@ import type { QueryResultRow } from 'pg';
 import type { ContentTypeEnum } from '@/constants/enums/ContentTypeEnum';
 import { DatabaseConnection } from '@/config/DatabaseConnection';
 import { Item } from '@/entities/Item';
-import { DatabaseErrorFactory } from '@/exceptions/database/DatabaseErrorFactory';
-import { ItemErrorFactory } from '@/exceptions/entities/ItemErrorFactory';
+import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
+import { ItemErrorFactory } from '@/exceptions/ItemErrorFactory';
 import type { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
 import type { IItemData } from '@/interfaces/entities/item/IItemData';
-import type {
-  IItemListOptions,
-  IItemListResult,
-  IItemRepository
-} from '@/interfaces/repositories/IItemRepository';
+import type { IItemListOptions, IItemListResult, IItemRepository } from '@/interfaces/repositories/IItemRepository';
 
 interface IItemRow extends QueryResultRow {
   id_item: string;
@@ -53,6 +49,8 @@ export class PgItemRepository implements IItemRepository {
     });
   }
 
+
+
   public async findById(id: string): Promise<Item | null> {
     try {
       const result = await this.db.query<IItemRow>('SELECT * FROM items WHERE id_item = $1', [id]);
@@ -62,6 +60,8 @@ export class PgItemRepository implements IItemRepository {
       throw DatabaseErrorFactory.queryFailed('findById', msg);
     }
   }
+
+
 
   public async findBySlug(userId: string, slug: string): Promise<Item | null> {
     try {
@@ -76,6 +76,8 @@ export class PgItemRepository implements IItemRepository {
     }
   }
 
+
+
   public async findByTitle(userId: string, title: string): Promise<Item | null> {
     try {
       const result = await this.db.query<IItemRow>(
@@ -89,11 +91,13 @@ export class PgItemRepository implements IItemRepository {
     }
   }
 
-  public async listByUser(userId: string, options?: IItemListOptions): Promise<IItemListResult> {
+
+
+  public async listByUser(p_sUserId: string, options?: IItemListOptions): Promise<IItemListResult> {
     const limit: number = options?.limit ?? 20;
     const offset: number = options?.offset ?? 0;
     const conditions: string[] = ['user_id = $1'];
-    const params: unknown[] = [userId];
+    const params: unknown[] = [p_sUserId];
 
     if (options?.contentType) {
       params.push(options.contentType);
@@ -159,6 +163,8 @@ export class PgItemRepository implements IItemRepository {
     }
   }
 
+
+
   public async update(id: string, data: Partial<IItemData>): Promise<Item | null> {
     const fields: string[] = [];
     const params: unknown[] = [];
@@ -199,6 +205,8 @@ export class PgItemRepository implements IItemRepository {
       throw DatabaseErrorFactory.queryFailed('update', msg);
     }
   }
+
+
 
   public async delete(id: string): Promise<boolean> {
     try {

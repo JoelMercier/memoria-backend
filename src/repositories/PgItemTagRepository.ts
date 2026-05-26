@@ -1,7 +1,7 @@
 import type { QueryResultRow } from 'pg';
 import { DatabaseConnection } from '@/config/DatabaseConnection';
 import { Tag } from '@/entities/Tag';
-import { DatabaseErrorFactory } from '@/exceptions/database/DatabaseErrorFactory';
+import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
 import type { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
 import type { IItemTagRepository } from '@/interfaces/repositories/IItemTagRepository';
 

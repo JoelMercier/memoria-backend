@@ -4,7 +4,7 @@
 -- ============================================================================
 
 -- Nettoyage préalable (si nécessaire)
-TRUNCATE TABLE users CASCADE;
+-- TRUNCATE TABLE users CASCADE;
 
 -- ============================================================================
 -- SUPER ADMINS (3)
@@ -56,7 +56,8 @@ INSERT INTO users (
     '{"theme": "dark", "language": "fr", "notifications": false, "emailDigest": "never"}',
     true,
     '2026-01-15 08:30:00'
-);
+)
+ON CONFLICT DO NOTHING;
 
 -- ============================================================================
 -- ADMINS (3)
@@ -105,7 +106,9 @@ INSERT INTO users (
     '{"theme": "light", "language": "fr", "notifications": false, "emailDigest": "monthly"}',
     true,
     '2026-01-15 09:30:00'
-);
+)
+ON CONFLICT DO NOTHING;
+
 
 -- ============================================================================
 -- CUSTOMERS / UTILISATEURS REGULIERS (12)
@@ -265,7 +268,8 @@ INSERT INTO users (
     '{"theme": "light", "language": "fr", "notifications": false, "emailDigest": "monthly"}',
     true,
     '2026-01-15 15:30:00'
-);
+)
+ON CONFLICT DO NOTHING;
 
 
 

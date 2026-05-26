@@ -25,7 +25,8 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
-export $(grep -v '^#' .env | xargs)
+#export $(grep -v '^#' .env | xargs)
+export $(grep -v '^' .env | xargs)
 
 DB_SUPERUSER=${DB_SUPERUSER:-postgres}
 DB_APP_USER=${DB_APP_USER:-app_memoria}
@@ -63,8 +64,7 @@ execute_directory() {
 # ============================================
 echo -e "${GREEN}📦 Phase 0: Database Check${NC}"
 
-psql -U "$DB_SUPERUSER" -lqt | cut -d \| -f 1 | grep -qw "$DB_NAME" || \
-createdb -U "$DB_SUPERUSER" "$DB_NAME"
+psql -U "$DB_SUPERUSER" -lqt | cut -d \| -f 1 | grep -qw "$DB_NAME" || createdb -U "$DB_SUPERUSER" "$DB_NAME"
 
 # ============================================
 # Phase 1 — Roles & Core config (SUPERUSER)

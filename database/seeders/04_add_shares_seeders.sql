@@ -4,7 +4,7 @@
 -- ============================================================================
 
 -- Nettoyage préalable
-TRUNCATE TABLE shares CASCADE;
+--TRUNCATE TABLE shares CASCADE;
 
 -- ============================================================================
 -- PARTAGES DE SOPHIE (Développeuse)
@@ -41,7 +41,7 @@ VALUES (
         'thomas.roux@startup.io',
         'tok_share_sophie_thomas_001',
         '{"level": "read", "allow_download": false, "expiration": "2026-02-15", "shared_at": "2026-01-06T16:45:00Z"}'::jsonb
-    );
+    ) ON CONFLICT DO NOTHING;
 
 -- ============================================================================
 -- PARTAGES DE MARC (Chef de projet)
@@ -75,4 +75,4 @@ VALUES (
         'paul.martin@corp.com',
         'tok_share_marc_paul_001',
         '{"level": "read", "allow_download": false, "expiration": "2026-01-31", "shared_at": "2026-01-07T15:30:00Z"}'::jsonb
-    );
+    ) ON CONFLICT DO NOTHING;

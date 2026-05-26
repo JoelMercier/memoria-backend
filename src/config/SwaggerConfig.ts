@@ -1,3 +1,5 @@
+// ——— fichier : src/config/SwaggerConfig.ts
+
 import swaggerJsdoc from 'swagger-jsdoc';
 import { LoggerSingleton } from '@/config/LoggerSingleton';
 
@@ -5,126 +7,126 @@ const options: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.3',
     info: {
-      title: 'Memoria API',
-      version: '1.0.0',
-      description:
+      title       : 'Memoria API',
+      version     : '1.0.0',
+      description :
         'API REST de gestion de connaissances personnelles. ' +
         'Permet de créer, organiser et partager des pépites (livres, podcasts, articles, vidéos, notes).'
     },
-    servers: [{ url: 'http://localhost:3000', description: 'Développement local' }],
-    tags: [
-      { name: 'Auth', description: 'Inscription, connexion, gestion du token' },
-      { name: 'Items', description: 'Pépites de connaissance' },
-      { name: 'Tags', description: 'Étiquettes pour organiser les pépites' },
+    servers : [{ url: 'http://localhost:3000', description: 'Développement local' }],
+    tags    : [
+      { name: 'Auth',   description: 'Inscription, connexion, gestion du token' },
+      { name: 'Items',  description: 'Pépites de connaissance' },
+      { name: 'Tags',   description: 'Étiquettes pour organiser les pépites' },
       { name: 'Shares', description: 'Partages publics de pépites' },
       { name: 'Public', description: 'Endpoints accessibles sans authentification' },
       { name: 'Health', description: 'Monitoring' },
-      { name: 'Users', description: 'Gestion du profil et RGPD' }
+      { name: 'Users',  description: 'Gestion du profil et RGPD' }
     ],
     components: {
       securitySchemes: {
         bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          description: 'JWT obtenu via POST /v1/auth/login'
+          type         : 'http',
+          scheme       : 'bearer',
+          bearerFormat : 'JWT',
+          description  : 'JWT obtenu via POST /v1/auth/login'
         }
       },
       schemas: {
         // === Enveloppes de réponse ===
         ResponseMeta: {
-          type: 'object',
-          properties: {
-            timestamp: { type: 'string', format: 'date-time' },
-            requestId: { type: 'string', format: 'uuid' }
+          type       : 'object',
+          properties : {
+            timestamp : { type: 'string', format: 'date-time' },
+            requestId : { type: 'string', format: 'uuid' }
           }
         },
         ApiResponseSuccess: {
-          type: 'object',
-          required: ['success', 'message', 'meta'],
-          properties: {
-            success: { type: 'boolean', example: true },
-            message: { type: 'string', example: 'Opération réussie' },
-            data: { type: 'object', description: "Payload, varie selon l'endpoint" },
-            meta: { $ref: '#/components/schemas/ResponseMeta' }
+          type     : 'object',
+          required : ['success', 'message', 'meta'],
+          properties : {
+            success : { type: 'boolean', example: true },
+            message : { type: 'string', example: 'Opération réussie' },
+            data    : { type: 'object', description: "Payload, varie selon l'endpoint" },
+            meta    : { $ref: '#/components/schemas/ResponseMeta' }
           }
         },
         ApiResponseError: {
-          type: 'object',
-          required: ['success', 'message', 'error', 'meta'],
-          properties: {
-            success: { type: 'boolean', example: false },
-            message: { type: 'string', example: 'Erreur de validation' },
-            error: {
-              type: 'object',
-              properties: { code: { type: 'string', example: 'VALIDATION_ERROR' } }
+          type     : 'object',
+          required : ['success', 'message', 'error', 'meta'],
+          properties : {
+            success : { type: 'boolean', example: false },
+            message : { type: 'string', example: 'Erreur de validation' },
+            error   : {
+              type       : 'object',
+              properties : { code: { type: 'string', example: 'VALIDATION_ERROR' } }
             },
-            meta: { $ref: '#/components/schemas/ResponseMeta' }
+            meta    : { $ref: '#/components/schemas/ResponseMeta' }
           }
         },
 
         // === Domaine User ===
         User: {
-          type: 'object',
-          properties: {
-            id: { type: 'string', format: 'uuid' },
-            email: { type: 'string', format: 'email' },
-            pseudo: { type: 'string' },
-            role: { type: 'string', enum: ['customer', 'admin', 'super_admin'] },
-            authProvider: { type: 'string', enum: ['local', 'google', 'azure', 'apple'] },
-            settingsUser: { type: 'object' },
-            gdprConsent: { type: 'boolean' },
-            createdAt: { type: 'string', format: 'date-time' }
+          type       : 'object',
+          properties : {
+            id              : { type: 'string', description: "Identifiant binaire unique de l'utilisateur (UserId)" },
+            email           : { type: 'string', format: 'email' },
+            pseudo          : { type: 'string' },
+            role            : { type: 'string', enum: ['CUSTOMER', 'ADMIN', 'SUPER_ADMIN'] },
+            authProvider    : { type: 'string', enum: ['LOCAL', 'GOOGLE', 'AZURE', 'APPLE'] },
+            settingsUser    : { type: 'object' },
+            gdprConsent     : { type: 'boolean' },
+            createdAt       : { type: 'string', format: 'date-time' }
           }
         },
 
         // === Domaine Item ===
         Item: {
-          type: 'object',
-          properties: {
-            id: { type: 'string', format: 'uuid' },
-            userId: { type: 'string', format: 'uuid' },
-            contentType: { type: 'string', enum: ['livre', 'podcast', 'article', 'video', 'note'] },
-            title: { type: 'string' },
-            slug: { type: 'string' },
-            content: { type: 'string' },
-            sourceAuthor: { type: 'string' },
-            thumbnailUrl: { type: 'string', nullable: true },
-            metadata: { type: 'object' },
-            createdAt: { type: 'string', format: 'date-time' },
-            updatedAt: { type: 'string', format: 'date-time' },
-            tags: { type: 'array', items: { $ref: '#/components/schemas/Tag' } }
+          type       : 'object',
+          properties : {
+            id           : { type: 'string', description: "Identifiant binaire unique de la Pépite (ItemId)" },
+            userId       : { type: 'string', description: "Identifiant du propriétaire (UserId)" },
+            contentType  : { type: 'string', enum: ['LIVRE', 'PODCAST', 'ARTICLE', 'VIDEO', 'NOTE'] },
+            title        : { type: 'string' },
+            slug         : { type: 'string' },
+            content      : { type: 'string' },
+            sourceAuthor : { type: 'string' },
+            thumbnailUrl : { type: 'string', nullable: true },
+            metadata     : { type: 'object' },
+            createdAt    : { type: 'string', format: 'date-time' },
+            updatedAt    : { type: 'string', format: 'date-time' },
+            tags         : { type: 'array', items: { $ref: '#/components/schemas/Tag' } }
           }
         },
 
         // === Domaine Tag ===
         Tag: {
-          type: 'object',
-          properties: {
-            id: { type: 'string', format: 'uuid' },
-            userId: { type: 'string', format: 'uuid' },
-            tagName: { type: 'string', maxLength: 50 },
-            createdAt: { type: 'string', format: 'date-time' },
-            updatedAt: { type: 'string', format: 'date-time' }
+          type       : 'object',
+          properties : {
+            id        : { type: 'string', description: "Identifiant binaire unique du Tag (TagId)" },
+            userId    : { type: 'string', description: "Identifiant du propriétaire (UserId)" },
+            tagName   : { type: 'string', maxLength: 50 },
+            createdAt : { type: 'string', format: 'date-time' },
+            updatedAt : { type: 'string', format: 'date-time' }
           }
         },
 
         // === Domaine Share ===
         Share: {
-          type: 'object',
-          properties: {
-            id: { type: 'string', format: 'uuid' },
-            itemId: { type: 'string', format: 'uuid' },
-            recipientEmail: { type: 'string', format: 'email', nullable: true },
-            shareToken: { type: 'string' },
-            shareUrl: { type: 'string', format: 'uri' },
-            accessConfig: {
-              type: 'object',
-              properties: { expiresAt: { type: 'string', format: 'date-time' } }
+          type       : 'object',
+          properties : {
+            id             : { type: 'string', description: "Identifiant binaire unique du partage (ShareId)" },
+            itemId         : { type: 'string', description: "Identifiant de la Pépite associée (ItemId)" },
+            recipientEmail : { type: 'string', format: 'email', nullable: true },
+            shareToken     : { type: 'string' },
+            shareUrl       : { type: 'string', format: 'uri' },
+            accessConfig   : {
+              type       : 'object',
+              properties : { expiresAt: { type: 'string', format: 'date-time' } }
             },
-            isExpired: { type: 'boolean' },
-            createdAt: { type: 'string', format: 'date-time' },
-            updatedAt: { type: 'string', format: 'date-time' }
+            isExpired      : { type: 'boolean' },
+            createdAt      : { type: 'string', format: 'date-time' },
+            updatedAt      : { type: 'string', format: 'date-time' }
           }
         }
       }
@@ -136,14 +138,30 @@ const options: swaggerJsdoc.Options = {
   apis: ['./src/routes/**/*.ts', './src/app.ts']
 };
 
+/**
+ * 🏛️ Classe SwaggerConfig
+ * -----------------------
+ * Initialisation, configuration globale et génération de la spécification OpenAPI 3.
+ * Centralise la documentation des contrats d'échange de l'application Memoria.
+ *
+ * @class SwaggerConfig
+ */
 export class SwaggerConfig {
-  private static spec: object | null = null;
 
+  /** 🗄️ Cache de la spécification OpenAPI générée */
+  private static m_rSpec : object | null = null;
+
+  /**
+   * 🗺️ Récupère ou génère à la volée la spécification OpenAPI (Singleton).
+   *
+   * @static
+   * @returns {object} La spécification OpenAPI brute prête pour swagger-ui
+   */
   public static getSpec(): object {
-    if (this.spec === null) {
-      this.spec = swaggerJsdoc(options);
+    if (this.m_rSpec === null) {
+      this.m_rSpec = swaggerJsdoc(options);
       LoggerSingleton.getInstance().info('📚 Spec OpenAPI générée');
     }
-    return this.spec;
+    return this.m_rSpec;
   }
 }

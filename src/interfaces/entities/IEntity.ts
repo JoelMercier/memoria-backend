@@ -1,12 +1,32 @@
-import type { IBaseEntityData } from '@/interfaces/entities/IBaseEntityData';
+// ——— fichier : src/interfaces/entities/IEntity.ts
+
+import type { AllowedIdTypes } from '@/interfaces/entities/IBaseEntityData';
 
 /**
- * Contrat générique d'une entité du domaine.
- * Toute entité doit exposer ses champs de base et savoir se sérialiser.
+ * 📜 Interface IEntity (Version Jojo Libérée)
+ * -------------------------------------------
+ * Contrat d'accès métier générique pour toutes les entités du système.
+ * Désormais ouverte aux Value Objects d'identifiants et aux métadonnées d'audit.
+ *
+ * @interface IEntity
+ * @template TData - Le contrat de données passif associé (DTO / Infra)
+ * @template TId   - Le type fort de la clé primaire (Par défaut string)
+ * @author Joël, Gaïa & Co
  */
-export interface IEntity<T extends IBaseEntityData = IBaseEntityData> {
-  getId(): string;
-  getCreatedAt(): Date | undefined;
-  getUpdatedAt(): Date | undefined;
-  toData(): T;
+export interface IEntity<
+  TData,
+  TId extends AllowedIdTypes = string
+> {
+
+  /** 📅 Horodatage immuable de la création de l'enregistrement en base de données. */
+  get createdAt(): Date;
+
+  /** 📅 Horodatage de la dernière modification de l'enregistrement (Optionnel). */
+  get updatedAt(): Date | undefined;
+
+  /** 📦 Extrait le sac de données passif correspondant à l'état vivant de l'entité. */
+  toData(): TData;
+
+  /** 🖨️ Sérialise textuellement l'entité au format de texte JSON. */
+  toString(): string;
 }

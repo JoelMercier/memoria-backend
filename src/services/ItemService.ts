@@ -1,130 +1,244 @@
+// ——— fichier : src/services/ItemService.ts
+
+import { UserId,
+         ItemId,
+         TagId            } from '@/domain/value-objects/IdMetier';
+import { Item             } from '@/entities/Item';
+import { Tag              } from '@/entities/Tag';
+import { ItemErrorFactory } from '@/exceptions/ItemErrorFactory';
+import { TagErrorFactory  } from '@/exceptions/TagErrorFactory';
 import type { CreateItemDto } from '@/dto/item/CreateItemDto';
 import type { UpdateItemDto } from '@/dto/item/UpdateItemDto';
-import type { Item } from '@/entities/Item';
-import type { Tag } from '@/entities/Tag';
-import { ItemErrorFactory } from '@/exceptions/entities/ItemErrorFactory';
-import { TagErrorFactory } from '@/exceptions/entities/TagErrorFactory';
-import type { IItem } from '@/interfaces/entities/item/IItem';
-import type { IItemData } from '@/interfaces/entities/item/IItemData';
+import type { IItem       } from '@/interfaces/entities/item/IItem';
+import type { IItemData   } from '@/interfaces/entities/item/IItemData';
 import type {
   IItemRepository,
   IItemListOptions,
   IItemListResult
 } from '@/interfaces/repositories/IItemRepository';
 import type { IItemTagRepository } from '@/interfaces/repositories/IItemTagRepository';
-import type { ITagRepository } from '@/interfaces/repositories/ITagRepository';
-import type { IItemService } from '@/interfaces/services/IItemService';
-import { SlugGenerator } from '@/utils/SlugGenerator';
+import type { ITagRepository     } from '@/interfaces/repositories/ITagRepository';
+import type { IItemService       } from '@/interfaces/services/IItemService';
+import { SlugGenerator           } from '@/utils/SlugGenerator';
 
+/**
+ * 🏛️ Classe ItemService
+ * ---------------------
+ * Service de domaine orchestrant le cycle de vie métier complet des Pépites (Items).
+ * Supervise les contrôles de propriété, l'unicité des ressources et la synchronisation des étiquettes.
+ *
+ * @class ItemService
+ * @implements {IItemService}
+ * @author Joël, Gaïa & Co
+ */
 export class ItemService implements IItemService {
+
+  /**
+   * Initialise le cas d'usage par injection d'abstractions de dépôts.
+   *
+   * @constructor
+   */
   public constructor(
-    private readonly itemRepository: IItemRepository,
-    private readonly itemTagRepository: IItemTagRepository,
-    private readonly tagRepository: ITagRepository
+    private readonly itemRepository : IItemRepository,
+    private readonly itemTagRepository : IItemTagRepository,
+    private readonly tagRepository : ITagRepository
   ) {}
 
   /**
-   * Vérifie que tous les tagIds existent ET appartiennent bien à l'utilisateur.
-   * Sinon, lève une erreur claire (404 ou 403 selon le cas).
+   * 🛡️ Sécurité Nominale : Valide l'existence et l'ownership légitime d'une collection d'étiquettes.
+   * Levera une anomalie claire (404 ou 403) au moindre écart constaté.
+   *
+   * @private
+   * @async
    */
-  private async validateTagOwnership(userId: string, tagIds: ReadonlyArray<string>): Promise<void> {
-    const tags: Tag[] = await this.tagRepository.findByIds(tagIds);
+  private async validateTagOwnership(userId: UserId, tagIds: ReadonlyArray<TagId>): Promise<void> {
+    const tags : Tag[] = await this.tagRepository.findByIds(tagIds);
+
     if (tags.length !== tagIds.length) {
-      throw TagErrorFactory.notFound('un ou plusieurs tags');
+      throw TagErrorFactory.notFound(new TagId('un ou plusieurs tags'));
     }
+
     for (const tag of tags) {
-      if (tag.getUserId() !== userId) {
-        throw TagErrorFactory.accessDenied(tag.getId(), userId);
+      if (tag.getUserId().valeur !== userId.valeur) {
+        throw TagErrorFactory.accessDenied(tag.getTagId(), userId);
       }
     }
   }
 
+  /**
+   * 🔔 Engendre et persiste une nouvelle Pépite après vérification rigoureuse des doublons.
+   *
+   * @public
+   * @async
+   */
   public async create(userId: string, dto: CreateItemDto): Promise<IItem> {
-    const slug: string = dto.slug ?? SlugGenerator.generate(dto.title);
+    const userMetierId = new UserId(userId);
+    const slug : string = dto.slug ?? SlugGenerator.generate(dto.title);
 
-    const existingSlug: Item | null = await this.itemRepository.findBySlug(userId, slug);
-    if (existingSlug) throw ItemErrorFactory.slugExists(userId, slug);
-
-    const existingTitle: Item | null = await this.itemRepository.findByTitle(userId, dto.title);
-    if (existingTitle) throw ItemErrorFactory.titleExists(userId, dto.title);
-
-    // Validation ownership des tags AVANT l'insert pour fail-fast
-    if (dto.tagIds && dto.tagIds.length > 0) {
-      await this.validateTagOwnership(userId, dto.tagIds);
+    const existingSlug : Item | null = await this.itemRepository.findBySlug(userMetierId, slug);
+    if (existingSlug) {
+      throw ItemErrorFactory.slugExists(userMetierId, slug);
     }
 
-    const data: IItemData = {
-      id: '',
-      userId,
-      contentType: dto.contentType,
-      title: dto.title,
-      slug,
-      content: dto.content,
-      sourceAuthor: dto.sourceAuthor,
-      thumbnailUrl: dto.thumbnailUrl,
-      metadata: dto.metadata
+    const existingTitle : Item | null = await this.itemRepository.findByTitle(userMetierId, dto.title);
+    if (existingTitle) {
+      throw ItemErrorFactory.titleExists(userMetierId, dto.title);
+    }
+
+    // 🪓 Correction définitive du transtypage de l'itérateur (Plus d'enfer de map)
+    const rawTagIds = dto.tagIds || [];
+    const domainTagIds : TagId[] = rawTagIds.map((id: unknown): TagId => new TagId(id as string));
+
+    // Validation de sécurité en Fail-Fast AVANT toute insertion d'infrastructure
+    if (domainTagIds.length > 0) {
+      await this.validateTagOwnership(userMetierId, domainTagIds);
+    }
+
+    const data : IItemData = {
+      idItem       : undefined as any, // Forgé à l'insertion SQL par gen_random_uuid()
+      idUser       : userMetierId,     // Alignement nominal strict de la propriété
+      contentType  : dto.contentType,
+      title        : dto.title,
+      slug         : slug,
+      content      : dto.content,
+      sourceAuthor : dto.sourceAuthor,
+      thumbnailUrl : dto.thumbnailUrl,
+      metadata     : dto.metadata
     };
 
-    const item: Item = await this.itemRepository.create(data);
+    const item : Item = await this.itemRepository.create(data);
 
-    // Sync des tags après création de l'item
-    if (dto.tagIds && dto.tagIds.length > 0) {
-      await this.itemTagRepository.sync(item.getId(), dto.tagIds);
+    // Synchronisation de masse de la table de jointure après persistance de l'atome racine
+    if (domainTagIds.length > 0) {
+      await this.itemTagRepository.sync(item.getItemId(), domainTagIds);
     }
 
     return item;
   }
 
+  /**
+   * 🔎 Récupère une pépite par sa clé primaire après validation de l'ownership.
+   *
+   * @public
+   * @async
+   */
   public async findById(userId: string, itemId: string): Promise<IItem> {
-    const item: Item | null = await this.itemRepository.findById(itemId);
-    if (!item) throw ItemErrorFactory.notFound(itemId);
-    if (item.getUserId() !== userId) throw ItemErrorFactory.accessDenied(itemId, userId);
-    return item;
-  }
+    const userMetierId = new UserId(userId);
+    const itemMetierId = new ItemId(itemId);
 
-  public async findBySlug(userId: string, slug: string): Promise<IItem> {
-    const item: Item | null = await this.itemRepository.findBySlug(userId, slug);
-    if (!item) throw ItemErrorFactory.notFound(slug);
-    return item;
-  }
+    const item : Item | null = await this.itemRepository.findById(itemMetierId);
 
-  public async listByUser(userId: string, options?: IItemListOptions): Promise<IItemListResult> {
-    return await this.itemRepository.listByUser(userId, options);
-  }
-
-  public async update(userId: string, itemId: string, dto: UpdateItemDto): Promise<IItem> {
-    const existing: Item | null = await this.itemRepository.findById(itemId);
-    if (!existing) throw ItemErrorFactory.notFound(itemId);
-    if (existing.getUserId() !== userId) throw ItemErrorFactory.accessDenied(itemId, userId);
-
-    if (dto.tagIds !== undefined && dto.tagIds.length > 0) {
-      await this.validateTagOwnership(userId, dto.tagIds);
+    if (!item) {
+      throw ItemErrorFactory.notFound(itemMetierId);
     }
 
-    const updates: Partial<IItemData> = { ...dto };
-    delete (updates as { tagIds?: string[] }).tagIds; // tagIds n'est pas une colonne items
+    if (item.getUserId().valeur !== userMetierId.valeur) {
+      throw ItemErrorFactory.accessDenied(itemMetierId, userMetierId);
+    }
+
+    return item;
+  }
+
+  /**
+   * 🛤️ Localise et extrait une pépite via son permalien (Slug).
+   *
+   * @public
+   * @async
+   */
+  public async findBySlug(userId: string, slug: string): Promise<IItem> {
+    const userMetierId = new UserId(userId);
+    const item : Item | null = await this.itemRepository.findBySlug(userMetierId, slug);
+
+    if (!item) {
+      throw ItemErrorFactory.notFound(new ItemId(slug));
+    }
+
+    return item;
+  }
+
+  /**
+   * 📜 Extrait la liste complète ou paginée des ressources d'un utilisateur.
+   *
+   * @public
+   * @async
+   */
+  public async listByUser(userId: string, options?: IItemListOptions): Promise<IItemListResult> {
+    const userMetierId = new UserId(userId);
+    return await this.itemRepository.listByUser(userMetierId, options);
+  }
+
+  /**
+   * 🎛️ Applique des révisions partielles ou totales sur une pépite existante.
+   *
+   * @public
+   * @async
+   */
+  public async update(userId: string, itemId: string, dto: UpdateItemDto): Promise<IItem> {
+    const userMetierId = new UserId(userId);
+    const itemMetierId = new ItemId(itemId);
+
+    const existing : Item | null = await this.itemRepository.findById(itemMetierId);
+
+    if (!existing) {
+      throw ItemErrorFactory.notFound(itemMetierId);
+    }
+
+    if (existing.getUserId().valeur !== userMetierId.valeur) {
+      throw ItemErrorFactory.accessDenied(itemMetierId, userMetierId);
+    }
+
+    // 🪓 Correction définitive du transtypage sur l'itérateur de mise à jour
+    const rawUpdateTagIds = dto.tagIds || [];
+    const domainTagIds : TagId[] = rawUpdateTagIds.map((id: unknown): TagId => new TagId(id as string));
+
+    if (dto.tagIds !== undefined && domainTagIds.length > 0) {
+      await this.validateTagOwnership(userMetierId, domainTagIds);
+    }
+
+    // Clonage et isolation du payload d'infrastructure pour l'extraction SQL
+    const updates : Partial<IItemData> = { ...dto } as any;
+    delete (updates as any).tagIds; // Nettoyage : tagIds n'appartient pas à la table items
+
     if (dto.title && !dto.slug) {
       updates.slug = SlugGenerator.generate(dto.title);
     }
 
-    const updated: Item | null = await this.itemRepository.update(itemId, updates);
-    if (!updated) throw ItemErrorFactory.notFound(itemId);
+    const updated : Item | null = await this.itemRepository.update(itemMetierId, updates);
+    if (!updated) {
+      throw ItemErrorFactory.notFound(itemMetierId);
+    }
 
-    // Sync des tags : si tagIds est passé (même []), on remplace tout
+    // Si la propriété tagIds a été fournie (même vide), on applique un écrasement transactionnel
     if (dto.tagIds !== undefined) {
-      await this.itemTagRepository.sync(itemId, dto.tagIds);
+      await this.itemTagRepository.sync(itemMetierId, domainTagIds);
     }
 
     return updated;
   }
 
+  /**
+   * 🗑️ Suppression destructive définitive d'une ressource.
+   *
+   * @public
+   * @async
+   */
   public async delete(userId: string, itemId: string): Promise<void> {
-    const existing: Item | null = await this.itemRepository.findById(itemId);
-    if (!existing) throw ItemErrorFactory.notFound(itemId);
-    if (existing.getUserId() !== userId) throw ItemErrorFactory.accessDenied(itemId, userId);
+    const userMetierId = new UserId(userId);
+    const itemMetierId = new ItemId(itemId);
 
-    // FK CASCADE sur item_tags se charge de nettoyer les liaisons
-    const deleted: boolean = await this.itemRepository.delete(itemId);
-    if (!deleted) throw ItemErrorFactory.notFound(itemId);
+    const existing : Item | null = await this.itemRepository.findById(itemMetierId);
+
+    if (!existing) {
+      throw ItemErrorFactory.notFound(itemMetierId);
+    }
+
+    if (existing.getUserId().valeur !== userMetierId.valeur) {
+      throw ItemErrorFactory.accessDenied(itemMetierId, userMetierId);
+    }
+
+    const deleted : boolean = await this.itemRepository.delete(itemMetierId);
+    if (!deleted) {
+      throw ItemErrorFactory.notFound(itemMetierId);
+    }
   }
 }

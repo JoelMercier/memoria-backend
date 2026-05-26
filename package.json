@@ -52,8 +52,10 @@
     "pino": "^10.3.1",
     "pino-http": "^11.0.0",
     "pino-roll": "^3.1.0",
+    "pnpm": "^11.3.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
+    "wls": "^0.1.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -64,7 +66,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/multer": "^2.1.0",
-    "@types/node": "^24.12.3",
+    "@types/node": "^24.12.4",
     "@types/pg": "^8.20.0",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
@@ -82,7 +84,7 @@
     "typescript-eslint": "^8.59.2",
     "vitest": "^4.1.5"
   },
-  "pnpm": {
+  "The 'pnpm' field in package.json is no longer read by pnpm - pnpm": {
     "onlyBuiltDependencies": [
       "esbuild"
     ],

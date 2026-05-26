@@ -4,7 +4,7 @@
 -- ============================================================================
 
 -- Nettoyage préalable pour éviter les doublons en cas de re-seed
-TRUNCATE TABLE app_events CASCADE;
+--TRUNCATE TABLE app_events CASCADE;
 
 -- ============================================================================
 -- ÉVÉNEMENTS SYSTÈME & MONITORING (Admin focus)
@@ -40,7 +40,7 @@ VALUES (
         'info',
         'Vérification périodique du système OK',
         '{"latency_ms": 15, "active_connections": 4}'::jsonb
-    );
+    ) ON CONFLICT DO NOTHING;
 
 -- ============================================================================
 -- ÉVÉNEMENTS UTILISATEUR : SOPHIE (Développeuse - ...9001-000000000001)
@@ -73,7 +73,7 @@ VALUES (
         'info',
         'Ajout d''une nouvelle pépite technique',
         '{"item_id": "018d5c8e-8001-7001-b001-000000000001", "type": "article"}'::jsonb
-    );
+    ) ON CONFLICT DO NOTHING;
 
 -- ============================================================================
 -- ÉVÉNEMENTS SÉCURITÉ & AUDIT : EMMA (Étudiante - ...9001-000000000003)
@@ -106,7 +106,7 @@ VALUES (
         'info',
         'Connexion réussie',
         '{"duration_ms": 450}'::jsonb
-    );
+    ) ON CONFLICT DO NOTHING;
 
 -- ============================================================================
 -- ÉVÉNEMENTS PROTECTION DES DONNÉES : ALICE (Entrepreneur - ...9001-000000000005)
@@ -130,7 +130,7 @@ VALUES (
         'info',
         'Exportation complète des données utilisateur demandée',
         '{"format": "json", "request_origin": "web_dashboard"}'::jsonb
-    );
+    ) ON CONFLICT DO NOTHING;
 
 -- ============================================================================
 -- ERREURS SYSTÈME (Audit/Monitoring)
@@ -154,4 +154,4 @@ VALUES (
         'warning',
         'Requête SQL lente détectée sur la table items',
         '{"duration_ms": 1250, "query": "SELECT * FROM items WHERE content @@ ...", "optimisation_needed": true}'::jsonb
-    );
+    ) ON CONFLICT DO NOTHING;

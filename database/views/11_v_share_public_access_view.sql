@@ -1,4 +1,4 @@
-CREATE VIEW v_share_public_access AS
+CREATE or replace VIEW v_share_public_access AS
 SELECT
   s.id_share,
   s.share_token,

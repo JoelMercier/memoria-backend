@@ -18,7 +18,7 @@ NC='\033[0m'
 # 1. Chargement des variables
 #---------------------------------------------
 if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+    export $(grep -v '^' .env | xargs)
     # Valeurs par défaut depuis le .env
     DEFAULT_DB_USER=${DB_APP_USER:-app_memoria}
     DEFAULT_DB_NAME=${DB_NAME:-memoria_db_dev}

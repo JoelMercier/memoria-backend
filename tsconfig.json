@@ -24,6 +24,9 @@
     "sourceMap": true,
     "useDefineForClassFields": true
   },
+  "scripts": {
+   "start": "cross-env NODE_OPTIONS=--trace-deprecation react-scripts start",
+  },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

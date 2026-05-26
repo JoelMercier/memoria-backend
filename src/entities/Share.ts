@@ -1,49 +1,153 @@
-import { BaseEntity } from '@/entities/BaseEntity';
+// ——— fichier : src/entities/Share.ts
+
+import { BaseEntity    } from '@/entities/BaseEntity';
+import { ItemId, ShareId } from '@/domain/value-objects/IdMetier';
 import type { IAccessConfig } from '@/interfaces/entities/share/IAccessConfig';
-import type { IShare } from '@/interfaces/entities/share/IShare';
+import type { IShare   } from '@/interfaces/entities/share/IShare';
 import type { IShareData } from '@/interfaces/entities/share/IShareData';
 
-export class Share extends BaseEntity<IShareData> implements IShare {
-  private readonly itemId: string;
-  private readonly recipientEmail: string | null;
-  private readonly shareToken: string;
-  private readonly accessConfig: IAccessConfig;
+/**
+ * 🏛️ Classe Share (Partages de Pépites)
+ * -------------------------------------
+ * Modèle métier immuable représentant un lien de partage sécurisé.
+ * Protégé par l'armure de la notation hongroise et piloté par le typage fort.
+ *
+ * @class Share
+ * @extends {BaseEntity<'share', IShareData, ShareId>}
+ * @implements {IShare}
+ * @author Joël, Gaïa & Co
+ */
+export class Share extends BaseEntity<'share', IShareData, ShareId> implements IShare {
 
+  /** 🔔 Caillou de couleur : Identifiant technique unique de l'entité de partage */
+  private readonly m_idShare         : ShareId;
+
+  /** 📦 Caillou de couleur : Identifiant de la pépite (Item) liée au partage */
+  private readonly m_idItem          : ItemId;
+
+  /** 📧 Courriel du destinataire ciblé ou NULL si le lien est public */
+  private readonly m_sRecipientEmail : string | null;
+
+  /** 🔑 Jeton de sécurité aléatoire unique intégré dans la route HTTP d'accès */
+  private readonly m_sShareToken     : string;
+
+  /** ⚙️ Règles de restriction d'infrastructure (Dates de péremption, etc.) */
+  private readonly m_rAccessConfig   : IAccessConfig;
+
+  /**
+   * Instancie un partage immuable à partir de son contrat de données.
+   *
+   * @constructor
+   * @param {IShareData} data - Payload brut ou typé issu de l'infrastructure
+   */
   public constructor(data: IShareData) {
     super(data);
-    this.itemId = data.itemId;
-    this.recipientEmail = data.recipientEmail;
-    this.shareToken = data.shareToken;
-    this.accessConfig = data.accessConfig;
+    this.m_idShare         = data.idShare;
+    this.m_idItem          = data.itemId;
+    this.m_sRecipientEmail = data.recipientEmail;
+    this.m_sShareToken     = data.shareToken;
+    this.m_rAccessConfig   = data.accessConfig;
   }
 
-  public getItemId(): string {
-    return this.itemId;
+  /**
+   * 🆔 Identifiant unique et fortement typé du partage.
+   * Aligné sur notre contrat d'interface métier unifié.
+   *
+   * @public
+   * @function getShareId
+   * @returns {ShareId} Le caillou de couleur de l'enregistrement de partage.
+   */
+  public getShareId(): ShareId {
+    return this.m_idShare;
   }
+
+  /**
+   * 📦 Récupère l'identifiant unique et fortement typé de la pépite partagée.
+   *
+   * @public
+   * @function getItemId
+   * @returns {ItemId} Le caillou de couleur de la pépite associée.
+   */
+  public getItemId(): ItemId {
+    return this.m_idItem;
+  }
+
+  /**
+   * 📧 Récupère l'adresse e-mail du destinataire (Ou NULL si partage public via lien).
+   *
+   * @public
+   * @function getRecipientEmail
+   * @returns {string | null} L'adresse de correspondance ou NULL.
+   */
   public getRecipientEmail(): string | null {
-    return this.recipientEmail;
+    return this.m_sRecipientEmail;
   }
+
+  /**
+   * 🔑 Récupère le jeton de sécurité unique associé au lien de partage.
+   *
+   * @public
+   * @function getShareToken
+   * @returns {string} Le token de sécurité brut.
+   */
   public getShareToken(): string {
-    return this.shareToken;
+    return this.m_sShareToken;
   }
+
+  /**
+   * ⚙️ Récupère la configuration fine des droits et restrictions d'accès.
+   *
+   * @public
+   * @function getAccessConfig
+   * @returns {IAccessConfig} La structure de configuration.
+   */
   public getAccessConfig(): IAccessConfig {
-    return this.accessConfig;
+    return this.m_rAccessConfig;
   }
 
+  /**
+   * ⏱️ Vérifie si le lien de partage a dépassé sa date de validité chronologique.
+   *
+   * @public
+   * @function isExpired
+   * @returns {boolean} True si le partage est expiré
+   */
   public isExpired(): boolean {
-    if (!this.accessConfig.expiresAt) return false;
-    return new Date(this.accessConfig.expiresAt) < new Date();
+    if (!this.m_rAccessConfig.expiresAt) {
+      return false;
+    }
+    return new Date(this.m_rAccessConfig.expiresAt) < new Date();
   }
 
+  /**
+   * 📦 Extrait le sac de données passif correspondant à l'état vivant de l'entité.
+   * Totalement synchronisé sur la clé dynamique idShare de l'infrastructure.
+   *
+   * @public
+   * @function toData
+   * @returns {IShareData} Structure de données brute d'infrastructure
+   */
   public toData(): IShareData {
     return {
-      id: this.id,
-      itemId: this.itemId,
-      recipientEmail: this.recipientEmail,
-      shareToken: this.shareToken,
-      accessConfig: this.accessConfig,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt
+      idShare        : this.getShareId(),
+      itemId         : this.getItemId(),
+      recipientEmail : this.getRecipientEmail(),
+      shareToken     : this.getShareToken(),
+      accessConfig   : this.getAccessConfig(),
+      createdAt      : this.createdAt,
+      updatedAt      : this.updatedAt
     };
+  }
+
+  /**
+   * 🖨️ Sérialise textuellement l'entité de partage au format de texte JSON.
+   *
+   * @public
+   * @override
+   * @function toString
+   * @returns {string} Le sac de données aplati sous forme de chaîne de caractères
+   */
+  public override toString(): string {
+    return JSON.stringify(this.toData());
   }
 }

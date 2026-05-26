@@ -1,8 +1,8 @@
 import type { QueryResultRow } from 'pg';
 import { DatabaseConnection } from '@/config/DatabaseConnection';
 import { Share } from '@/entities/Share';
-import { DatabaseErrorFactory } from '@/exceptions/database/DatabaseErrorFactory';
-import { ShareErrorFactory } from '@/exceptions/entities/ShareErrorFactory';
+import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
+import { ShareErrorFactory } from '@/exceptions/ShareErrorFactory';
 import type { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
 import type { IAccessConfig } from '@/interfaces/entities/share/IAccessConfig';
 import type { IShareData } from '@/interfaces/entities/share/IShareData';

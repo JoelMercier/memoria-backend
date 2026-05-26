@@ -4,7 +4,7 @@
 -- ============================================================================
 
 -- Nettoyage préalable
-TRUNCATE TABLE item_tags CASCADE;
+-- TRUNCATE TABLE item_tags CASCADE;
 
 -- ============================================================================
 -- LIAISONS POUR SOPHIE (Développeuse)
@@ -41,7 +41,9 @@ INSERT INTO item_tags (id_tag, id_item) VALUES
 
 -- Item 8: Node.js Event Loop (Node.js + JavaScript)
 ('018d5c8e-7001-7001-a001-000000000003', '018d5c8e-8001-7001-b001-000000000008'), -- Node.js
-('018d5c8e-7001-7001-a001-000000000001', '018d5c8e-8001-7001-b001-000000000008'); -- JavaScript
+('018d5c8e-7001-7001-a001-000000000001', '018d5c8e-8001-7001-b001-000000000008')
+ ON CONFLICT DO NOTHING;
+; -- JavaScript
 
 
 -- ============================================================================
@@ -70,7 +72,8 @@ INSERT INTO item_tags (id_tag, id_item) VALUES
 ('018d5c8e-7001-7001-a002-000000000006', '018d5c8e-8001-7001-b002-000000000005'), -- Productivité
 
 -- Item 6: Template post-mortem (Gestion de projet)
-('018d5c8e-7001-7001-a002-000000000001', '018d5c8e-8001-7001-b002-000000000006'); -- Gestion de projet
+('018d5c8e-7001-7001-a002-000000000001', '018d5c8e-8001-7001-b002-000000000006') -- Gestion de projet
+ ON CONFLICT DO NOTHING;
 
 
 -- ============================================================================
@@ -102,4 +105,5 @@ INSERT INTO item_tags (id_tag, id_item) VALUES
 ('018d5c8e-7001-7001-a003-000000000004', '018d5c8e-8001-7001-b003-000000000006'), -- Apprentissage
 
 -- Item 7: L'art de la mémoire (Mémoire + Histoire)
-('018d5c8e-7001-7001-a003-000000000003', '018d5c8e-8001-7001-b003-000000000007'); -- Mémoire
+('018d5c8e-7001-7001-a003-000000000003', '018d5c8e-8001-7001-b003-000000000007')  -- Mémoire
+ ON CONFLICT DO NOTHING;

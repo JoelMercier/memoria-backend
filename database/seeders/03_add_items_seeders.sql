@@ -4,7 +4,7 @@
 -- ============================================================================
 
 -- Nettoyage préalable
-TRUNCATE TABLE items CASCADE;
+-- TRUNCATE TABLE items CASCADE;
 
 -- ============================================================================
 -- ITEMS POUR SOPHIE (Développeuse) - 8 pépites
@@ -112,7 +112,7 @@ INSERT INTO items (
     'https://images.unsplash.com/photo-1627398242454-45a1465c2479',
     'JSConf',
     '{"duration": "18:45", "platform": "YouTube", "year": 2025, "views": "1.2M", "source_url": "https://youtube.com/watch?v=nodejs-eventloop"}'::jsonb
-);
+    ) ON CONFLICT DO NOTHING;
 
 -- ============================================================================
 -- ITEMS POUR MARC (Chef de projet) - 6 pépites
@@ -195,7 +195,7 @@ INSERT INTO items (
     'https://images.unsplash.com/photo-1586281380349-632531db7ed4',
     'My Self',
     '{"template_type": "incident", "team_size": "5-15", "duration": "60 min"}'::jsonb
-);
+    ) ON CONFLICT DO NOTHING;
 
 -- ============================================================================
 -- ITEMS POUR EMMA (Étudiante psychologie) - 7 pépites
@@ -289,7 +289,7 @@ INSERT INTO items (
     'https://images.unsplash.com/photo-1524578271613-d550eacf6090',
     'Frances Yates',
     '{"isbn": "978-0226950013", "pages": 400, "year": 1966, "field": "history", "source_url": "https://www.amazon.fr/art-memoire-yates"}'::jsonb
-);
+    ) ON CONFLICT DO NOTHING;
 
 -- ============================================================================
 -- ITEMS POUR ALICE (Designer UX/UI) - 8 pépites
@@ -394,4 +394,5 @@ INSERT INTO items (
     'https://images.unsplash.com/photo-1559028012-481c04fa702d',
     'Framer Team',
     '{"duration": "14:30", "platform": "YouTube", "tool_version": "2026.1", "source_url": "https://youtube.com/watch?v=framer-proto"}'::jsonb
-);
+    ) ON CONFLICT DO NOTHING;
+

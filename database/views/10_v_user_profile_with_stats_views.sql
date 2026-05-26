@@ -1,4 +1,4 @@
-CREATE VIEW v_user_profile_with_stats AS
+CREATE or replace VIEW v_user_profile_with_stats AS
 SELECT
   u.id_user,
   u.email,
