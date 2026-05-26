@@ -42,7 +42,9 @@ echo ""
 
 # ─── 3. Intelligent Analysis: Detect if actual code changed ─────────
 # Compare la branche locale avec sa version distante (ou develop par défaut)
-REMOTE_REF=$(git rev-parse --verify @{u} 2>/dev/null || git merge-base HEAD develop)
+# ─── 3. Intelligent Analysis: Detect if actual code changed ─────────
+# Compare la branche locale avec sa version distante ou la branche par défaut locale
+REMOTE_REF=$(git rev-parse --verify @{u} 2>/dev/null || git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null || echo "HEAD^")
 CODE_CHANGES=$(git diff --name-only "$REMOTE_REF" HEAD | grep -E '\.(ts|tsx|js|jsx)$')
 
 if [ -z "$CODE_CHANGES" ]; then

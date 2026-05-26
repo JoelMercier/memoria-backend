@@ -1,0 +1,110 @@
+{
+  "En-tete de fichier TypeScript": {
+    "scope": "typescript,javascript",
+    "prefix": "fn",
+    "body": [
+      "// ——— fichier : $RELATIVE_FILEPATH",
+      "$0"
+    ],
+    "description": "Insère automatiquement l'en-tête avec les deux slashes pour TypeScript"
+  },
+
+  "En-tete de fichier SQL": {
+    "scope": "sql",
+    "prefix": "fn",
+    "body": [
+      "-- ——— fichier : $RELATIVE_FILEPATH",
+      "$0"
+    ],
+    "description": "Insère automatiquement l'en-tête avec les deux tirets pour SQL"
+  },
+
+  "Armure Nominal VO": {
+    "scope": "typescript",
+    "prefix": "jvo",
+    "description": "Engendre un Value Object nominal fort (Style C++ IdBinaire)",
+    "body": [
+      "import { IdBinaire } from '@/domain/base/IdBinaire';",
+      "",
+      "/**",
+      " * 💎 Value Object ${1:NomId}",
+      " * --------------------",
+      " * Armure nominale forte régissant l'identité unique de l'entité ${2:Entite}.",
+      " * Interdit l'usage et la fuite de primitives 'string' au sein du Domaine.",
+      " *",
+      " * @class ${1:NomId}",
+      " * @extends {IdBinaire}",
+      " * @author Joël, Gaïa & Co",
+      " */",
+      "export class ${1:NomId} extends IdBinaire {",
+      "  // L'allocation et la validation UUID sont héritées nativement de la classe mère",
+      "}"
+    ]
+  },
+
+  "Fabrique Exception Clinique": {
+    "scope": "typescript",
+    "prefix": "jfe",
+    "description": "Moule une fabrique d'exceptions standardisée à plat",
+    "body": [
+      "import { ApiError } from '@/exceptions/ApiError';",
+      "import type { ${1:IdType} } from '@/domain/value-objects/IdMetier';",
+      "",
+      "/**",
+      " * 🚨 Classe ${2:Domaine}ErrorFactory",
+      " * ----------------------------",
+      " * Fabrique spécialisée pour la forge d'anomalies unifiées du domaine ${2:Domaine}.",
+      " *",
+      " * @class ${2:Domaine}ErrorFactory",
+      " * @author Joël, Gaïa & Co",
+      " */",
+      "export class ${2:Domaine}ErrorFactory {",
+      "",
+      "  /** 🔍 Ressource introuvable via son identifiant nominal fort */",
+      "  public static notFound(id: ${1:IdType}): ApiError {",
+      "    return new ApiError(404, '${3:CODE}_NOT_FOUND', `L'entité ${4:ressource} recherchée n'existe pas ou est introuvable.`);",
+      "  }",
+      "",
+      "  /** 🛡️ Violation des droits de propriété ou d'accès */",
+      "  public static accessDenied(id: ${1:IdType}): ApiError {",
+      "    return new ApiError(403, '${3:CODE}_ACCESS_DENIED', `Action interdite : vous ne possédez pas les privilèges requis.`);",
+      "  }",
+      "}"
+    ]
+  },
+
+  "Service Concret de Domaine": {
+    "scope": "typescript",
+    "prefix": "jsc",
+    "description": "Génère la structure d'un service de domaine avec injection par constructeur",
+    "body": [
+      "import type { I${1:NomService} } from '@/interfaces/services/I${1:NomService}';",
+      "",
+      "/**",
+      " * 🏛️ Classe ${1:NomService}",
+      " * --------------------",
+      " * Service d'application orchestrant les cas d'usage métiers du domaine ${2:Metier}.",
+      " * ",
+      " * @class ${1:NomService}",
+      " * @implements {I${1:NomService}}",
+      " * @author Joël, Gaïa & Co",
+      " */",
+      "export class ${1:NomService} implements I${1:NomService} {",
+      "",
+      "  /**",
+      "   * Initialise le cas d'usage par injection d'abstractions de dépôts.",
+      "   * ",
+      "   * @constructor",
+      "   */",
+      "  public constructor(",
+      "    private readonly ${3:repository} : I${4:RepositoryType}",
+      "  ) {}",
+      "",
+      "  /** 🔔 Exécute la logique métier principale du cas d'usage */",
+      "  public async execute(): Promise<void> {",
+      "    // Plan de bataille",
+      "  }",
+      "}"
+    ]
+  }
+}

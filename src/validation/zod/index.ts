@@ -1,10 +1,16 @@
 // ——— fichier : src/validation/zod/index.ts
 
 /**
+ * 🏛️ Point d'entrée unique (Barrel File) de la couche de validation Zod
+ * ---------------------------------------------------------------------
+ * Regroupe et expose de manière centralisée tous les portiers de sécurité (classes)
+ * et leurs contrats de structure inférés (types) pour l'application Memoria.
+ *
+ * SOLID :
+ *  - Interface Segregation / Facade Pattern : Offre un point d'accès unifié aux douanes.
+ *
  * @file index.ts
- * @description Point d'entrée unique et baril d'exportation (Barrel File) pour la couche de validation Zod.
- * Regroupe tous les portiers de sécurité et leurs types inférés pour l'application Memoria.
- * @author Jojo & Co
+ * @author Joël, Gaïa & Co
  */
 
 /** 🏛️ Exportation des classes actives de validation (Portiers de sécurité) */
@@ -37,3 +43,4 @@ export type { CreateUserSchemaType,
               UpdateProfileSchemaType,
               ChangePasswordSchemaType,
               DeleteAccountSchemaType } from '@/validation/zod/UserValidation';
+              
