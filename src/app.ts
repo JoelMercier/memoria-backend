@@ -12,6 +12,7 @@ import swaggerUi                    from 'swagger-ui-express';
 import { DatabaseConnection } from '@/config/DatabaseConnection';
 import { LoggerSingleton }    from '@/config/LoggerSingleton';
 import { SwaggerConfig }      from '@/config/SwaggerConfig';
+import { RequestId }          from '@/domain/value-objects/IdMetier';
 import { createV1Router }     from '@/routes/v1';
 import { HandlerService }     from '@/services/http/HandlerService';
 import { ApiResponseFactory } from '@/utils/ApiResponseFactory';
@@ -28,7 +29,10 @@ import { RequestIdGenerator } from '@/utils/RequestIdGenerator';
  *
  * @function createApp
  * @returns {Express} L'instance configurée de l'application Express
- * @author Joël, Gaïa & Co
+ * @author 🧠 feat(donjon): Joël (Abstrait' Obsession)
+ * @author ☄️ refactor(forge): Gaïa (Trébuchet lourd)
+ * @author 🛡️ fix(remparts): Le Cartel du Donjon (Garde d'élite)
+ * @author 🏺 chore(fossile): L'Ancien Régime & Co (Gergovie textuelle)
  */
 export function createApp(): Express {
   const app : Express  = express();
@@ -60,13 +64,16 @@ export function createApp(): Express {
   // ----- 🆔 Injection et Corrélation du Request-ID -----
   app.use((req: Request, res: Response, next: NextFunction): void => {
     const incoming : string | undefined = req.header('x-request-id');
-    const id : string = incoming && incoming.length > 0 ? incoming : RequestIdGenerator.generate();
+    const sIdBrute : string = incoming && incoming.length > 0 ? incoming : RequestIdGenerator.generate();
 
-    res.setHeader('x-request-id', id);
-    (req as Request & { id: string }).id = id;
+    res.setHeader('x-request-id', sIdBrute);
+
+    // 🪓 ALIGNEMENT SÉMANTIQUE : Plus de collision possible avec req.user.id !
+    req.requestId = new RequestId(sIdBrute);
 
     next();
   });
+
 
   /**
    * @swagger
@@ -99,14 +106,14 @@ export function createApp(): Express {
     const db : DatabaseConnection = DatabaseConnection.getInstance();
     const dbAlive : boolean       = await db.ping().catch((): boolean => false);
 
-    const payload = {
+    const chargeUtile = {
       status    : dbAlive ? 'ok' : 'degraded',
       uptime    : process.uptime(),
       database  : dbAlive ? 'up' : 'down',
       timestamp : new Date().toISOString()
     };
 
-    res.status(dbAlive ? 200 : 503).json(ApiResponseFactory.success('Health check', payload));
+    res.status(dbAlive ? 200 : 503).json(ApiResponseFactory.success('Health check', chargeUtile));
   });
 
   // ----- 🛣️ Enclenchement des Routes Versionnées -----

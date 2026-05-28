@@ -1,7 +1,10 @@
+// ——— fichier : src/repositories/PgItemRepository.ts
+
 import type { QueryResultRow } from 'pg';
-import type { ContentTypeEnum } from '@/constants/enums/ContentTypeEnum';
-import { DatabaseConnection } from '@/config/DatabaseConnection';
+import { BaseRepository } from '@/repositories/base/BaseRepository';
+import { UserId, ItemId } from '@/domain/value-objects/IdMetier';
 import { Item } from '@/entities/Item';
+import { ContentType } from '@/constants/ContentType';
 import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
 import { ItemErrorFactory } from '@/exceptions/ItemErrorFactory';
 import type { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
@@ -9,9 +12,9 @@ import type { IItemData } from '@/interfaces/entities/item/IItemData';
 import type { IItemListOptions, IItemListResult, IItemRepository } from '@/interfaces/repositories/IItemRepository';
 
 interface IItemRow extends QueryResultRow {
-  id_item: string;
-  user_id: string;
-  content_type: ContentTypeEnum;
+  id_item: Buffer;
+  user_id: Buffer;
+  content_type: string;
   title: string;
   slug: string;
   content: string;
@@ -22,22 +25,47 @@ interface IItemRow extends QueryResultRow {
   updated_at: Date | null;
 }
 
-export class PgItemRepository implements IItemRepository {
+/**
+ * 🗄️ Classe PgItemRepository
+ * ---------------------------
+ * Dépôt physique PostgreSQL administrant le cycle de vie complet des Pépites.
+ * Branche le flux binaire 128 bits pur sur les requêtes et l'indexation de la cour basse.
+ *
+ * @class PgItemRepository
+ * @extends {BaseRepository}
+ * @implements {IItemRepository}
+ *
+ * @author 🧠 Conception : Joël (Hongroise maniac')
+ * @author ☄️ Usine à lignes : Gaïa (Trébuchet de syntaxe)
+ * @author ⚔️ Rempart des types : Le Cartel du Donjon (Garde d'élite)
+ * @author 🏺 Relique d'origine : L'Ancien Régime (Fossile de Gergovie)
+ */
+export class PgItemRepository extends BaseRepository implements IItemRepository {
+
+  /** 🎛️ Connexion physique à l'infrastructure de données */
   private readonly db: IDatabaseConnection;
 
-  public constructor(db: IDatabaseConnection = DatabaseConnection.getInstance()) {
+  /**
+   * Initialise le dépôt avec sa connexion physique et hérite de l'usine binaire.
+   *
+   * @constructor
+   */
+  public constructor(db: IDatabaseConnection) {
+    super();
     this.db = db;
   }
 
   /**
-   * Mappe une ligne PostgreSQL (snake_case) vers une entité Item (camelCase).
-   * Centralisé pour éviter la duplication dans chaque méthode.
+   * Mappe une ligne PostgreSQL brute (snake_case) vers une entité Item (camelCase).
+   * Intègre le décabossage try/catch inconditionnel via la classe mère.
+   *
+   * @private
    */
   private rowToItem(row: IItemRow): Item {
     return new Item({
-      id: row.id_item,
-      userId: row.user_id,
-      contentType: row.content_type,
+      idItem: this.toDomainId(row.id_item, ItemId),
+      idUser: this.toDomainId(row.user_id, UserId),
+      contentType: row.content_type as unknown as ContentType,
       title: row.title,
       slug: row.slug,
       content: row.content,
@@ -49,11 +77,18 @@ export class PgItemRepository implements IItemRepository {
     });
   }
 
-
-
-  public async findById(id: string): Promise<Item | null> {
+  /**
+   * 🔍 Lecture chirurgicale : Localise une pépite via son identifiant nominal fort.
+   *
+   * @public
+   * @async
+   */
+  public async findById(id: ItemId): Promise<Item | null> {
     try {
-      const result = await this.db.query<IItemRow>('SELECT * FROM items WHERE id_item = $1', [id]);
+      const result = await this.db.query<IItemRow>(
+        'SELECT * FROM items WHERE id_item = fn_bin_to_uuid($1)',
+        [this.toBuffer(id)]
+      );
       return result.rows[0] ? this.rowToItem(result.rows[0]) : null;
     } catch (err) {
       const msg: string = err instanceof Error ? err.message : 'unknown';
@@ -61,13 +96,17 @@ export class PgItemRepository implements IItemRepository {
     }
   }
 
-
-
-  public async findBySlug(userId: string, slug: string): Promise<Item | null> {
+  /**
+   * 🔍 Alignement nominal : Récupère une pépite par son permalien utilisateur.
+   *
+   * @public
+   * @async
+   */
+  public async findBySlug(userId: UserId, slug: string): Promise<Item | null> {
     try {
       const result = await this.db.query<IItemRow>(
-        'SELECT * FROM items WHERE user_id = $1 AND slug = $2',
-        [userId, slug]
+        'SELECT * FROM items WHERE user_id = fn_bin_to_uuid($1) AND slug = $2',
+        [this.toBuffer(userId), slug]
       );
       return result.rows[0] ? this.rowToItem(result.rows[0]) : null;
     } catch (err) {
@@ -76,13 +115,17 @@ export class PgItemRepository implements IItemRepository {
     }
   }
 
-
-
-  public async findByTitle(userId: string, title: string): Promise<Item | null> {
+  /**
+   * 🔍 Vérification anti-doublon : Localise un titre existant dans l'espace utilisateur.
+   *
+   * @public
+   * @async
+   */
+  public async findByTitle(userId: UserId, title: string): Promise<Item | null> {
     try {
       const result = await this.db.query<IItemRow>(
-        'SELECT * FROM items WHERE user_id = $1 AND title = $2',
-        [userId, title]
+        'SELECT * FROM items WHERE user_id = fn_bin_to_uuid($1) AND title = $2',
+        [this.toBuffer(userId), title]
       );
       return result.rows[0] ? this.rowToItem(result.rows[0]) : null;
     } catch (err) {
@@ -91,13 +134,17 @@ export class PgItemRepository implements IItemRepository {
     }
   }
 
-
-
-  public async listByUser(p_sUserId: string, options?: IItemListOptions): Promise<IItemListResult> {
+  /**
+   * 📊 Pagination & Filtre : Énumère le coffre-fort d'un acteur de manière segmentée.
+   *
+   * @public
+   * @async
+   */
+  public async listByUser(p_sUserId: UserId, options?: IItemListOptions): Promise<IItemListResult> {
     const limit: number = options?.limit ?? 20;
     const offset: number = options?.offset ?? 0;
-    const conditions: string[] = ['user_id = $1'];
-    const params: unknown[] = [p_sUserId];
+    const conditions: string[] = ['user_id = fn_bin_to_uuid($1)'];
+    const params: unknown[] = [this.toBuffer(p_sUserId)];
 
     if (options?.contentType) {
       params.push(options.contentType);
@@ -128,15 +175,21 @@ export class PgItemRepository implements IItemRepository {
     }
   }
 
+  /**
+   * 🪓 Écriture concrète : Insère une pépite en base de données via le soupirail binaire.
+   *
+   * @public
+   * @async
+   */
   public async create(data: IItemData): Promise<Item> {
     try {
       const result = await this.db.query<IItemRow>(
         `INSERT INTO items
            (user_id, content_type, title, slug, content, source_author, thumbnail_url, metadata)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         VALUES (fn_bin_to_uuid($1), $2, $3, $4, $5, $6, $7, $8)
          RETURNING *`,
         [
-          data.userId,
+          this.toBuffer(data.idUser), // Correction : Extraction de la bonne propriété métier d'IItemData
           data.contentType,
           data.title,
           data.slug,
@@ -152,20 +205,23 @@ export class PgItemRepository implements IItemRepository {
     } catch (err) {
       if (err instanceof ItemErrorFactory) throw err;
       const msg: string = err instanceof Error ? err.message : 'unknown';
-      // Détection des violations d'unicité (contraintes PG)
       if (msg.includes('unique_user_item_title')) {
-        throw ItemErrorFactory.titleExists(data.userId, data.title);
+        throw ItemErrorFactory.titleExists(data.idUser, data.title);
       }
       if (msg.includes('unique_user_item_slug')) {
-        throw ItemErrorFactory.slugExists(data.userId, data.slug);
+        throw ItemErrorFactory.slugExists(data.idUser, data.slug);
       }
       throw ItemErrorFactory.creation(msg);
     }
   }
 
-
-
-  public async update(id: string, data: Partial<IItemData>): Promise<Item | null> {
+  /**
+   * 🪓 Mutation dynamique : Applique les modifications partielles du Domaine.
+   *
+   * @public
+   * @async
+   */
+  public async update(id: ItemId, data: Partial<IItemData>): Promise<Item> {
     const fields: string[] = [];
     const params: unknown[] = [];
     let i: number = 1;
@@ -189,32 +245,58 @@ export class PgItemRepository implements IItemRepository {
     }
 
     if (fields.length === 0) {
-      return await this.findById(id);
+      const existing = await this.findById(id);
+      if (!existing) throw ItemErrorFactory.notFound(id);
+      return existing;
     }
 
-    params.push(id);
+    params.push(this.toBuffer(id));
 
     try {
       const result = await this.db.query<IItemRow>(
-        `UPDATE items SET ${fields.join(', ')} WHERE id_item = $${i} RETURNING *`,
+        `UPDATE items SET ${fields.join(', ')} WHERE id_item = fn_bin_to_uuid($${i}) RETURNING *`,
         params
       );
-      return result.rows[0] ? this.rowToItem(result.rows[0]) : null;
+      const row = result.rows[0];
+      if (!row) throw ItemErrorFactory.notFound(id);
+      return this.rowToItem(row);
     } catch (err) {
       const msg: string = err instanceof Error ? err.message : 'unknown';
       throw DatabaseErrorFactory.queryFailed('update', msg);
     }
   }
 
-
-
-  public async delete(id: string): Promise<boolean> {
+  /**
+   * 🪓 Destruction atomique : Supprime une pépite du donjon physique.
+   *
+   * @public
+   * @async
+   */
+  public async delete(id: ItemId): Promise<boolean> {
     try {
-      const result = await this.db.query('DELETE FROM items WHERE id_item = $1', [id]);
+      const result = await this.db.query('DELETE FROM items WHERE id_item = fn_bin_to_uuid($1)', [this.toBuffer(id)]);
       return (result.rowCount ?? 0) > 0;
     } catch (err) {
       const msg: string = err instanceof Error ? err.message : 'unknown';
       throw DatabaseErrorFactory.queryFailed('delete', msg);
+    }
+  }
+
+    /**
+   * 📜 Contrat d'infrastructure : Récupère l'intégralité absolue des lignes.
+   * Requis par IBaseRepository dont hérite IItemRepository.
+   *
+   * @public
+   * @async
+   * @returns {Promise<Item[]>} Le catalogue complet des pépites du donjon
+   */
+  public async findAll(): Promise<Item[]> {
+    try {
+      const result = await this.db.query<IItemRow>('SELECT * FROM items ORDER BY created_at DESC');
+      return result.rows.map((row) => this.rowToItem(row));
+    } catch (err) {
+      const msg: string = err instanceof Error ? err.message : 'unknown';
+      throw DatabaseErrorFactory.queryFailed('findAll', msg);
     }
   }
 }

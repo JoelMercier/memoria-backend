@@ -13,7 +13,11 @@ import type { IBlacklistService } from '@/interfaces/security/IBlacklistService'
  *
  * @class BlacklistService
  * @implements {IBlacklistService}
- * @author Joël, Gaïa & Co
+ *
+ * @author 🧠 Conception : Joël (Hongroise maniac')
+ * @author ☄️ Usine à lignes : Gaïa (Trébuchet de syntaxe)
+ * @author ⚔️ Rempart des types : Le Cartel du Donjon (Garde d'élite)
+ * @author 🏺 Relique d'origine : L'Ancien Régime (Fossile de Gergovie)
  */
 export class BlacklistService implements IBlacklistService {
 
@@ -24,9 +28,7 @@ export class BlacklistService implements IBlacklistService {
    * 🔏 Ajoute un identifiant de jeton (jti) au registre de quarantaine et déclenche une purge préventive.
    *
    * @public
-   * @function add
-   * @param {string} jti - L'identifiant universel unique du jeton à bannir
-   * @param {number} expiresAtEpochSeconds - Horodatage Unix de fin de validité théorique
+   * @async
    */
   public add(jti: string, expiresAtEpochSeconds: number): void {
     this.m_rEntries.set(jti, expiresAtEpochSeconds);
@@ -38,9 +40,7 @@ export class BlacklistService implements IBlacklistService {
    * Supprime l'entrée au passage si celle-ci a dépassé sa date limite (auto-nettoyage opportuniste).
    *
    * @public
-   * @function isBlacklisted
-   * @param {string} jti - L'identifiant à tester
-   * @returns {boolean} True si le jeton est banni et toujours valide
+   * @async
    */
   public isBlacklisted(jti: string): boolean {
     const exp : number | undefined = this.m_rEntries.get(jti);
@@ -61,8 +61,7 @@ export class BlacklistService implements IBlacklistService {
    * 📊 Extrait la volumétrie physique actuelle de la table de quarantaine résidente.
    *
    * @public
-   * @function size
-   * @returns {number} Le nombre total d'entrées maintenues en RAM
+   * @async
    */
   public size(): number {
     return this.m_rEntries.size;
@@ -73,7 +72,6 @@ export class BlacklistService implements IBlacklistService {
    * Limite la croissance de l'empreinte mémoire à chaque écriture.
    *
    * @private
-   * @function cleanup
    */
   private cleanup(): void {
     const now : number = this.nowSeconds();
@@ -89,8 +87,6 @@ export class BlacklistService implements IBlacklistService {
    * ⏱️ Calcule l'horodatage courant normalisé au standard d'infrastructure Unix Epoch (secondes).
    *
    * @private
-   * @function nowSeconds
-   * @returns {number} Timestamp en secondes
    */
   private nowSeconds(): number {
     return Math.floor(Date.now() / 1000);

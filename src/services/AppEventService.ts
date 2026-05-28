@@ -2,10 +2,9 @@
 
 import { AppEventCategory } from '@/constants/AppEventCategory';
 import { AppEventSeverity } from '@/constants/AppEventSeverity';
-import { AppEventType     } from '@/constants/AppEventType';
-import { UserId,
-         ItemId,
-         ShareId          } from '@/domain/value-objects/IdMetier';
+import { AppEventType } from '@/constants/AppEventType';
+import { UserId, ItemId, ShareId } from '@/domain/value-objects/IdMetier';
+import { DatabaseConnection } from '@/config/DatabaseConnection';
 import { PgAppEventRepository } from '@/repositories/PgAppEventRepository';
 
 /**
@@ -16,7 +15,11 @@ import { PgAppEventRepository } from '@/repositories/PgAppEventRepository';
  *
  * @sealed Règle d'or : Append-only (Émission stricte, aucune modification autorisée)
  * @class AppEventService
- * @author Joël, Gaïa & Co
+ *
+ * @author 🧠 Conception : Joël (Hongroise maniac')
+ * @author ☄️ Usine à lignes : Gaïa (Trébuchet de syntaxe)
+ * @author ⚔️ Rempart des types : Le Cartel du Donjon (Garde d'élite)
+ * @author 🏺 Relique d'origine : L'Ancien Régime (Fossile de Gergovie)
  */
 export class AppEventService {
 
@@ -26,9 +29,7 @@ export class AppEventService {
    *
    * @public
    * @static
-   * @function log
-   * @param {Object} data - Payload contenant les instances strictes du Domaine
-   * @returns {Promise<any>} L'entité AppEvent créée et enregistrée
+   * @async
    */
   public static async log(data: {
     userId?        : UserId | null;
@@ -38,7 +39,8 @@ export class AppEventService {
     message        : string;
     metadata?      : Record<string, any>;
   }): Promise<any> {
-    const repo = new PgAppEventRepository();
+    const db = DatabaseConnection.getInstance();
+    const repo = new PgAppEventRepository(db);
 
     return repo.create({
       idAppEvent    : undefined as any,
@@ -56,9 +58,7 @@ export class AppEventService {
    *
    * @public
    * @static
-   * @function authSuccess
-   * @param {UserId} userId - Identifiant unique et validé de l'utilisateur connecté
-   * @returns {Promise<any>} L'entité log enregistrée
+   * @async
    */
   public static async authSuccess(userId: UserId): Promise<any> {
     return this.log({
@@ -74,9 +74,7 @@ export class AppEventService {
    *
    * @public
    * @static
-   * @function authFailure
-   * @param {string} email - Adresse email ciblée par la tentative infructueuse
-   * @returns {Promise<any>} L'entité log enregistrée
+   * @async
    */
   public static async authFailure(email: string): Promise<any> {
     return this.log({
@@ -93,10 +91,7 @@ export class AppEventService {
    *
    * @public
    * @static
-   * @function itemCreated
-   * @param {UserId} userId - Identifiant du propriétaire de la ressource
-   * @param {ItemId} itemId - Identifiant unique de la pépite générée
-   * @returns {Promise<any>} L'entité log enregistrée
+   * @async
    */
   public static async itemCreated(userId: UserId, itemId: ItemId): Promise<any> {
     return this.log({
@@ -113,10 +108,7 @@ export class AppEventService {
    *
    * @public
    * @static
-   * @function shareCreated
-   * @param {UserId} userId - Identifiant de l'utilisateur initiant le partage
-   * @param {ShareId} shareId - Identifiant du jeton de partage généré
-   * @returns {Promise<any>} L'entité log enregistrée
+   * @async
    */
   public static async shareCreated(userId: UserId, shareId: ShareId): Promise<any> {
     return this.log({

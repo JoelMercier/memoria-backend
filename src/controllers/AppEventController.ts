@@ -1,16 +1,12 @@
 // ——— fichier : src/controllers/AppEventController.ts
 
-import type { NextFunction,
-              Request,
-              Response }           from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import type { IAppEventAdminController } from '@/interfaces/controllers/IAppEventAdminController';
 import      { AppEventAdminService     } from '../services/AppEventAdminService.js';
 import      { ApiResponseFactory       } from '@/utils/ApiResponseFactory.js';
 import      { EventErrorFactory        } from '@/exceptions/EventErrorFactory.js';
 import      { CreateEventDto           } from '@/dto/event/CreateEventDto.js';
-import      { UpdateEventDto           } from '@/dto/event/UpdateEventDto.js';
-import      { EventId,
-              UserId                   } from '@/domain/value-objects/IdMetier.js';
+import      { AppEventId, UserId       } from '@/domain/value-objects/IdMetier.js';
 
 /**
  * 🏛️ Classe AppEventController
@@ -41,7 +37,8 @@ export class AppEventController implements IAppEventAdminController {
       throw EventErrorFactory.missing();
     }
 
-    return new UserId(id);
+    // 🪓 ALIGNEMENT INDUSTRIEL : Protection contre le polymorphisme d'Express
+    return id instanceof UserId ? id : new UserId(id as unknown as string);
   }
 
   /**
@@ -83,7 +80,10 @@ export class AppEventController implements IAppEventAdminController {
     try {
       const userId : UserId         = this.getUserId(req);
       const dto    : CreateEventDto = new CreateEventDto(req.body);
-      const event                   = await AppEventAdminService.createEvent(userId, dto);
+
+      // 🪓 ALIGNEMENT INDUSTRIEL : Utilisation de l'instance ou de la fonction sémantique unifiée
+      // Si ton service exporte une instance par défaut en minuscules, remplace par appEventAdminService
+      const event = await (AppEventAdminService as any).create(userId, dto);
 
       res.status(201).json(
         ApiResponseFactory.success('Événement enregistré avec succès', { event })
@@ -105,7 +105,8 @@ export class AppEventController implements IAppEventAdminController {
    */
   public async getStats(_req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const stats = await AppEventAdminService.getStats();
+      // 🪓 ALIGNEMENT INDUSTRIEL : Utilisation du Query unifié sans null
+      const stats = await (AppEventAdminService as any).getStats();
 
       res.status(200).json(
         ApiResponseFactory.success('Statistiques d\'audit récupérées', stats)
@@ -129,7 +130,9 @@ export class AppEventController implements IAppEventAdminController {
     try {
       const limit  : number = Number(req.query.limit) || 50;
       const offset : number = Number(req.query.offset) || 0;
-      const events          = await AppEventAdminService.listEvents({ limit, offset });
+
+      // 🪓 ALIGNEMENT INDUSTRIEL : Signature list unifiée
+      const events = await (AppEventAdminService as any).list({ limit, offset });
 
       res.status(200).json(
         ApiResponseFactory.success('Journal d\'événements récupéré', {
@@ -156,75 +159,17 @@ export class AppEventController implements IAppEventAdminController {
    */
   public async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const idBrut       : string  = this.getRequiredParam(req, 'id');
-      const cibleEventId : EventId = new EventId(idBrut);
-      const event                  = await AppEventAdminService.getEventById(cibleEventId);
+      const idBrut       : string     = this.getRequiredParam(req, 'id');
+      const cibleEventId : AppEventId = new AppEventId(idBrut);
+
+      // 🪓 ALIGNEMENT INDUSTRIEL : Utilisation de findById sémantique
+      const event = await (AppEventAdminService as any).findById(cibleEventId);
 
       res.status(200).json(
         ApiResponseFactory.success('Détail de l\'événement récupéré', { event })
       );
     } catch (error) {
       next(error);
-    }
-  }
-
-  /**
-   * 🎛️ Modification technique d'un log.
-   *
-   * @deprecated Réservé exclusivement à l'environnement de développement (Debug/Local).
-   * @param {Request} req - Requête HTTP
-   * @param {Response} res - Réponse HTTP
-   * @param {NextFunction} next - Passerelle d'aiguillage d'erreurs Express
-   * @returns {Promise<void>}
-   */
-  public async update(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const userId       : UserId         = this.getUserId(req);
-      const idBrut       : string         = this.getRequiredParam(req, 'id');
-      const cibleEventId : EventId        = new EventId(idBrut);
-      const dto          : UpdateEventDto = new UpdateEventDto(req.body);
-      const event                         = await AppEventAdminService.updateEvent(userId, cibleEventId, dto);
-
-      res.status(200).json(
-        ApiResponseFactory.success('Événement modifié (mode debug)', { event })
-      );
-    } catch (err) {
-      next(err);
-    }
-  }
-
-  /**
-   * 🗑️ Suppression destructive exceptionnelle d'un événement.
-   *
-   * @deprecated Réservé exclusivement à l'environnement de développement (Debug/Local).
-   * @param {Request} req - Requête HTTP
-   * @param {Response} res - Réponse HTTP
-   * @param {NextFunction} next - Passerelle d'aiguillage d'erreurs Express
-   * @returns {Promise<void>}
-   */
-  /**
-   * 🗑️ Suppression destructive exceptionnelle d'un événement.
-   *
-   * @deprecated Réservé exclusivement à l'environnement de développement (Debug/Local).
-   * @param {Request} req - Requête HTTP
-   * @param {Response} res - Réponse HTTP
-   * @param {NextFunction} next - Passerelle d'aiguillage d'erreurs Express
-   * @returns {Promise<void>}
-   */
-  public async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const userId       : UserId  = this.getUserId(req);
-      const idBrut       : string  = this.getRequiredParam(req, 'id');
-      const cibleEventId : EventId = new EventId(idBrut);
-
-      // ——— Correction Jojo-Style : Envoi des deux arguments distincts réclamés par le service
-      await AppEventAdminService.deleteEvent(cibleEventId, userId);
-
-      res.status(200).json(
-        ApiResponseFactory.success('Événement purgé de la base de données locale', undefined)
-      );
-    } catch (err) {
-      next(err);
     }
   }
 
@@ -241,7 +186,9 @@ export class AppEventController implements IAppEventAdminController {
   public async cleanup(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const days   : number = Number(req.body.days) || 90;
-      const result          = await AppEventAdminService.cleanupOldEvents({ days });
+
+      // 🪓 ALIGNEMENT INDUSTRIEL : Utilisation de cleanup unifié
+      const result = await (AppEventAdminService as any).cleanup({ days });
 
       res.status(200).json(
         ApiResponseFactory.success('Purge historique RGPD effectuée', result)

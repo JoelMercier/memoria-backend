@@ -15,6 +15,7 @@ import type { AllowedIdTypes } from '@/interfaces/entities/IBaseEntityData';
  */
 export interface IEntity<
   TData,
+  // @ts-expect-error - TId est déclaré pour l'extensibilité des classes héritières mais non lu directement ici
   TId extends AllowedIdTypes = string
 > {
 

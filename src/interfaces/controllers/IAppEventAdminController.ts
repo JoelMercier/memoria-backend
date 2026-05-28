@@ -32,15 +32,4 @@ export interface IAppEventAdminController extends IAppEventController {
   /** 📊 Calcule les métriques et statistiques globales pour le tableau de bord d'audit. */
   getStats(req: Request, res: Response, next: NextFunction): Promise<void>;
 
-  /**
-   * 🎛️ Modification technique d'un log.
-   * @deprecated Réservé exclusivement à l'environnement de développement (Debug/Local).
-   */
-  update(req: Request, res: Response, next: NextFunction): Promise<void>;
-
-  /**
-   * 🗑️ Suppression destructive d'une ligne de journal.
-   * @deprecated Réservé exclusivement à l'environnement de développement (Debug/Local).
-   */
-  delete(req: Request, res: Response, next: NextFunction): Promise<void>;
 }

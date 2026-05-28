@@ -1,4 +1,8 @@
+// ——— fichier : src/routes/v1/index.ts
+
 import { Router } from 'express';
+// 🪓 Importation du vrai gestionnaire de connexion PostgreSQL de Gaïa
+import { DatabaseConnection } from '@/config/DatabaseConnection';
 import { AuthController } from '@/controllers/AuthController';
 import { ItemController } from '@/controllers/ItemController';
 import { PublicShareController } from '@/controllers/PublicShareController';
@@ -33,12 +37,15 @@ export function createV1Router(): Router {
   const tokenManager = new TokenManager();
   const blacklistService = new BlacklistService();
 
+  // 🪓 ALIGNEMENT INDUSTRIEL : Récupération de l'instance vivante du Singleton de connexion
+  const db = DatabaseConnection.getInstance();
+
   // Repositories
-  const userRepository = new PgUserRepository();
-  const itemRepository = new PgItemRepository();
-  const tagRepository = new PgTagRepository();
-  const itemTagRepository = new PgItemTagRepository();
-  const shareRepository = new PgShareRepository();
+  const userRepository = new PgUserRepository(db as any);
+  const itemRepository = new PgItemRepository(db as any);
+  const tagRepository = new PgTagRepository(db as any);
+  const itemTagRepository = new PgItemTagRepository(db as any);
+  const shareRepository = new PgShareRepository(db as any);
 
   // Services
   const authService = new AuthService(
@@ -63,7 +70,7 @@ export function createV1Router(): Router {
 
   // Controllers
   const authController = new AuthController(authService, userRepository);
-  const itemController = new ItemController(itemService, itemTagRepository);
+  const itemController = new ItemController(itemService);
   const tagController = new TagController(tagService);
   const shareController = new ShareController(shareService);
   const publicShareController = new PublicShareController(shareService);

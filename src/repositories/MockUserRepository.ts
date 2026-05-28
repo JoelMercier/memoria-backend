@@ -1,13 +1,16 @@
+// ——— fichier : src\repositories\MockUserRepository.ts
+
 import { User } from '@/entities/User';
+import { UserId } from '@/domain/value-objects/IdMetier';
 import type { IUserData } from '@/interfaces/entities/user/IUserData';
 import type { IUserRepository } from '@/interfaces/repositories/IUserRepository';
 
 export class MockUserRepository implements IUserRepository {
   private users: User[] = [];
-  private currentId: number = 1;
 
-  public async findById(id: string): Promise<User | null> {
-    return this.users.find((u): boolean => u.getId() === id) ?? null;
+  public async findById(id: UserId): Promise<User | null> {
+    // 🪓 ALIGNEMENT INDUSTRIEL : Utilisation du getter getUserId() unifié
+    return this.users.find((u): boolean => u.getUserId().valeur === id.valeur) ?? null;
   }
 
   public async findByEmail(email: string): Promise<User | null> {
@@ -31,10 +34,9 @@ export class MockUserRepository implements IUserRepository {
   }
 
   public async create(data: IUserData): Promise<User> {
-    const id: string = (this.currentId++).toString();
+    // L'ID est déjà forgé par le service sous forme de UserId dans l'objet data
     const user = new User({
       ...data,
-      id,
       createdAt: new Date(),
       updatedAt: new Date()
     });
@@ -42,18 +44,37 @@ export class MockUserRepository implements IUserRepository {
     return user;
   }
 
-  public async update(id: string, data: Partial<IUserData>): Promise<User | null> {
-    const idx: number = this.users.findIndex((u): boolean => u.getId() === id);
-    if (idx === -1) return null;
+  public async update(id: UserId, data: Partial<IUserData>): Promise<User> {
+    const idx: number = this.users.findIndex((u): boolean => u.getUserId().valeur === id.valeur);
+    if (idx === -1) {
+      throw new Error(`User with ID ${id.valeur} not found for update`);
+    }
     const current: IUserData = this.users[idx].toData();
-    const updated = new User({ ...current, ...data, id, updatedAt: new Date() });
+    const updated = new User({
+      ...current,
+      ...data,
+      idUser: id, // Alignement nominal sur le champ idUser attendu par l'IUserData
+      updatedAt: new Date()
+    });
     this.users[idx] = updated;
     return updated;
   }
 
-  public async delete(id: string): Promise<boolean> {
+  public async delete(id: UserId): Promise<boolean> {
     const before: number = this.users.length;
-    this.users = this.users.filter((u): boolean => u.getId() !== id);
+    this.users = this.users.filter((u): boolean => u.getUserId().valeur !== id.valeur);
     return this.users.length < before;
+  }
+
+  /**
+   * 🪓 ALIGNEMENT CONTRAT BASE : Extrait l'intégralité absolue de la table de simulation.
+   * Requis par l'héritage strict de IBaseRepository via IUserRepository.
+   *
+   * @public
+   * @async
+   * @returns {Promise<User[]>} Le catalogue complet des utilisateurs simulés.
+   */
+  public async findAll(): Promise<User[]> {
+    return [...this.users];
   }
 }

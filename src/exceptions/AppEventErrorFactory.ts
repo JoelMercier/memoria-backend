@@ -1,8 +1,9 @@
 // ——— fichier : src/exceptions/AppEventErrorFactory.ts
 
 import { ApiError } from '@/exceptions/ApiError';
+// 🪓 ALIGNEMENT INDUSTRIEL : Remplacement du fantomatique EventId par le type nominal officiel AppEventId
 import { UserId,
-         EventId  } from '@/domain/value-objects/IdMetier';
+         AppEventId } from '@/domain/value-objects/IdMetier';
 
 /**
  * 🏛️ Classe AppEventErrorFactory
@@ -29,10 +30,10 @@ export class AppEventErrorFactory extends ApiError {
    *
    * @static
    * @function notFound
-   * @param {EventId} eventId - L'identifiant fort de l'événement manquant
+   * @param {AppEventId} eventId - L'identifiant fort de l'événement manquant
    * @returns {AppEventErrorFactory} L'instance vivante de l'exception configurée
    */
-  public static notFound(eventId: EventId): AppEventErrorFactory {
+  public static notFound(eventId: AppEventId): AppEventErrorFactory {
     return new AppEventErrorFactory(`Événement introuvable : ${eventId.valeur}`, 404, {
       code       : 'APPEVENT_NOT_FOUND',
       identifier : eventId.valeur
@@ -44,10 +45,10 @@ export class AppEventErrorFactory extends ApiError {
    *
    * @static
    * @function eventExists
-   * @param {EventId} eventId - L'identifiant déjà présent en base
+   * @param {AppEventId} eventId - L'identifiant déjà présent en base
    * @returns {AppEventErrorFactory} L'instance vivante de l'exception configurée
    */
-  public static eventExists(eventId: EventId): AppEventErrorFactory {
+  public static eventExists(eventId: AppEventId): AppEventErrorFactory {
     return new AppEventErrorFactory(`L'identifiant « ${eventId.valeur} » existe déjà.`, 409, {
       code  : 'APPEVENT_EXISTS',
       field : 'eventId',

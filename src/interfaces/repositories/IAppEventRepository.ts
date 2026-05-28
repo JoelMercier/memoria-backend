@@ -1,13 +1,13 @@
 // ——— fichier : src/interfaces/repositories/IAppEventRepository.ts
 
-import type { AppEventCategory } from '@/constants/AppEventCategory';
-import type { AppEventSeverity } from '@/constants/AppEventSeverity';
-import type { AppEventType     } from '@/constants/AppEventType';
-import type { UserId, EventId  } from '@/domain/value-objects/IdMetier';
-import type { AppEvent         } from '@/entities/AppEvent';
-import type { IAppEventData    } from '@/interfaces/entities/event/IAppEventData';
-import type { IBaseRepository  } from '@/interfaces/repositories/IBaseRepository';
-import type { IListOptions     } from '@/interfaces/shared/IListOptions';
+import type { AppEventCategory   } from '@/constants/AppEventCategory';
+import type { AppEventSeverity   } from '@/constants/AppEventSeverity';
+import type { AppEventType       } from '@/constants/AppEventType';
+import type { UserId, AppEventId } from '@/domain/value-objects/IdMetier';
+import type { AppEvent           } from '@/entities/AppEvent';
+import type { IAppEventData      } from '@/interfaces/entities/event/IAppEventData';
+import type { IBaseRepository    } from '@/interfaces/repositories/IBaseRepository';
+import type { IListOptions       } from '@/interfaces/shared/IListOptions';
 
 /**
  * 📋 Interface IAppEventListOptions
@@ -57,10 +57,10 @@ export interface IAppEventListResult {
  * @extends {IBaseRepository<AppEvent, IAppEventData, EventId>}
  * @author Joël, Gaïa & Co
  */
-export interface IAppEventRepository extends IBaseRepository<AppEvent, IAppEventData, EventId> {
+export interface IAppEventRepository extends IBaseRepository<AppEvent, IAppEventData, AppEventId> {
 
   /** 🔎 Récupère l'intégralité d'un log d'audit par son identifiant unique fort. */
-  findById(eventId: EventId): Promise<AppEvent | null>;
+  findById(eventId: AppEventId): Promise<AppEvent | null>;
 
   /** 👥 Extrait la liste brute des derniers logs rattachés à un utilisateur spécifique. */
   findByUserId(userId: UserId, limit?: number): Promise<AppEvent[] | null>;

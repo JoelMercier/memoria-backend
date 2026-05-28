@@ -4,8 +4,8 @@ import type { AppEventCategory } from '@/constants/AppEventCategory';
 import type { AppEventSeverity } from '@/constants/AppEventSeverity';
 import type { AppEventType     } from '@/constants/AppEventType';
 import { UserId,
-         EventId               } from '@/domain/value-objects/IdMetier';
-import type { IAppEvent         } from '@/interfaces/entities/event/IAppEvent';
+         AppEventId            } from '@/domain/value-objects/IdMetier';
+import type { IAppEvent        } from '@/interfaces/entities/event/IAppEvent';
 
 /**
  * 📦 Classe ResponseEventDto
@@ -19,7 +19,7 @@ import type { IAppEvent         } from '@/interfaces/entities/event/IAppEvent';
 export class ResponseEventDto {
 
   /** 🔔 Caillou de couleur : Identifiant unique immuable de l'événement */
-  public readonly idEvent : EventId;
+  public readonly idEvent : AppEventId;
 
   /** 👥 Caillou de couleur : Identifiant unique de l'utilisateur rattaché */
   public readonly userId : UserId | null;
@@ -53,18 +53,16 @@ export class ResponseEventDto {
    * @param {IAppEvent} event - Le contrat de données brut de l'événement d'audit
    */
   private constructor(event: IAppEvent) {
-    // Correction chirurgicale : event.idAppEvent devient event.idEvent !
-    this.idEvent       = event.idEvent as unknown as EventId;
-    this.userId        = event.userId ? (event.userId as unknown as UserId) : null;
-    this.eventCategory = event.eventCategory as unknown as AppEventCategory;
-    this.eventType     = event.eventType as unknown as AppEventType;
-    this.severity      = event.severity as unknown as AppEventSeverity;
-    this.message       = event.message;
-    this.metadata      = event.metadata as Record<string, unknown>;
-    this.createdAt     = event.createdAt;
-    this.updatedAt     = event.updatedAt;
+    // 🪓 ALIGNEMENT INDUSTRIEL : Respect strict de l'armure nominale et des Smart Enums
+    this.idEvent       = event.getAppEventId();
+    this.userId        = event.getUserId();
+    this.eventCategory = event.getEventCategory();
+    this.eventType     = event.getEventType();
+    this.severity      = event.getSeverity();
+    this.message       = event.getMessage();
+    this.metadata      = event.getMetadata();
+    this.createdAt     = event.createdAt; // Propriété directe héritée d'IEntity
   }
-
 
   /**
    * 🏭 Fabrique statique : Transforme un contrat de données d'audit en DTO de sortie.

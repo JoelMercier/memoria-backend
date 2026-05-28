@@ -41,7 +41,7 @@ export class ShareController implements IShareController {
 
   /**
    * 🛡️ Accesseur privé vers le service des partages.
-      *
+   *
    * @private
    * @returns {IShareService} L'instance du service métier.
    */
@@ -62,8 +62,10 @@ export class ShareController implements IShareController {
     if (!sIdBrut) {
       throw UserErrorFactory.invalidCredentials();
     }
-    return new UserId(sIdBrut);
+    // 🪓 ALIGNEMENT INDUSTRIEL : Si c'est déjà un UserId, on le retourne directement, sinon on l'instancie
+    return sIdBrut instanceof UserId ? sIdBrut : new UserId(sIdBrut as unknown as string);
   }
+
 
   /**
    * 🔍 Extrait un paramètre obligatoire de l'URL Express ou lève une exception.
@@ -238,10 +240,11 @@ export class ShareController implements IShareController {
       const sIdBrut      : string  = this.getRequiredParam(req, 'id');
       const cibleShareId : ShareId = new ShareId(sIdBrut);
 
+      // ——— Utilisation de l'accesseur propre
       await this.shareService.delete(userId, cibleShareId);
 
       res.status(200).json(
-        ApiResponseFactory.success('Partage révoqué', undefined, requestId)
+        ApiResponseFactory.success('Partage révoqué avec succès', undefined, requestId)
       );
     } catch (err) {
       next(err);

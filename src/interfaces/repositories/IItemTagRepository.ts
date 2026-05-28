@@ -1,7 +1,7 @@
 // ——— fichier : src/interfaces/repositories/IItemTagRepository.ts
 
-import type { ItemId, TagId } from '@/domain/value-objects/IdMetier';
-import type { Tag           } from '@/entities/Tag';
+import { ItemId, TagId } from '@/domain/value-objects/IdMetier';
+import type { Tag } from '@/entities/Tag';
 
 /**
  * 🗄️ Interface IItemTagRepository
@@ -10,7 +10,11 @@ import type { Tag           } from '@/entities/Tag';
  * Orchestre les liaisons sémantiques, les synchronisations de masse et les purges transactionnelles.
  *
  * @interface IItemTagRepository
- * @author Joël, Gaïa & Co
+ *
+ * @author 🧠 Conception : Joël (Hongroise maniac')
+ * @author ☄️ Usine à lignes : Gaïa (Trébuchet de syntaxe)
+ * @author ⚔️ Rempart des types : Le Cartel du Donjon (Garde d'élite)
+ * @author 🏺 Relique d'origine : L'Ancien Régime (Fossile de Gergovie)
  */
 export interface IItemTagRepository {
 

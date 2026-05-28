@@ -68,7 +68,6 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
 
   /**
    * 🆔 Identifiant unique et fortement typé du profil utilisateur.
-   * Réaligné fidèlement sur notre contrat d'interface sémantique unifié.
    *
    * @public
    * @function getUserId
@@ -79,104 +78,87 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
   }
 
   /**
-   * 🆔 Identifiant unique du contrat IUser (Rétrocompatibilité d'infrastructure d'accès).
-   * Alias transitoire redirigeant vers le type nominal scellé getUserId().
-   *
-   * @public
-   * @returns {UserId} Le Value Object de l'identifiant utilisateur.
-   */
-  public get idUser(): UserId {
-    return this.getUserId();
-  }
-
-  /**
-   * 📧 Adresse email unique (Conforme IUser).
+   * 📧 Adresse email unique.
    *
    * @public
    * @returns {string} L'adresse email de l'utilisateur.
    */
-  public get Email(): string {
+  public getEmail(): string {
     return this.m_sEmail;
   }
 
   /**
-   * 🔑 Empreinte cryptographique du mot de passe (Conforme IUser).
+   * 🔑 Empreinte cryptographique du mot de passe.
    *
    * @public
    * @returns {string} Le hash sécurisé du mot de passe.
    */
-  public get PasswordHash(): string {
+  public getPasswordHash(): string {
     return this.m_sPasswordHash;
   }
 
   /**
-   * 👤 Pseudonyme public de l'utilisateur (Conforme IUser).
+   * 👤 Pseudonyme public de l'utilisateur.
    *
    * @public
    * @returns {string} Le nom d'affichage public.
    */
-  public get Pseudo(): string {
+  public getPseudo(): string {
     return this.m_sPseudo;
   }
 
   /**
-   * 🗂️ Rôle de sécurité hiérarchique (Conforme IUser).
+   * 🗂️ Rôle de sécurité hiérarchique.
    *
    * @public
    * @returns {Role} Le Smart Enum représentant le rôle utilisateur.
    */
-  public get Role(): Role {
+  public getRole(): Role {
     return this.m_eRole;
   }
 
   /**
-   * 🌐 Fournisseur d'authentification d'origine (Conforme IUser).
+   * 🌐 Fournisseur d'authentification d'origine.
    *
    * @public
    * @returns {AuthProvider} Le type de fournisseur d'identité.
    */
-  public get AuthProvider(): AuthProvider {
+  public getAuthProvider(): AuthProvider {
     return this.m_eAuthProvider;
   }
 
   /**
-   * 🗄️ Dictionnaire des préférences d'interface (Conforme IUser).
+   * 🗄️ Dictionnaire des préférences d'interface.
    *
    * @public
    * @returns {Record<string, any>} Bloc JSON contenant la configuration utilisateur.
    */
-  public get SettingsUser(): Record<string, any> {
+  public getSettingsUser(): Record<string, any> {
     return this.m_rSettingsUser;
   }
 
   /**
-   * 🛡️ Statut du consentement aux règles RGPD (Conforme IUser).
+   * 🛡️ Statut du consentement aux règles RGPD.
    *
    * @public
    * @returns {boolean} True si les conditions d'utilisation sont validées.
    */
-  public get GdprConsent(): boolean {
+  public getGdprConsent(): boolean {
     return this.m_bGdprConsent;
   }
 
   /**
-   * ⏱️ Horodatage du consentement RGPD (Conforme IUser).
+   * ⏱️ Horodatage du consentement RGPD.
    *
    * @public
    * @returns {Date | null} Date précise de la signature ou NULL.
    */
-  public get GdprConsentDate(): Date | null {
+  public getGdprConsentDate(): Date | null {
     return this.m_dGdprConsentDate;
   }
 
   /**
    * 🛡️ Sécurité Nominale : Vérifie les privilèges d'accès de l'utilisateur.
-   * Exploite directement la comparaison sémantique de ton Smart Enum Role.
-   *
-   * @public
-   * @function aLeDroitAccederA
-   * @param {Role} roleMinimalRequis - Le palier de sécurité minimal exigé pour l'action
-   * @returns {boolean} True si l'utilisateur dispose des droits suffisants
    */
   public aLeDroitAccederA(roleMinimalRequis: Role): boolean {
     return this.m_eRole.estSuperieurOuEgalA(roleMinimalRequis);
@@ -184,22 +166,18 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
 
   /**
    * 📦 Extrait le sac de données passif correspondant à l'état vivant de l'entité.
-   *
-   * @public
-   * @function toData
-   * @returns {IUserData} Structure de données brute d'infrastructure
    */
   public toData(): IUserData {
     return {
       idUser          : this.getUserId(),
-      email           : this.Email,
-      passwordHash    : this.PasswordHash,
-      pseudo          : this.Pseudo,
-      role            : this.Role,
-      authProvider    : this.AuthProvider,
-      settingsUser    : this.SettingsUser,
-      gdprConsent     : this.GdprConsent,
-      gdprConsentDate : this.GdprConsentDate,
+      email           : this.getEmail(),
+      passwordHash    : this.getPasswordHash(),
+      pseudo          : this.getPseudo(),
+      role            : this.getRole(),
+      authProvider    : this.getAuthProvider(),
+      settingsUser    : this.getSettingsUser(),
+      gdprConsent     : this.getGdprConsent(),
+      gdprConsentDate : this.getGdprConsentDate(),
       createdAt       : this.createdAt,
       updatedAt       : this.updatedAt
     };
@@ -207,11 +185,6 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
 
   /**
    * 🖨️ Sérialise textuellement l'entité utilisateur au format de texte JSON.
-   *
-   * @public
-   * @override
-   * @function toString
-   * @returns {string} Chaîne JSON formatée
    */
   public override toString(): string {
     return JSON.stringify(this.toData());

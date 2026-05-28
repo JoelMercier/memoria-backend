@@ -162,7 +162,7 @@ export class AuthController implements IAuthController {
     }
   }
 
-  /**
+   /**
    * 🔎 Récupération autonome de la fiche d'identité de l'utilisateur connecté.
    * GET /v1/auth/me
    *
@@ -173,18 +173,23 @@ export class AuthController implements IAuthController {
    */
   public async me(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const requestId : string           = RequestIdGenerator.getFromRequest(req);
-      const sIdBrut   : string|undefined = req.user?.id;
+      const requestId : string = RequestIdGenerator.getFromRequest(req);
 
-      if (!sIdBrut) {
+      // 🪓 ALIGNEMENT INDUSTRIEL : Récupération directe sans forcer le type string primitif
+      const idDuUser = req.user?.id;
+
+      if (!idDuUser) {
         throw UserErrorFactory.invalidCredentials();
       }
 
-      const cibleUserId : UserId = new UserId(sIdBrut);
+      // 🪓 ALIGNEMENT INDUSTRIEL : Adaptation polymorphe identique au TagController
+      const cibleUserId : UserId = idDuUser instanceof UserId
+        ? idDuUser
+        : new UserId(idDuUser as unknown as string);
 
       const user = await this.m_rUserRepository.findById(cibleUserId);
       if (!user) {
-        throw UserErrorFactory.notFound(sIdBrut);
+        throw UserErrorFactory.notFound(cibleUserId);
       }
 
       res.status(200).json(

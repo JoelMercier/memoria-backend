@@ -1,8 +1,8 @@
 // ——— fichier : src/server.ts
 
-import { createApp }        from '@/app';
+import { createApp          } from '@/app';
 import { DatabaseConnection } from '@/config/DatabaseConnection';
-import { LoggerSingleton }    from '@/config/LoggerSingleton';
+import { LoggerSingleton    } from '@/config/LoggerSingleton';
 
 /** 🪵 Instance partagée du journal applicatif global */
 const logger = LoggerSingleton.getInstance();

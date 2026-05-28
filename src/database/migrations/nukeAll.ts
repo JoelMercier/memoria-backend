@@ -1,4 +1,4 @@
-// ——— fichier : database/scripts/nuke.ts
+// ——— fichier : src\database\migrations\nukeAll.ts
 
 import { readdir, readFile } from 'node:fs/promises';
 import   path                from 'node:path';

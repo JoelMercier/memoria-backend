@@ -50,6 +50,7 @@ export class TagController implements ITagController {
     return this.m_rTagService;
   }
 
+
   /**
    * 🔏 Extrait et sécurise l'identifiant utilisateur depuis la session HTTP Express.
    * Effectue le transtypage d'infrastructure vers le type nominal du domaine.
@@ -60,34 +61,39 @@ export class TagController implements ITagController {
    * @returns {UserId} L'identifiant immuable fortement typé
    */
   private getUserId(req: Request): UserId {
-    const id : string | undefined = req.user?.id;
+    const id = req.user?.id;
     if (!id) {
       throw UserErrorFactory.invalidCredentials();
     }
-    return id as unknown as UserId;
+    // 🪓 ALIGNEMENT INDUSTRIEL : Si c'est déjà un UserId, on le retourne, sinon on le forge
+    return id instanceof UserId ? id : new UserId(id as unknown as string);
   }
 
   /**
    * 🛤️ Extrait et valide un paramètre obligatoire de la route HTTP (Path Parameter).
    *
    * @private
-   * @template T - Type fort attendu dérivé de la marque nominale
    * @param {Request} req - La requête HTTP
    * @param {string} name - Le nom du paramètre (ex: 'id')
    * @throws {Error} Si le paramètre est absent, altéré ou vide
-   * @returns {T} Le paramètre converti vers le type nominal attendu
+   * @returns {string} Le paramètre extrait sous forme de chaîne purifiée
    */
-  private getRequiredParam<T>(req: Request, name: string): T {
+  private getRequiredParam(req: Request, name: string): string {
     const value : string | string[] | undefined = req.params[name];
     if (typeof value !== 'string' || value.length === 0) {
       throw new Error(`Path parameter "${name}" is missing or invalid`);
     }
-    return value as unknown as T;
+    return value;
   }
 
   /**
    * 📜 GET /tags
    * Récupère la collection complète des étiquettes détenues par l'appelant.
+   *
+   * @param {Request} req - Requête HTTP
+   * @param {Response} res - Réponse HTTP
+   * @param {NextFunction} next - Passerelle d'erreurs Express
+   * @returns {Promise<void>}
    */
   public async list(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -112,6 +118,11 @@ export class TagController implements ITagController {
   /**
    * 🎯 POST /tags
    * Crée et persiste une nouvelle étiquette métier pour l'utilisateur connecté.
+   *
+   * @param {Request} req - Requête HTTP
+   * @param {Response} res - Réponse HTTP
+   * @param {NextFunction} next - Passerelle d'erreurs Express
+   * @returns {Promise<void>}
    */
   public async create(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -138,12 +149,18 @@ export class TagController implements ITagController {
   /**
    * 🔎 GET /tags/:id
    * Extrait un tag spécifique après vérification bilatérale des privilèges.
+   *
+   * @param {Request} req - Requête HTTP
+   * @param {Response} res - Réponse HTTP
+   * @param {NextFunction} next - Passerelle d'erreurs Express
+   * @returns {Promise<void>}
    */
   public async findById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const requestId : string = RequestIdGenerator.getFromRequest(req);
       const userId    : UserId = this.getUserId(req);
-      const tagId     : TagId  = this.getRequiredParam<TagId>(req, 'id');
+      const sIdBrut   : string = this.getRequiredParam(req, 'id');
+      const tagId     : TagId  = new TagId(sIdBrut);
 
       const tag = await this.tagService.findById(userId, tagId);
 
@@ -164,12 +181,18 @@ export class TagController implements ITagController {
   /**
    * 🎛️ PUT /tags/:id
    * Met à jour les propriétés configurables d'un tag existant.
+   *
+   * @param {Request} req - Requête HTTP
+   * @param {Response} res - Réponse HTTP
+   * @param {NextFunction} next - Passerelle d'erreurs Express
+   * @returns {Promise<void>}
    */
   public async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const requestId : string       = RequestIdGenerator.getFromRequest(req);
       const userId    : UserId       = this.getUserId(req);
-      const tagId     : TagId        = this.getRequiredParam<TagId>(req, 'id');
+      const sIdBrut   : string       = this.getRequiredParam(req, 'id');
+      const tagId     : TagId        = new TagId(sIdBrut);
       const dto       : UpdateTagDto = new UpdateTagDto(req.body);
 
       const tag = await this.tagService.update(userId, tagId, dto);
@@ -191,12 +214,18 @@ export class TagController implements ITagController {
   /**
    * 🗑️ DELETE /tags/:id
    * Supprime définitivement l'étiquette spécifiée de l'infrastructure.
+   *
+   * @param {Request} req - Requête HTTP
+   * @param {Response} res - Réponse HTTP
+   * @param {NextFunction} next - Passerelle d'erreurs Express
+   * @returns {Promise<void>}
    */
   public async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const requestId : string = RequestIdGenerator.getFromRequest(req);
       const userId    : UserId = this.getUserId(req);
-      const tagId     : TagId  = this.getRequiredParam<TagId>(req, 'id');
+      const sIdBrut   : string = this.getRequiredParam(req, 'id');
+      const tagId     : TagId  = new TagId(sIdBrut);
 
       await this.tagService.delete(userId, tagId);
 

@@ -1,23 +1,23 @@
 // ——— fichier : src/services/AuthService.ts
 
-import { AuthProvider }     from '@/constants/AuthProvider';
-import { Role }             from '@/constants/Role';
-import { User }             from '@/entities/User';
+import { randomUUID } from 'node:crypto';
+import { AuthProvider } from '@/constants/AuthProvider';
+import { Role } from '@/constants/Role';
+import { User } from '@/entities/User';
 import { ConflictErrorFactory } from '@/exceptions/ConflictErrorFactory';
-import { TokenError }       from '@/exceptions/TokenError';
+import { TokenError } from '@/exceptions/TokenError';
 import { UserErrorFactory } from '@/exceptions/UserErrorFactory';
-import type { CreateUserDto }   from '@/dto/user/CreateUserDto';
-import type { LoginDto }        from '@/dto/user/auth/LoginDto';
+import { UserId } from '@/domain/value-objects/IdMetier';
+import type { CreateUserDto } from '@/dto/user/CreateUserDto';
+import type { LoginDto } from '@/dto/user/auth/LoginDto';
 import type { RefreshTokenDto } from '@/dto/user/auth/RefreshTokenDto';
-import type { IUser }           from '@/interfaces/entities/user/IUser';
-import type { IUserData }       from '@/interfaces/entities/user/IUserData';
+import type { IUser } from '@/interfaces/entities/user/IUser';
+import type { IUserData } from '@/interfaces/entities/user/IUserData';
 import type { IUserRepository } from '@/interfaces/repositories/IUserRepository';
 import type { IBlacklistService } from '@/interfaces/security/IBlacklistService';
-import type { IPasswordHasher }   from '@/interfaces/security/IPasswordHasher';
-import type { ITokenManager }     from '@/interfaces/security/ITokenManager';
-import type { IAuthResult,
-              IAuthService,
-              IRefreshResult }    from '@/interfaces/services/IAuthService';
+import type { IPasswordHasher } from '@/interfaces/security/IPasswordHasher';
+import type { ITokenManager } from '@/interfaces/security/ITokenManager';
+import type { IAuthResult, IAuthService, IRefreshResult } from '@/interfaces/services/IAuthService';
 
 /**
  * 🏛️ Classe AuthService
@@ -27,9 +27,19 @@ import type { IAuthResult,
  *
  * @class AuthService
  * @implements {IAuthService}
- * @author Joël, Gaïa & Co
+ *
+ * @author 🧠 Conception : Joël (Hongroise maniac')
+ * @author ☄️ Usine à lignes : Gaïa (Trébuchet de syntaxe)
+ * @author ⚔️ Rempart des types : Le Cartel du Donjon (Garde d'élite)
+ * @author 🏺 Relique d'origine : L'Ancien Régime (Fossile de Gergovie)
  */
 export class AuthService implements IAuthService {
+
+  /** 🎛️ Dépendances de sécurité et de persistance injectées */
+  private readonly userRepository : IUserRepository;
+  private readonly passwordHasher : IPasswordHasher;
+  private readonly tokenManager   : ITokenManager;
+  private readonly blacklistService : IBlacklistService;
 
   /**
    * Initialise les fondations de sécurité par injection d'abstractions.
@@ -37,11 +47,16 @@ export class AuthService implements IAuthService {
    * @constructor
    */
   public constructor(
-    private readonly userRepository : IUserRepository,
-    private readonly passwordHasher : IPasswordHasher,
-    private readonly tokenManager   : ITokenManager,
-    private readonly blacklistService : IBlacklistService
-  ) {}
+    userRepository : IUserRepository,
+    passwordHasher : IPasswordHasher,
+    tokenManager   : ITokenManager,
+    blacklistService : IBlacklistService
+  ) {
+    this.userRepository = userRepository;
+    this.passwordHasher = passwordHasher;
+    this.tokenManager = tokenManager;
+    this.blacklistService = blacklistService;
+  }
 
   /**
    * 📝 Inscription d'un nouvel utilisateur (Fail-fast unitaire inclus).
@@ -50,33 +65,27 @@ export class AuthService implements IAuthService {
    * @async
    */
   public async register(dto: CreateUserDto): Promise<IUser> {
-    // 1. Vérifie l'unicité email et pseudo avant le hash cryptographique coûteux
     const existingEmail: User | null = await this.userRepository.findByEmail(dto.email);
-    if (existingEmail) {
-      throw UserErrorFactory.emailExists(dto.email);
-    }
-    const existingPseudo: User | null = await this.userRepository.findByPseudo(dto.pseudo);
-    if (existingPseudo) {
-      throw ConflictErrorFactory.usernameExists(dto.pseudo);
-    }
+    if (existingEmail) throw UserErrorFactory.emailExists(dto.email);
 
-    // 2. Hash cryptographique du mot de passe
+    const existingPseudo: User | null = await this.userRepository.findByPseudo(dto.pseudo);
+    if (existingPseudo) throw ConflictErrorFactory.usernameExists(dto.pseudo);
+
     const passwordHash : string = await this.passwordHasher.hash(dto.password);
 
-    // 3. Construit IUserData pour le stockage persistant
+    // 🪓 ALIGNEMENT 128-BIT : Allocation d'un véritable UserId d'acier pur généré à la volée !
     const userData : IUserData = {
-      idUser          : undefined as any, // Forgé dynamiquement à l'insertion par gen_random_uuid()
+      idUser          : new UserId(randomUUID()),
       email           : dto.email,
       passwordHash    : passwordHash,
       pseudo          : dto.pseudo,
-      role            : Role.fromSql('customer'), // Alignement sur nos instances de Smart Enums
-      authProvider    : AuthProvider.fromSql('local'),
+      role            : Role.fromSql('customer')!,
+      authProvider    : AuthProvider.fromSql('local')!,
       settingsUser    : {},
       gdprConsent     : dto.gdprConsent,
       gdprConsentDate : new Date()
     };
 
-    // 4. Persistance finale via le dépôt PostgreSQL
     return await this.userRepository.create(userData);
   }
 
@@ -88,20 +97,18 @@ export class AuthService implements IAuthService {
    */
   public async login(dto: LoginDto): Promise<IAuthResult> {
     const user : User | null = await this.userRepository.findByEmail(dto.email);
-    if (!user) {
-      throw UserErrorFactory.invalidCredentials();
-    }
+    if (!user) throw UserErrorFactory.invalidCredentials();
 
-    const isValid : boolean = await this.passwordHasher.verify(dto.password, user.PasswordHash);
-    if (!isValid) {
-      throw UserErrorFactory.invalidCredentials();
-    }
+    // 🪓 ALIGNEMENT INDUSTRIEL : Utilisation de getPasswordHash()
+    const isValid : boolean = await this.passwordHasher.verify(dto.password, user.getPasswordHash());
+    if (!isValid) throw UserErrorFactory.invalidCredentials();
 
+    // 🪓 ALIGNEMENT INDUSTRIEL : Extraction propre via les nouvelles signatures de fonctions métiers de IUser
     const { accessToken, refreshToken } = await this.tokenManager.generateTokens({
-      sub    : user.getUserId(), // Capture nominale stricte du caillou de couleur UserId
-      email  : user.Email,
-      pseudo : user.Pseudo,
-      role   : user.Role
+      sub    : user.getUserId(),
+      email  : user.getEmail(),
+      pseudo : user.getPseudo(),
+      role   : user.getRole()
     });
 
     return { user, accessToken, refreshToken };
@@ -114,31 +121,26 @@ export class AuthService implements IAuthService {
    * @async
    */
   public async refresh(dto: RefreshTokenDto): Promise<IRefreshResult> {
-    // 1. Analyse la validité, la signature et l'expiration temporelle
     const payload = await this.tokenManager.verifyRefreshToken(dto.refreshToken);
 
-    // 2. Bloque la transaction si l'identifiant unique du token (jti) est sur liste noire
     if (payload.jti && this.blacklistService.isBlacklisted(payload.jti)) {
       throw TokenError.revoked();
     }
 
-    // 3. Vérifie l'existence saine du sujet (sub) au sein de la base de données
-    const user : User | null = await this.userRepository.findById(payload.sub);
-    if (!user) {
-      throw UserErrorFactory.notFound(payload.sub);
-    }
+    const idActeur = typeof payload.sub === 'string' ? new UserId(payload.sub) : (payload.sub as UserId);
+    const user : User | null = await this.userRepository.findById(idActeur);
+    if (!user) throw UserErrorFactory.notFound(idActeur);
 
-    // 4. Règle de rotation : Ancien jeton mis en quarantaine immédiate
     if (payload.jti && payload.exp) {
       this.blacklistService.add(payload.jti, payload.exp);
     }
 
-    // 5. Génère le nouveau doublet de jetons d'accès et de rafraîchissement
+    // 🪓 ALIGNEMENT INDUSTRIEL : Extraction propre via les nouvelles signatures de fonctions métiers de IUser
     const tokens = await this.tokenManager.generateTokens({
-      sub    : user.getUserId(), // Alignement chirurgical nominal
-      email  : user.Email,
-      pseudo : user.Pseudo,
-      role   : user.Role
+      sub    : user.getUserId(),
+      email  : user.getEmail(),
+      pseudo : user.getPseudo(),
+      role   : user.getRole()
     });
 
     return tokens;

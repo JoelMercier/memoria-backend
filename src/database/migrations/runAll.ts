@@ -1,4 +1,4 @@
-// ——— fichier : database/scripts/migrate.ts
+// ——— fichier : src\database\migrations\runAll.ts
 
 import { readdir,
          readFile        } from 'node:fs/promises';

@@ -102,17 +102,18 @@ export class UserExportDto {
 
     // 🪓 Correction chirurgicale : IAppUser/IUser n'exposent que des propriétés de données directes
     this.user = {
-      id              : user.idUser as unknown as string,
-      email           : user.Email,
-      pseudo          : user.Pseudo,
-      role            : user.Role.code,
-      authProvider    : user.AuthProvider.code,
-      settingsUser    : user.SettingsUser,
-      gdprConsent     : user.GdprConsent,
-      gdprConsentDate : user.GdprConsentDate,
+      id              : user.getUserId().valeur,
+      email           : user.getEmail(),
+      pseudo          : user.getPseudo(),
+      role            : String(user.getRole()),         // Force la conversion via toString()
+      authProvider    : String(user.getAuthProvider()), // Force la conversion via toString()
+      settingsUser    : user.getSettingsUser(),
+      gdprConsent     : user.getGdprConsent(),
+      gdprConsentDate : user.getGdprConsentDate(),
       createdAt       : user.createdAt,
       updatedAt       : user.updatedAt
     };
+
 
     this.tags = tags.map(
       (t): IExportedTag => ({

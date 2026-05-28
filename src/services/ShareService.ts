@@ -14,6 +14,7 @@ import type { IItemRepository     } from '@/interfaces/repositories/IItemReposit
 import type { IShareRepository    } from '@/interfaces/repositories/IShareRepository';
 import type { IShareService       } from '@/interfaces/services/IShareService';
 import      { ShareTokenGenerator } from '@/utils/ShareTokenGenerator';
+import      { randomUUID          } from 'node:crypto';
 
 /** ⚖️ Nombre maximal de tentatives de régénération en cas de collision de token */
 const MAX_TOKEN_GEN_ATTEMPTS : number = 5;
@@ -106,6 +107,7 @@ export class ShareService implements IShareService {
       throw ShareErrorFactory.notFound(shareId.valeur);
     }
     const item : Item | null = await this.itemRepository.findById(share.getItemId());
+    // 🪓 ALIGNEMENT INDUSTRIEL : Utilisation du getter getUserId() de l'Ancien Régime sur Item
     if (!item || item.getUserId().valeur !== userId.valeur) {
       throw ShareErrorFactory.accessDenied(shareId, userId);
     }
@@ -123,14 +125,16 @@ export class ShareService implements IShareService {
     if (!item) {
       throw ItemErrorFactory.notFound(dto.itemId);
     }
+    // 🪓 ALIGNEMENT INDUSTRIEL : Utilisation du getter getUserId() de l'Ancien Régime sur Item
     if (item.getUserId().valeur !== userId.valeur) {
       throw ItemErrorFactory.accessDenied(dto.itemId, userId);
     }
 
     const token : string = await this.generateUniqueToken();
 
+    // 🪓 ALIGNEMENT INDUSTRIEL : Utilisation de randomUUID() propre au lieu de undefined
     const data : IShareData = {
-      idShare        : undefined as any, // Forgé dynamiquement à l'insertion SQL par gen_random_uuid()
+      idShare        : new ShareId(randomUUID()),
       itemId         : dto.itemId,
       recipientEmail : dto.recipientEmail,
       shareToken     : token,

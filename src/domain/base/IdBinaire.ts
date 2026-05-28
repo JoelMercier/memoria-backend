@@ -1,52 +1,90 @@
 // ——— fichier : src/domain/base/IdBinaire.ts
 
+import { Buffer } from 'node:buffer';
+
 /**
- * 🏛️ Classe Abstraite IdBinaire (Value Object Pattern)
- * ----------------------------------------------------
- * Fondation universelle pour tous les identifiants UUID PostgreSQL du système.
- * Garantit la validité structurelle dès la construction.
+ * 🏛️ Classe Abstraite IdBinaire (Armure Nominale 128 bits Pure)
+ * -------------------------------------------------------------
+ * Fondation universelle pour tous les identifiants uniques du système.
+ * Encapsule un Buffer Node.js immuable de 16 octets (128 bits tassés en RAM).
  *
- * @abstract
+ * SOLID :
+ *  - SRP : Unique responsabilité de garantir l'intégrité binaire.
+ *
  * @class IdBinaire
- * @author Joël, Gaïa & Co
+ * @abstract
+ * @author Vision & Conception : Joël (C++ Addict')
+ * @author Forge & Martelage du Code : Gaïa (Trébuchet de bataille)
+ * @author Décabossage : Le Cartel du Donjon (Soudure de boucliers)
+ * @author Code fossile Git->Origin : L'Ancien Régime & Co (Gergovie textuelle)
  */
 export abstract class IdBinaire {
 
-  /** 🕵️‍♂️ Expression régulière de validation d'un UUIDv4 PostgreSQL conforme */
-  private static readonly REGEX_UUID : RegExp = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  /** 🕵️‍♂️ Expression régulière de validation d'un UUID compact pur de 32 caractères hexadécimaux */
+  private static readonly REGEX_HEX_COMPACT : RegExp = /^[0-9a-f]{32}$/;
 
-  /** 🔏 Valeur physique de l'identifiant (Immuabilité stricte) */
-  public readonly valeur : string;
+  /** 💾 Le Côté Face : Segment de mémoire binaire pur de 16 octets (128 bits tassés sans aucun alignement) */
+  private readonly m_rBuffer : Buffer;
 
   /**
-   * Valide la syntaxe de la chaîne brute avant d'autoriser la création de l'objet.
+   * Construit et verrouille l'armure nominale binaire.
    *
    * @protected
    * @constructor
-   * @param {string} p_chaineBrute - La chaîne de caractères à valider
-   * @throws {Error} Si la syntaxe UUIDv4 PostgreSQL est invalide
+   * @param {string | Buffer} idBrut - L'identifiant brut sous sa forme textuelle ou binaire
+   * @throws {Error} Si la syntaxe hexadécimale épurée est invalide
    */
-  protected constructor(p_chaineBrute: string) {
-    if (!IdBinaire.REGEX_UUID.test(p_chaineBrute)) {
-      throw new Error(`[Erreur Sécurité] Syntaxe UUID PostgreSQL invalide : '${p_chaineBrute}'`);
+  protected constructor(idBrut: string | Buffer) {
+    if (typeof idBrut === 'string') {
+      const cleanHex = idBrut.toLowerCase().replace(/[^0-9a-f]/g, '');
+
+      if (!IdBinaire.REGEX_HEX_COMPACT.test(cleanHex)) {
+        throw new Error(`[Erreur Sécurité] Format d'identifiant binaire invalide : attendu 32 caractères hexadécimaux, reçu ${cleanHex.length}.`);
+      }
+
+      this.m_rBuffer = Buffer.from(cleanHex, 'hex');
+    } else {
+      this.m_rBuffer = idBrut;
     }
-    this.valeur = p_chaineBrute.toLowerCase();
   }
 
   /**
-   * 🔄 Redéfinition sémantique de l'égalité (Faute d'opérateur '=' de surcharge).
+   * 🎛️ Accesseur Côté Face : Renvoie le segment binaire de 16 octets pour le pilote PostgreSQL.
    *
+   * @public
+   * @returns {Buffer} Le buffer d'infrastructure mémoire pur.
+   */
+  public get binaire(): Buffer {
+    return this.m_rBuffer;
+  }
+
+  /**
+   * 📜 Accesseur Côté Pile : Re-formate l'UUID standardisé avec ses 4 tirets réglementaires.
+   *
+   * @public
+   * @returns {string} La représentation textuelle UUID normalisée (Format standard: 8-4-4-4-12)
+   */
+  public get valeur(): string {
+    const hex = this.m_rBuffer.toString('hex');
+    return `${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20)}`;
+  }
+
+  /**
+   * 🔄 Redéfinition sémantique de l'égalité au bit près en mémoire vive (RAM).
+   *
+   * @public
    * @param {IdBinaire} autreId - L'autre instance d'identifiant à comparer
-   * @returns {boolean} Vrai si les deux valeurs physiques coïncident
+   * @returns {boolean} Vrai si les segments binaires sous-jacents coïncident à 100%
    */
   public estEgalA(autreId: IdBinaire): boolean {
-    return this.valeur === autreId.valeur;
+    return this.m_rBuffer.equals(autreId.m_rBuffer);
   }
 
   /**
-   * Permet l'affichage propre ou l'injection directe dans les requêtes de l'infrastructure.
+   * Permet l'affichage propre ou l'injection classique dans les logs d'infrastructure.
    *
-   * @returns {string} La chaîne de caractères de l'UUID normalisé en minuscules
+   * @public
+   * @returns {string} La chaîne de caractères de l'UUID canonique avec ses tirets
    */
   public toString(): string {
     return this.valeur;

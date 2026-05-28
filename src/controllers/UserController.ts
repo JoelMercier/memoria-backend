@@ -78,16 +78,22 @@ export class UserController implements IUserController {
    * @returns {UserId} L'identifiant immuable fortement typé
    */
   private getUserId(req: Request): UserId {
-    const id : string | undefined = req.user?.id;
+    const id = req.user?.id;
     if (!id) {
       throw UserErrorFactory.invalidCredentials();
     }
-    return id as unknown as UserId;
+    // 🪓 ALIGNEMENT INDUSTRIEL : Check polymorphe étanche si Express transporte déjà un UserId
+    return id instanceof UserId ? id : new UserId(id as unknown as string);
   }
 
   /**
    * 🎛️ PUT /users/profile
    * Modifie les informations publiques ou de contact du profil utilisateur.
+   *
+   * @param {Request} req - Requête HTTP Express
+   * @param {Response} res - Réponse HTTP Express
+   * @param {NextFunction} next - Passerelle d'erreurs Express
+   * @returns {Promise<void>}
    */
   public async updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -114,6 +120,11 @@ export class UserController implements IUserController {
   /**
    * 🔏 PATCH /users/password
    * Valide et applique le renouvellement sécurisé du mot de passe de l'acteur.
+   *
+   * @param {Request} req - Requête HTTP Express
+   * @param {Response} res - Réponse HTTP Express
+   * @param {NextFunction} next - Passerelle d'erreurs Express
+   * @returns {Promise<void>}
    */
   public async changePassword(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -134,6 +145,11 @@ export class UserController implements IUserController {
   /**
    * 🗑️ DELETE /users/account
    * Clôture et purge définitivement le compte de l'utilisateur après confirmation.
+   *
+   * @param {Request} req - Requête HTTP Express
+   * @param {Response} res - Réponse HTTP Express
+   * @param {NextFunction} next - Passerelle d'erreurs Express
+   * @returns {Promise<void>}
    */
   public async deleteAccount(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -154,6 +170,11 @@ export class UserController implements IUserController {
   /**
    * 📦 GET /users/export
    * Génère une archive au format JSON contenant toutes les données personnelles de l'acteur (RGPD).
+   *
+   * @param {Request} req - Requête HTTP Express
+   * @param {Response} res - Réponse HTTP Express
+   * @param {NextFunction} next - Passerelle d'erreurs Express
+   * @returns {Promise<void>}
    */
   public async exportData(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {

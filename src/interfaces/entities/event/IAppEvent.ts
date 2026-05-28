@@ -3,8 +3,9 @@
 import { AppEventCategory } from '@/constants/AppEventCategory';
 import { AppEventSeverity } from '@/constants/AppEventSeverity';
 import { AppEventType     } from '@/constants/AppEventType';
+// 🪓 ALIGNEMENT INDUSTRIEL : Importation du véritable type nominal fort AppEventId
 import type { UserId,
-              EventId     } from '@/domain/value-objects/IdMetier';
+              AppEventId  } from '@/domain/value-objects/IdMetier';
 import type { IEntity      } from '@/interfaces/entities/IEntity';
 import type { IAppEventData } from '@/interfaces/entities/event/IAppEventData';
 
@@ -20,27 +21,24 @@ import type { IAppEventData } from '@/interfaces/entities/event/IAppEventData';
  */
 export interface IAppEvent extends IEntity<IAppEventData> {
 
-  /** 🔔 Accesseur en lecture vers l'identifiant unique et fort de l'événement */
-  get idEvent(): EventId;
+  /** 🔔 Signature sémantique vers l'identifiant unique et fort de l'événement */
+  getAppEventId(): AppEventId;
 
-  /** 👥 Accesseur en lecture vers l'identifiant fort de l'auteur de l'action ou NULL si système */
-  get userId(): UserId | null;
+  /** 👥 Signature sémantique vers l'identifiant fort de l'auteur de l'action ou NULL si système */
+  getUserId(): UserId | null;
 
-  /** 📂 Accesseur en lecture vers l'instance de Smart Enum représentant la catégorie */
-  get eventCategory(): AppEventCategory;
+  /** 📂 Signature sémantique vers l'instance de Smart Enum représentant la catégorie */
+  getEventCategory(): AppEventCategory;
 
-  /** 🏷️ Accesseur en lecture vers l'instance de Smart Enum qualifiant le type précis */
-  get eventType(): AppEventType;
+  /** 🏷️ Signature sémantique vers l'instance de Smart Enum qualifiant le type précis */
+  getEventType(): AppEventType;
 
-  /** ⚠️ Accesseur en lecture vers l'instance de Smart Enum fixant le niveau de gravité */
-  get severity(): AppEventSeverity;
+  /** ⚠️ Signature sémantique vers l'instance de Smart Enum fixant le niveau de gravité */
+  getSeverity(): AppEventSeverity;
 
-  /** 💬 Accesseur en lecture vers la description textuelle explicite stockée */
-  get message(): string;
+  /** 💬 Signature sémantique vers la description textuelle explicite stockée */
+  getMessage(): string;
 
-  /** 🎛️ Accesseur en lecture vers le sac de métadonnées contextuelles */
-  get metadata(): Record<string, any>;
-
-  /** 📅 Accesseur en lecture vers l'horodatage précis d'ancrage en persistance */
-  get createdAt(): Date;
+  /** 🎛️ Signature sémantique vers le sac de métadonnées contextuelles */
+  getMetadata(): Record<string, any>;
 }

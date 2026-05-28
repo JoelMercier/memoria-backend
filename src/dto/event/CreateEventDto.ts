@@ -4,7 +4,7 @@ import { AppEventCategory         } from '@/constants/AppEventCategory';
 import { AppEventSeverity         } from '@/constants/AppEventSeverity';
 import { AppEventType             } from '@/constants/AppEventType';
 import { UserId,
-         EventId                  } from '@/domain/value-objects/IdMetier';
+         AppEventId               } from '@/domain/value-objects/IdMetier';
 import { type CreateAppEventSchemaType,
          AppEventValidation       } from '@/validation/zod/AppEventValidation';
 
@@ -24,7 +24,7 @@ export class CreateEventDto {
   public readonly eventCategory : AppEventCategory;
 
   /** 🔔 Caillou de couleur : Identifiant unique et fort de l'événement */
-  public readonly idEvent       : EventId;
+  public readonly idEvent       : AppEventId;
 
   /** 👥 Caillou de couleur : Propriétaire rattaché à l'action d'audit */
   public readonly userId        : UserId | null;
@@ -53,7 +53,7 @@ export class CreateEventDto {
 
     // Cast simples, légitimes et sécurisés par l'amont du .refine() de Zod
     this.eventCategory = validated.eventCategory as unknown as AppEventCategory;
-    this.idEvent       = new EventId(validated.idAppEvent);
+    this.idEvent       = new AppEventId(validated.idAppEvent);
     this.userId        = validated.userId ? new UserId(validated.userId) : null;
     this.eventType     = validated.eventType as unknown as AppEventType;
     this.severity      = (validated.severity ?? 'INFO') as unknown as AppEventSeverity;

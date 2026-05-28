@@ -1,3 +1,5 @@
+// ——— fichier : src\routes\v1\auth.routes.ts
+
 import { Router } from 'express';
 import type { AuthController } from '@/controllers/AuthController';
 import type { AuthMiddleware } from '@/middlewares/AuthMiddleware';

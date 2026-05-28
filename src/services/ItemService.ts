@@ -1,25 +1,20 @@
 // ——— fichier : src/services/ItemService.ts
 
-import { UserId,
-         ItemId,
-         TagId            } from '@/domain/value-objects/IdMetier';
-import { Item             } from '@/entities/Item';
-import { Tag              } from '@/entities/Tag';
+import { randomUUID } from 'node:crypto';
+import { UserId, ItemId, TagId } from '@/domain/value-objects/IdMetier';
+import { Item } from '@/entities/Item';
+import { Tag } from '@/entities/Tag';
 import { ItemErrorFactory } from '@/exceptions/ItemErrorFactory';
-import { TagErrorFactory  } from '@/exceptions/TagErrorFactory';
+import { TagErrorFactory } from '@/exceptions/TagErrorFactory';
 import type { CreateItemDto } from '@/dto/item/CreateItemDto';
 import type { UpdateItemDto } from '@/dto/item/UpdateItemDto';
-import type { IItem       } from '@/interfaces/entities/item/IItem';
-import type { IItemData   } from '@/interfaces/entities/item/IItemData';
-import type {
-  IItemRepository,
-  IItemListOptions,
-  IItemListResult
-} from '@/interfaces/repositories/IItemRepository';
+import type { IItem } from '@/interfaces/entities/item/IItem';
+import type { IItemData } from '@/interfaces/entities/item/IItemData';
+import type { IItemRepository, IItemListOptions, IItemListResult } from '@/interfaces/repositories/IItemRepository';
 import type { IItemTagRepository } from '@/interfaces/repositories/IItemTagRepository';
-import type { ITagRepository     } from '@/interfaces/repositories/ITagRepository';
-import type { IItemService       } from '@/interfaces/services/IItemService';
-import { SlugGenerator           } from '@/utils/SlugGenerator';
+import type { ITagRepository } from '@/interfaces/repositories/ITagRepository';
+import type { IItemService } from '@/interfaces/services/IItemService';
+import { SlugGenerator } from '@/utils/SlugGenerator';
 
 /**
  * 🏛️ Classe ItemService
@@ -29,9 +24,17 @@ import { SlugGenerator           } from '@/utils/SlugGenerator';
  *
  * @class ItemService
  * @implements {IItemService}
- * @author Joël, Gaïa & Co
+ *
+ * @author 🧠 Conception : Joël (Hongroise maniac')
+ * @author ☄️ Usine à lignes : Gaïa (Trébuchet de syntaxe)
+ * @author ⚔️ Rempart des types : Le Cartel du Donjon (Garde d'élite)
+ * @author 🏺 Relique d'origine : L'Ancien Régime (Fossile de Gergovie)
  */
 export class ItemService implements IItemService {
+
+  private readonly itemRepository : IItemRepository;
+  private readonly itemTagRepository : IItemTagRepository;
+  private readonly tagRepository : ITagRepository;
 
   /**
    * Initialise le cas d'usage par injection d'abstractions de dépôts.
@@ -39,14 +42,17 @@ export class ItemService implements IItemService {
    * @constructor
    */
   public constructor(
-    private readonly itemRepository : IItemRepository,
-    private readonly itemTagRepository : IItemTagRepository,
-    private readonly tagRepository : ITagRepository
-  ) {}
+    itemRepository : IItemRepository,
+    itemTagRepository : IItemTagRepository,
+    tagRepository : ITagRepository
+  ) {
+    this.itemRepository = itemRepository;
+    this.itemTagRepository = itemTagRepository;
+    this.tagRepository = tagRepository;
+  }
 
   /**
    * 🛡️ Sécurité Nominale : Valide l'existence et l'ownership légitime d'une collection d'étiquettes.
-   * Levera une anomalie claire (404 ou 403) au moindre écart constaté.
    *
    * @private
    * @async
@@ -63,6 +69,7 @@ export class ItemService implements IItemService {
         throw TagErrorFactory.accessDenied(tag.getTagId(), userId);
       }
     }
+
   }
 
   /**
@@ -76,27 +83,22 @@ export class ItemService implements IItemService {
     const slug : string = dto.slug ?? SlugGenerator.generate(dto.title);
 
     const existingSlug : Item | null = await this.itemRepository.findBySlug(userMetierId, slug);
-    if (existingSlug) {
-      throw ItemErrorFactory.slugExists(userMetierId, slug);
-    }
+    if (existingSlug) throw ItemErrorFactory.slugExists(userMetierId, slug);
 
     const existingTitle : Item | null = await this.itemRepository.findByTitle(userMetierId, dto.title);
-    if (existingTitle) {
-      throw ItemErrorFactory.titleExists(userMetierId, dto.title);
-    }
+    if (existingTitle) throw ItemErrorFactory.titleExists(userMetierId, dto.title);
 
-    // 🪓 Correction définitive du transtypage de l'itérateur (Plus d'enfer de map)
     const rawTagIds = dto.tagIds || [];
     const domainTagIds : TagId[] = rawTagIds.map((id: unknown): TagId => new TagId(id as string));
 
-    // Validation de sécurité en Fail-Fast AVANT toute insertion d'infrastructure
     if (domainTagIds.length > 0) {
       await this.validateTagOwnership(userMetierId, domainTagIds);
     }
 
+    // 🪓 ALIGNEMENT INDUSTRIEL : Création propre de la pépite via crypto native
     const data : IItemData = {
-      idItem       : undefined as any, // Forgé à l'insertion SQL par gen_random_uuid()
-      idUser       : userMetierId,     // Alignement nominal strict de la propriété
+      idItem       : new ItemId(randomUUID()),
+      idUser       : userMetierId,
       contentType  : dto.contentType,
       title        : dto.title,
       slug         : slug,
@@ -108,7 +110,6 @@ export class ItemService implements IItemService {
 
     const item : Item = await this.itemRepository.create(data);
 
-    // Synchronisation de masse de la table de jointure après persistance de l'atome racine
     if (domainTagIds.length > 0) {
       await this.itemTagRepository.sync(item.getItemId(), domainTagIds);
     }
@@ -127,10 +128,7 @@ export class ItemService implements IItemService {
     const itemMetierId = new ItemId(itemId);
 
     const item : Item | null = await this.itemRepository.findById(itemMetierId);
-
-    if (!item) {
-      throw ItemErrorFactory.notFound(itemMetierId);
-    }
+    if (!item) throw ItemErrorFactory.notFound(itemMetierId);
 
     if (item.getUserId().valeur !== userMetierId.valeur) {
       throw ItemErrorFactory.accessDenied(itemMetierId, userMetierId);
@@ -148,10 +146,7 @@ export class ItemService implements IItemService {
   public async findBySlug(userId: string, slug: string): Promise<IItem> {
     const userMetierId = new UserId(userId);
     const item : Item | null = await this.itemRepository.findBySlug(userMetierId, slug);
-
-    if (!item) {
-      throw ItemErrorFactory.notFound(new ItemId(slug));
-    }
+    if (!item) throw ItemErrorFactory.notFound(new ItemId(slug));
 
     return item;
   }
@@ -178,16 +173,12 @@ export class ItemService implements IItemService {
     const itemMetierId = new ItemId(itemId);
 
     const existing : Item | null = await this.itemRepository.findById(itemMetierId);
-
-    if (!existing) {
-      throw ItemErrorFactory.notFound(itemMetierId);
-    }
+    if (!existing) throw ItemErrorFactory.notFound(itemMetierId);
 
     if (existing.getUserId().valeur !== userMetierId.valeur) {
       throw ItemErrorFactory.accessDenied(itemMetierId, userMetierId);
     }
 
-    // 🪓 Correction définitive du transtypage sur l'itérateur de mise à jour
     const rawUpdateTagIds = dto.tagIds || [];
     const domainTagIds : TagId[] = rawUpdateTagIds.map((id: unknown): TagId => new TagId(id as string));
 
@@ -195,20 +186,16 @@ export class ItemService implements IItemService {
       await this.validateTagOwnership(userMetierId, domainTagIds);
     }
 
-    // Clonage et isolation du payload d'infrastructure pour l'extraction SQL
     const updates : Partial<IItemData> = { ...dto } as any;
-    delete (updates as any).tagIds; // Nettoyage : tagIds n'appartient pas à la table items
+    delete (updates as any).tagIds;
 
     if (dto.title && !dto.slug) {
       updates.slug = SlugGenerator.generate(dto.title);
     }
 
     const updated : Item | null = await this.itemRepository.update(itemMetierId, updates);
-    if (!updated) {
-      throw ItemErrorFactory.notFound(itemMetierId);
-    }
+    if (!updated) throw ItemErrorFactory.notFound(itemMetierId);
 
-    // Si la propriété tagIds a été fournie (même vide), on applique un écrasement transactionnel
     if (dto.tagIds !== undefined) {
       await this.itemTagRepository.sync(itemMetierId, domainTagIds);
     }
@@ -227,18 +214,13 @@ export class ItemService implements IItemService {
     const itemMetierId = new ItemId(itemId);
 
     const existing : Item | null = await this.itemRepository.findById(itemMetierId);
-
-    if (!existing) {
-      throw ItemErrorFactory.notFound(itemMetierId);
-    }
+    if (!existing) throw ItemErrorFactory.notFound(itemMetierId);
 
     if (existing.getUserId().valeur !== userMetierId.valeur) {
       throw ItemErrorFactory.accessDenied(itemMetierId, userMetierId);
     }
 
     const deleted : boolean = await this.itemRepository.delete(itemMetierId);
-    if (!deleted) {
-      throw ItemErrorFactory.notFound(itemMetierId);
-    }
+    if (!deleted) throw ItemErrorFactory.notFound(itemMetierId);
   }
 }

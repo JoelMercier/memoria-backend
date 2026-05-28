@@ -1,3 +1,5 @@
+// ——— fichier : src\routes\v1\share.routes.ts
+
 import { Router } from 'express';
 import type { ShareController } from '@/controllers/ShareController';
 

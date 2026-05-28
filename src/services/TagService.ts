@@ -9,6 +9,7 @@ import type { ITag           } from '@/interfaces/entities/tag/ITag';
 import type { ITagData       } from '@/interfaces/entities/tag/ITagData';
 import type { ITagRepository } from '@/interfaces/repositories/ITagRepository';
 import type { ITagService    } from '@/interfaces/services/ITagService';
+import      { randomUUID          } from 'node:crypto';
 
 /**
  * 🏛️ Classe TagService
@@ -52,8 +53,9 @@ export class TagService implements ITagService {
    * @async
    */
   public async create(userId: UserId, dto: CreateTagDto): Promise<ITag> {
+    // 🪓 ALIGNEMENT INDUSTRIEL : Forgeage propre de l'ID avec l'outil crypto natif
     const data : ITagData = {
-      idTag   : undefined as any, // Forgé dynamiquement à l'insertion SQL par gen_random_uuid()
+      idTag   : new TagId(randomUUID()),
       userId  : userId,
       tagName : dto.tagName
     };

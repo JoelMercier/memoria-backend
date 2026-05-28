@@ -4,7 +4,7 @@ import { AppEventCategory } from '@/constants/AppEventCategory';
 import { AppEventSeverity } from '@/constants/AppEventSeverity';
 import { AppEventType     } from '@/constants/AppEventType';
 import type { UserId,
-              EventId     } from '@/domain/value-objects/IdMetier';
+              AppEventId  } from '@/domain/value-objects/IdMetier';
 import type { IBaseEntityData } from '@/interfaces/entities/IBaseEntityData';
 
 /**
@@ -16,7 +16,7 @@ import type { IBaseEntityData } from '@/interfaces/entities/IBaseEntityData';
  * @type IAppEventData
  * @author Joël, Gaïa & Co
  */
-export type IAppEventData = IBaseEntityData<'appEvent', EventId> & {
+export type IAppEventData = IBaseEntityData<'appEvent', AppEventId> & {
 
   /** 👥 ID de l'utilisateur concerné (Peut être NULL pour les événements système) */
   userId : UserId | null;

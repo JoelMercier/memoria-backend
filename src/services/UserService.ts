@@ -24,11 +24,6 @@ import type { IUserService       } from '@/interfaces/services/IUserService';
  */
 export class UserService implements IUserService {
 
-  /**
-   * Initialise le cas d'usage par injection d'abstractions.
-   *
-   * @constructor
-   */
   public constructor(
     private readonly userRepository : IUserRepository,
     private readonly passwordHasher : IPasswordHasher
@@ -36,10 +31,6 @@ export class UserService implements IUserService {
 
   /**
    * 👤 Met à jour le pseudonyme, le courriel ou les préférences graphiques de l'utilisateur.
-   * Supervise les vérifications préalables d'unicité en Fail-Fast.
-   *
-   * @public
-   * @async
    */
   public async updateProfile(userId: UserId, dto: UpdateProfileDto): Promise<IUser> {
     const existing : User | null = await this.userRepository.findById(userId);
@@ -47,16 +38,16 @@ export class UserService implements IUserService {
       throw UserErrorFactory.notFound(userId);
     }
 
-    // Vérifie l'unicité de l'email si celui-ci fait l'objet d'un changement
-    if (dto.email && dto.email.toLowerCase() !== existing.Email.toLowerCase()) {
+    // 🪓 ALIGNEMENT INDUSTRIEL REUSSIT : .getEmail() uniformisé
+    if (dto.email && dto.email.toLowerCase() !== existing.getEmail().toLowerCase()) {
       const byEmail : User | null = await this.userRepository.findByEmail(dto.email);
       if (byEmail) {
         throw UserErrorFactory.profileConflict('email', dto.email);
       }
     }
 
-    // Vérifie l'unicité du pseudonyme public si modifié
-    if (dto.pseudo && dto.pseudo !== existing.Pseudo) {
+    // 🪓 ALIGNEMENT INDUSTRIEL REUSSIT : .getPseudo() uniformisé
+    if (dto.pseudo && dto.pseudo !== existing.getPseudo()) {
       const byPseudo : User | null = await this.userRepository.findByPseudo(dto.pseudo);
       if (byPseudo) {
         throw UserErrorFactory.profileConflict('pseudo', dto.pseudo);
@@ -83,9 +74,6 @@ export class UserService implements IUserService {
 
   /**
    * 🔐 Remplace les secrets d'accès de l'utilisateur après double contrôle de l'infrastructure.
-   *
-   * @public
-   * @async
    */
   public async changePassword(userId: UserId, dto: ChangePasswordDto): Promise<void> {
     const user : User | null = await this.userRepository.findById(userId);
@@ -93,9 +81,10 @@ export class UserService implements IUserService {
       throw UserErrorFactory.notFound(userId);
     }
 
+    // 🪓 ALIGNEMENT INDUSTRIEL REUSSIT : .getPasswordHash() uniformisé
     const ok : boolean = await this.passwordHasher.verify(
       dto.currentPassword,
-      user.PasswordHash
+      user.getPasswordHash()
     );
     if (!ok) {
       throw UserErrorFactory.wrongPassword();
@@ -112,10 +101,6 @@ export class UserService implements IUserService {
 
   /**
    * 🗑️ Purge destructive et définitive du compte de l'utilisateur.
-   * Déclenche en cascade la destruction de toutes les pépites, étiquettes et partages associés.
-   *
-   * @public
-   * @async
    */
   public async deleteAccount(userId: UserId, dto: DeleteAccountDto): Promise<void> {
     const user : User | null = await this.userRepository.findById(userId);
@@ -123,12 +108,12 @@ export class UserService implements IUserService {
       throw UserErrorFactory.notFound(userId);
     }
 
-    const ok : boolean = await this.passwordHasher.verify(dto.password, user.PasswordHash);
+    // 🪓 ALIGNEMENT INDUSTRIEL REUSSIT : .getPasswordHash() uniformisé
+    const ok : boolean = await this.passwordHasher.verify(dto.password, user.getPasswordHash());
     if (!ok) {
       throw UserErrorFactory.wrongPassword();
     }
 
-    // Le mécanisme FK CASCADE de la base se charge de balayer l'empreinte de toutes les tables associées
     const deleted : boolean = await this.userRepository.delete(userId);
     if (!deleted) {
       throw UserErrorFactory.notFound(userId);

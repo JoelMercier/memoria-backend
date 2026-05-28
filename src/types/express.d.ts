@@ -1,7 +1,7 @@
 // ——— fichier : src/types/express.d.ts
 
-import { Role   } from '@/constants/Role';
-import { UserId } from '@/domain/value-objects/IdMetier';
+import { Role } from '@/constants/Role';
+import { UserId, RequestId } from '@/domain/value-objects/IdMetier';
 
 /**
  * 🏛️ Extension Globale de Types Express
@@ -9,13 +9,10 @@ import { UserId } from '@/domain/value-objects/IdMetier';
  * Augmente le contrat d'infrastructure natif de la requête HTTP Express.
  * Permet de greffer l'identité de l'acteur et le jeton de traçabilité de façon typée.
  *
- * 💡 JUSTIFICATION DE LA CONSERVATION DE CE FICHIER :
- * Oui, Joël, ce fichier a une raison d'être absolue et capitale ! Sans lui, TypeScript est totalement
- * incapable de compiler ton projet dès qu'un contrôleur ou un middleware tente de lire `req.user`
- * ou `req.id`. C'est le poste frontière de l'infrastructure web.
- * Cependant, il était resté coincé dans le passé avec de vieilles primitives volantes et des enums morts !
- *
- * @author Joël, Gaïa & Co
+ * @author 🧠 Conception : Joël (Hongroise maniac')
+ * @author ☄️ Usine à lignes : Gaïa (Trébuchet de syntaxe)
+ * @author ⚔️ Rempart des types : Le Cartel du Donjon (Garde d'élite)
+ * @author 🏺 Relique d'origine : L'Ancien Régime (Fossile de Gergovie)
  */
 declare global {
   namespace Express {
@@ -35,8 +32,8 @@ declare global {
         role: Role;
       };
 
-      /** 🆔 Identifiant unique de corrélation de la requête (Audit / Traçabilité Request-ID) */
-      id?: string;
+      /** 🆔 Identifiant nominal unique de corrélation (Audit / Traçabilité réseau) */
+      requestId?: RequestId; // 🪓 PULVÉRISATION DE LA COLLISION GRÂCE À L'AMIRAL !
     }
   }
 }

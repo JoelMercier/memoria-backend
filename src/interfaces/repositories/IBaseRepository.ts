@@ -5,14 +5,19 @@ import type { AllowedIdTypes } from '@/interfaces/entities/IBaseEntityData';
 /**
  * 📜 Interface IBaseRepository (Version Jojo Libérée)
  * ----------------------------------------------------
- * Contrat d'accès aux données générique (CRUD) pour les infrastructures de stockage.
- * Ouverte aux Value Objects d'identifiants métiers typés.
+ * Contrat d'accès aux données générique pour les infrastructures de stockage.
+ * Limité constitutionnellement aux flux en lecture et écriture seule (Append/Read).
+ * Isole les structures immuables (comme les traces d'audit app_events) des dangers de mutation.
  *
  * @interface IBaseRepository
  * @template TEntity - La classe ou interface de l'entité métier (ex: User)
  * @template TData   - Le contrat de données passif associé (ex: IUserData)
  * @template TId     - Le type fort de la clé primaire (Par défaut string)
- * @author Joël, Gaïa & Co
+ *
+ * @author 🧠 Conception : Joël (Abstract' Obsession)
+ * @author ☄️ Usine à lignes : Gaïa (Trébuchet de syntaxe)
+ * @author ⚔️ Rempart des types : Le Cartel du Donjon (Garde d'élite)
+ * @author 🏺 Relique d'origine : L'Ancien Régime (Fossile de Gergovie)
  */
 export interface IBaseRepository<
   TEntity,
@@ -28,10 +33,4 @@ export interface IBaseRepository<
 
   /** 💾 Insère ou persiste une nouvelle structure de données dans le stockage. */
   create(data: TData): Promise<TEntity>;
-
-  /** 🎛️ Met à jour les données partielles d'une entité via son identifiant fort. */
-  update(id: TId, data: Partial<TData>): Promise<TEntity>;
-
-  /** 🗑️ Supprime définitivement un enregistrement du stockage. */
-  delete(id: TId): Promise<boolean>;
 }

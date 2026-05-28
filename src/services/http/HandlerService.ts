@@ -1,13 +1,11 @@
 // ——— fichier : src/services/http/HandlerService.ts
 
-import type { NextFunction,
-              Request,
-              Response           } from 'express';
-import { LoggerSingleton }         from '@/config/LoggerSingleton';
-import { ApiError }                from '@/exceptions/ApiError';
-import type { IHandlerService }    from '@/interfaces/http/IHandlerService';
-import { ApiResponseFactory }      from '@/utils/ApiResponseFactory';
-import { RequestIdGenerator }      from '@/utils/RequestIdGenerator';
+import type { NextFunction, Request, Response } from 'express';
+import { LoggerSingleton } from '@/config/LoggerSingleton';
+import { ApiError } from '@/exceptions/ApiError';
+import type { IHandlerService } from '@/interfaces/http/IHandlerService';
+import { ApiResponseFactory } from '@/utils/ApiResponseFactory';
+import { RequestIdGenerator } from '@/utils/RequestIdGenerator';
 
 /**
  * 🏛️ Classe HandlerService
@@ -19,7 +17,10 @@ import { RequestIdGenerator }      from '@/utils/RequestIdGenerator';
  *
  * @class HandlerService
  * @implements {IHandlerService}
- * @author Joël, Gaïa & Co
+ * @author 🧠 feat(donjon): Joël (Abstrait' Obsession)
+ * @author ☄️ refactor(forge): Gaïa (Trébuchet lourd)
+ * @author 🛡️ fix(remparts): Le Cartel du Donjon (Garde d'élite)
+ * @author 🏺 chore(fossile): L'Ancien Régime & Co (Gergovie textuelle)
  */
 export class HandlerService implements IHandlerService {
 

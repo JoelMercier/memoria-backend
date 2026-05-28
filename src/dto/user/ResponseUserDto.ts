@@ -49,14 +49,14 @@ export class ResponseUserDto {
    * @param {IUser} user - L'interface métier immuable de référence
    */
   private constructor(user: IUser) {
-    // Raccordement chirurgical nominal et protection contre les reliques archéologiques
-    this.id           = user.idUser;
-    this.email        = user.Email;
-    this.pseudo       = user.Pseudo;
-    this.role         = user.Role.code;
-    this.authProvider = user.AuthProvider.code;
-    this.settingsUser = user.SettingsUser;
-    this.gdprConsent  = user.GdprConsent;
+    // 🪓 ALIGNEMENT INDUSTRIEL : Raccordement via les fonctions nominales unifiées
+    this.id           = user.getUserId();
+    this.email        = user.getEmail();
+    this.pseudo       = user.getPseudo();
+    this.role         = user.getRole().code;
+    this.authProvider = user.getAuthProvider().code;
+    this.settingsUser = user.getSettingsUser();
+    this.gdprConsent  = user.getGdprConsent();
     this.createdAt    = user.createdAt;
     this.updatedAt    = user.updatedAt;
   }
