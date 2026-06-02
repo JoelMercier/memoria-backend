@@ -1,8 +1,6 @@
 // ——— fichier : src/interfaces/database/IDatabaseConnection.ts
 
-import type { Pool,
-              QueryResult,
-              QueryResultRow } from 'pg';
+import type { Pool, QueryResult, QueryResultRow } from 'pg';
 
 /**
  * 🗄️ Interface IDatabaseConnection

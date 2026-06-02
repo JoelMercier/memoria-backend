@@ -1,6 +1,6 @@
 // ——— fichier : src/interfaces/shared/IListOptions.ts
 
-import { OrdreAff } from '@/constants/OrdreAff';
+import { OrdreAff } from '@/constants/OrdreTriEnum';
 
 /**
  * 📊 Interface IListOptions (Version Jojo Excellence)
@@ -27,5 +27,5 @@ export interface IListOptions {
 
   /** Date de coupure optionnelle pour l'isolation des historiques */
   DatePivot?   : Date;
-  
+
 }

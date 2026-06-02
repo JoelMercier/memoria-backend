@@ -1,5 +1,5 @@
 -- ============================================================================
--- SEEDER 06 : APP_EVENTS (ÉVÉNEMENTS SYSTÈME)
+-- script d'ensemencement 06 : APP_EVENTS (ÉVÉNEMENTS SYSTÈME)
 -- Fichier: database/seeders/06_add_app_events_seeders.sql
 -- ============================================================================
 

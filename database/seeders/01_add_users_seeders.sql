@@ -1,5 +1,5 @@
 -- ============================================================================
--- SEEDER 01 : UTILISATEURS
+-- script d'ensemencement 01 : UTILISATEURS
 -- Fichier: database/seeders/01_add_users_seeders.sql
 -- ============================================================================
 
@@ -270,6 +270,3 @@ INSERT INTO users (
     '2026-01-15 15:30:00'
 )
 ON CONFLICT DO NOTHING;
-
-
-

@@ -1,0 +1,9 @@
+📜 PROTOCOLE DE REPRISE - PROJET MÉMORIA (V1 STABLE)
+- Charte : Jojo-Style stricte, politesse Capitalised, français de production souverain (usCourriel, shCourrielDest).
+- Infrastructure SQL : 11 tables physiques coulées en Bytea (16 octets bruts pour IdBinaire, padding = 0%), indexation anti-produit cartésien (Events_aeIdSeverity_Idx), table associative ItemTags basculée sur le domaine "ti" avec sa colonne "tiCreatedAt" de traçabilité.
+- Trigger Universel : Fonction unique et dynamique "TraceModif"('NomColonne') opérationnelle pour les UpdatedAt via variables text internes.
+- Dictionnaires Système : Rôles, Providers, ContentTypes et Severites stabilisés avec colonnes d'affichage "roOrdreAff" et de hiérarchie machine "roNiveau" / "seNiveau" (Smallint).
+- API SQL Fermée : 17 fonctions stockées paramétrées en Bytea construites et ordonnées en RAM du plus lourd au variable libre (> void appliqué aux 18 anciennes vues miroirs/multicompte).
+- Seeders : 12 acteurs de tests complets (SophieDev à PierreRoot), 8 pépites de Lucas et journal d'audit Append-Only (systeme.demarrage à bd.requete_lente) convertis en decode('...', 'hex') et engrangés localement dans 00_Seeders_Globaux.sql.
+
+=> Objectif immédiat : Lancer la Phase 2 et ouvrir officiellement le second front dans la Cour Basse TypeScript !

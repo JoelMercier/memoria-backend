@@ -1,76 +1,84 @@
 // ——— fichier : src/constants/Role.ts
 
-import { SmartEnum } from './base/SmartEnum';
+import { SmartEnum } from '@/constants/base/SmartEnum';
 
 /**
- * 🏛️ Classe Role (Smart Enum)
- * ----------------------------
- * Gère la hiérarchie de sécurité et les droits d'accès au sein du système.
- * Encapsule la logique de supériorité des privilèges.
+ * 👥 Classe Role 🧮 (Le Régulateur des Rangs Applicatifs 🤖)
+ * ----------------------------------------------------------------------------
+ * Centralise les rôles de sécurité pour le contrôle des accès (ACL) de "Users".
+ * Aligné au bit près sur les quadrigrammes de production de la table "Roles" [Mémoria].
+ *
+ * @class Role
+ * @extends {SmartEnum<string>}
+ * @author Vision : Joël (Void capillaire)
+ * @author Sculpture d'octets : Gaïa (Sculptrice de silicium)
+ * @author Héritage Git->Origin : La Vague Initiale (Ouvriers de la première heure)
  */
 export class Role extends SmartEnum<string> {
-
-  /** 👥 Utilisateur standard / Client final de la plateforme */
-  public static readonly CUSTOMER    = new Role('CUSTOMER', 'customer', 1, '👤 Client');
-
-  /** 🛠️ Administrateur doté des droits d'exploitation courants */
-  public static readonly ADMIN       = new Role('ADMIN', 'admin', 2, '🛠️ Administrateur');
-
-  /** 👑 Super-Administrateur détenant l'accès destructeur total */
-  public static readonly SUPER_ADMIN = new Role('SUPER_ADMIN', 'super_admin', 3, '👑 Super Admin');
+  /** 🤖 Le poids numérique unique de pouvoir pour les contrôles de sécurité (ex: 10, 20, 30) [Mémoria] */
+  private readonly m_nNiveau: number;
 
   /**
-   * Constructeur privé assurant l'immuabilité des privilèges.
+   * Moule une instance immuable de privilège dans la RAM 🧠.
    *
-   * @param {string} libelle - Identifiant interne textuel
-   * @param {string} codeSql - Chaîne brute stockée dans PostgreSQL
-   * @param {number} niveau - Poids hiérarchique (plus le chiffre est haut, plus le rôle est puissant)
-   * @param {string} libelleAffichage - Libellé destiné à l'interface de gestion
+   * @private
+   * @constructor
+   * @param {string} p_sLibelle - Désignation intelligible pour le front-end
+   * @param {string} p_sCode - Le quadrigramme d'infrastructure immuable (4 majuscules) [Mémoria]
+   * @param {number} p_nNiveau - Poids hiérarchique pour le contrôle machine [Mémoria]
+   * @param {number} p_nOrdreAff - Position numérique unique pour le tri logique visuel [Mémoria]
    */
-  private constructor(
-    libelle: string,
-    codeSql: string,
-    public readonly niveau: number,
-    public readonly libelleAffichage: string
-  ) {
-    super(libelle, codeSql);
+  private constructor(p_sLibelle: string, p_sCode: string, p_nNiveau: number, p_nOrdreAff: number) {
+    super(p_sLibelle, p_sCode, p_nOrdreAff);
+    this.m_nNiveau = Math.floor(p_nNiveau);
   }
 
   /**
-   * Liste exhaustive des rôles du système.
+   * 🤖 Obtient le poids numérique de sécurité lié au rôle.
    */
-  public static values(): Role[] {
-    return [
-      Role.CUSTOMER,
-      Role.ADMIN,
-      Role.SUPER_ADMIN
-    ];
+  public get niveau(): number {
+    return this.m_nNiveau;
   }
 
   /**
-   * Vérifie si ce rôle possède des privilèges supérieurs ou égaux à un autre.
-   * Supprime définitivement les cascades de "if" dans le code.
+   * 🛡️ Accesseur rétrocompatible pour éviter de casser ton code existant [Mémoria] */
+  public get libelleAffichage(): string {
+    return this.libelle;
+  }
+
+  /**
+   * 🛡️ Vérifie si ce rôle possède des privilèges supérieurs ou égaux à un autre [Mémoria].
+   * Supprime définitivement les cascades de "if" dans la logique métier.
    *
-   * @param {Role} autreRole - Le rôle minimal requis pour l'action
+   * @param {Role} p_oAutreRole - Le rôle minimal requis pour l'action
    * @returns {boolean} True si l'accès est légitime
    */
-  public estSuperieurOuEgalA(autreRole: Role): boolean {
-    return this.niveau >= autreRole.niveau;
+  public estSuperieurOuEgalA(p_oAutreRole: Role): boolean {
+    return this.m_nNiveau >= p_oAutreRole.niveau;
   }
 
-  /**
-   * Convertit la chaîne brute de la DB en instance sécurisée.
-   */
-  public static fromSql(codeSql: string): Role {
-    const found = this.values().find(r => r.code === codeSql);
-
-    if (!found) {
-      throw new Error(`[Erreur Sécurité] Code de rôle SQL inconnu : '${codeSql}'`);
-    }
-
-    return found;
+  /** 🚀 Passerelle rétrocompatible pour tes DTOs existants [Mémoria] */
+  public static values(): Role[] {
+    return this.ObtenirToutes<Role>();
   }
 
+  /** 🗄️ Convertisseur d'infrastructure historique branché sur le décodeur central [Mémoria] */
+  public static fromSql(p_sCodeSql: string): Role {
+    return this.DeCode<Role>(p_sCodeSql);
+  }
+
+  // ----------------------------------------------------------------------------
+  // 🏺 ENSEMENCEMENT DE LA RAM (Les trois piliers du contrôle d'accès - Format 4 lettres)
+  // ----------------------------------------------------------------------------
+
+  /** 🪙 CUST - Rôle Utilisateur : Droits de capture sémantique de base */
+  public static readonly CUST = new Role('Utilisateur', 'CUST', 10, 10);
+
+  /** 💾 ADMN - Rôle Administrateur : Pouvoirs de supervision et modération [Mémoria] */
+  public static readonly ADMN = new Role('Administrateur', 'ADMN', 20, 20);
+
+  /** 💽 SADM - Rôle Super Administrateur : Pouvoir absolu sur les infrastructures [Mémoria] */
+  public static readonly SADM = new Role('Super Administrateur', 'SADM', 30, 30);
 }
 
 export default Role;

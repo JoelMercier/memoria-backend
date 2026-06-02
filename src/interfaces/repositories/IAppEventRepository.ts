@@ -1,79 +1,67 @@
 // ——— fichier : src/interfaces/repositories/IAppEventRepository.ts
 
-import type { AppEventCategory   } from '@/constants/AppEventCategory';
-import type { AppEventSeverity   } from '@/constants/AppEventSeverity';
-import type { AppEventType       } from '@/constants/AppEventType';
-import type { UserId, AppEventId } from '@/domain/value-objects/IdMetier';
-import type { AppEvent           } from '@/entities/AppEvent';
-import type { IAppEventData      } from '@/interfaces/entities/event/IAppEventData';
-import type { IBaseRepository    } from '@/interfaces/repositories/IBaseRepository';
-import type { IListOptions       } from '@/interfaces/shared/IListOptions';
+import { AppEventCategory }     from '@/constants/AppEventCategory';
+import { AppEventSeverity }     from '@/constants/AppEventSeverity';
+import { AppEventType }         from '@/constants/AppEventType';
+import { UserId, AppEventId }   from '@/domain/value-objects/IdMetier';
+import { AppEvent }             from '@/entities/AppEvent';
+import { IListOptions }         from '@/interfaces/shared/IListOptions';
 
 /**
- * 📋 Interface IAppEventListOptions
- * ---------------------------------
- * Options de filtrage spécifiques pour le journal d'audit.
- * Hérite des propriétés de pagination universelles (NbLignesMax, IndexDepart, search).
+ * 📋 Interface exclusive pour le sac de données brutes de l'événement d'audit.
+ * ----------------------------------------------------------------------------
+ * Alignée au bit près sur la structure physique décroissante de la table "Events".
  *
- * @interface IAppEventListOptions
- * @extends {IListOptions}
- * @author Joël, Gaïa & Co
+ * @interface IAppEventData
+ * @author Vision : Joël (C++ Addict)
+ * @author Forgerie logicielle : Gaïa (Graveuse de lignes d'acier)
+ * @author Héritage Git->Origin : La Vague Initiale (Artisans du temps imparti)
+ */
+export interface IAppEventData {
+  /** 🤖 L'identifiant binaire fort obligatoire pour l'entité [Mémoria] */
+  idAppEvent     : AppEventId;
+  /** 👥 L'identifiant unique de l'acteur (Peut être null pour le système ou le RGPD) */
+  userId         : UserId | null;
+  /** 🏷️ Le type d'action métier qualifié (ex: 'authentification.echec') */
+  eventType      : AppEventType;
+  /** 📂 La catégorie fonctionnelle parente du log au format quadrigramme */
+  eventCategory  : AppEventCategory;
+  /** ⚠️ L'objet sévérité riche contenant le poids numérique machine */
+  severity       : AppEventSeverity;
+  /** 📦 Libellé textuel ou message intelligible de l'événement pour l'écran */
+  message        : string;
+  /** 🗄️ Le dictionnaire Jsonb de contexte technique (IP, user-agent) [Mémoria] */
+  metadata       : Record<string, unknown>;
+  /** 📅 La date d'enregistrement immuable calculée par la RAM du Domaine */
+  createdAt?     : Date;
+}
+
+/**
+ * 📋 Interface IAppEventListOptions 🧮 (Le Calibreur d'Options d'Audit 🤖)
  */
 export interface IAppEventListOptions extends IListOptions {
-
-  /** 🏷️ Filtre optionnel ciblant un type d'action métier précis */
-  eventType? : AppEventType;
-
-  /** 📂 Filtre optionnel ciblant une catégorie logique d'événement */
+  eventType?     : AppEventType;
   eventCategory? : AppEventCategory;
-
-  /** ⚠️ Filtre optionnel ciblant un niveau de criticité opérationnelle */
-  severity? : AppEventSeverity;
+  severity?      : AppEventSeverity;
 }
 
 /**
- * 📦 Interface IAppEventListResult
- * --------------------------------
- * Structure de restitution normalisée pour les listes paginées de logs d'audit.
- *
- * @interface IAppEventListResult
- * @author Joël, Gaïa & Co
+ * 📦 Interface IAppEventListResult 🧮 (Le Restituteur Normalisé de Traces 🤖)
  */
 export interface IAppEventListResult {
-
-  /** 🧾 Collection d'instances vivantes d'événements extraites du stockage */
-  items : AppEvent[];
-
-  /** 📊 Nombre total cumulé d'enregistrements correspondants trouvés en base */
-  total : number;
+  items          : AppEvent[];
+  total          : number;
 }
 
 /**
- * 🗄️ Interface IAppEventRepository
- * --------------------------------
- * Contrat d'accès aux données pour la journalisation et l'audit système (logs).
- *
- * @interface IAppEventRepository
- * @extends {IBaseRepository<AppEvent, IAppEventData, EventId>}
- * @author Joël, Gaïa & Co
+ * 🗄️ Interface IAppEventRepository 🧮 (Le Gardien du Registre d'Audit 🤖)
  */
-export interface IAppEventRepository extends IBaseRepository<AppEvent, IAppEventData, AppEventId> {
-
-  /** 🔎 Récupère l'intégralité d'un log d'audit par son identifiant unique fort. */
-  findById(eventId: AppEventId): Promise<AppEvent | null>;
-
-  /** 👥 Extrait la liste brute des derniers logs rattachés à un utilisateur spécifique. */
-  findByUserId(userId: UserId, limit?: number): Promise<AppEvent[] | null>;
-
-  /** 📜 Extrait la liste paginée, filtrée et indexée des logs d'un utilisateur donné. */
-  listByUserId(userId: UserId, options?: IAppEventListOptions): Promise<IAppEventListResult>;
-
-  /** ⚠️ Extrait les derniers logs correspondant à un niveau de sévérité précis. */
-  findBySeverity(severity: AppEventSeverity, limit?: number): Promise<AppEvent[] | null>;
-
-  /** 🗂️ Extrait les derniers logs correspondant à une catégorie fonctionnelle spécifique. */
-  findByCategory(category: AppEventCategory, limit?: number): Promise<AppEvent[] | null>;
-
-  /** 🚨 Récupère en priorité absolue les derniers logs critiques du système. */
-  findCritical(limit?: number): Promise<AppEvent[] | null>;
+export interface IAppEventRepository {
+  findById(p_axEventId: AppEventId): Promise<AppEvent | null>;
+  findByUserId(p_axUserId: UserId, p_iNbLignesMax?: number): Promise<AppEvent[] | null>;
+  listByUserId(p_axUserId: UserId, p_oOptions?: IAppEventListOptions): Promise<IAppEventListResult>;
+  findBySeverity(p_eSeverity: AppEventSeverity, p_iNbLignesMax?: number): Promise<AppEvent[] | null>;
+  findByCategory(p_eCategory: AppEventCategory, p_iNbLignesMax?: number): Promise<AppEvent[] | null>;
+  findCritical(p_iNbLignesMax?: number): Promise<AppEvent[] | null>;
+  findAll(): Promise<AppEvent[]>;
 }

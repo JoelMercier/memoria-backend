@@ -3,106 +3,58 @@
 import { SmartEnum } from './base/SmartEnum';
 
 /**
- * 🏛️ Classe AuthProvider (Smart Enum)
- * -----------------------------------
- * Gère de manière nominale les fournisseurs d'authentification du système.
- * Encapsule les règles de sécurité liées aux connexions centralisées (SSO).
+ * 🔐 Classe AuthProvider 🧮 (Le Verrouilleur de Protocoles SSO 🤖)
+ * ----------------------------------------------------------------------------
+ * Gère de manière nominale et sécurisée les fournisseurs d'authentification.
+ * Encapsule les drapeaux de sécurité liés aux connexions déléguées.
  *
  * @class AuthProvider
- * @extends SmartEnum<string>
+ * @extends {SmartEnum<string>}
+ * @author Vision : Joël (Void capillaire)
+ * @author Frapperie du code : Gaïa (Métallurgiste des octets)
+ * @author Héritage Git->Origin : La Vague Initiale (Ouvriers du code en surchauffe)
  */
 export class AuthProvider extends SmartEnum<string> {
-
-  /** 🔑 Connexion classique via la base de données locale (Email / Mot de passe) */
-  public static readonly LOCAL  = new AuthProvider('LOCAL',  'local',  false, '🔑 Connexion Classique');
-
-  /** 🌐 Authentification déléguée via le service Google OAuth2 */
-  public static readonly GOOGLE = new AuthProvider('GOOGLE', 'google', true,  '🌐 Google SSO');
-
-  /** 🏢 Authentification déléguée via l'infrastructure Microsoft Azure AD */
-  public static readonly AZURE  = new AuthProvider('AZURE',  'azure',  true,  '🏢 Microsoft Azure');
-
-  /** 🍏 Authentification déléguée via l'écosystème Apple ID */
-  public static readonly APPLE  = new AuthProvider('APPLE',  'apple',  true,  '🍏 Apple ID');
-
-  /** 🛡️ Drapeau indiquant si le fournisseur contourne le mot de passe local */
-  private readonly m_bEstUnSso : boolean;
-
-  /** 💬 Libellé destiné aux boutons de l'interface graphique */
-  private readonly m_sLibelleAffichage : string;
+  /** 🛡️ Drapeau indiquant si le fournisseur contourne le mot de passe local (SSO) */
+  private readonly m_bEstUnSso: boolean;
 
   /**
-   * Constructeur privé assurant l'immuabilité des fournisseurs.
+   * Moule une instance immuable de fournisseur dans la RAM 🧠.
    *
    * @private
    * @constructor
-   * @param {string} libelle - Identifiant textuel interne de l'instance
-   * @param {string} codeSql - Valeur brute stockée dans la colonne PostgreSQL (Minuscules)
-   * @param {boolean} estUnSso - Drapeau indiquant si le fournisseur contourne le mot de passe local
-   * @param {string} libelleAffichage - Libellé destiné aux boutons de l'interface graphique
+   * @param {string} p_sLibelle - Libellé d'affichage convivial destiné aux boutons du front-end
+   * @param {string} p_sCode - Le quadrigramme d'infrastructure immuable (4 majuscules) [Mémoria]
+   * @param {boolean} p_bEstUnSso - Indicateur de délégation d'authentification externe
+   * @param {number} p_nOrdreAff - Position numérique unique pour le tri logique visuel [Mémoria]
    */
-  private constructor(
-    libelle          : string,
-    codeSql          : string,
-    estUnSso         : boolean,
-    libelleAffichage : string
-  ) {
-    super(libelle, codeSql);
-    this.m_bEstUnSso         = estUnSso;
-    this.m_sLibelleAffichage = libelleAffichage;
+  private constructor(p_sLibelle: string, p_sCode: string, p_bEstUnSso: boolean, p_nOrdreAff: number) {
+    super(p_sLibelle, p_sCode, p_nOrdreAff);
+    this.m_bEstUnSso = p_bEstUnSso;
   }
 
   /**
    * 🛡️ Détermine si le fournisseur est un protocole d'authentification externe SSO.
-   *
-   * @returns {boolean} True si c'est un SSO externe.
    */
   public get estUnSso(): boolean {
     return this.m_bEstUnSso;
   }
 
-  /**
-   * 💬 Obtient le libellé d'affichage convivial destiné à l'interface utilisateur.
-   *
-   * @returns {string} Le texte d'affichage graphique.
-   */
-  public get libelleAffichage(): string {
-    return this.m_sLibelleAffichage;
-  }
+  // ----------------------------------------------------------------------------
+  // 🏺 ENSEMENCEMENT DE LA RAM (Les protocoles d'accès de Phase 1 - Format 4 lettres)
+  // ----------------------------------------------------------------------------
 
-  /**
-   * 🌐 Retourne la liste exhaustive de tous les fournisseurs configurés.
-   *
-   * @static
-   * @returns {AuthProvider[]} Tableau des instances de sécurité
-   */
-  public static values(): AuthProvider[] {
-    return [
-      AuthProvider.LOCAL,
-      AuthProvider.GOOGLE,
-      AuthProvider.AZURE,
-      AuthProvider.APPLE
-    ];
-  }
+  /** 🔑 LOCA - Connexion classique : Validation de l'empreinte Argon2id en Cour Basse [Mémoria] */
+  public static readonly LOCAL = new AuthProvider('Connexion Classique', 'LOCA', false, 10);
 
-  /**
-   * 🗄️ Convertit la chaîne brute de la base de données en fournisseur qualifié.
-   * Exploite l'indexation dynamique du registre de notre classe de base SmartEnum.
-   *
-   * @static
-   * @param {string} codeSql - Le code brut extrait de la session ou du token
-   * @throws {Error} Si le code ne correspond à aucun protocole de sécurité valide
-   * @returns {AuthProvider} L'instance validée du fournisseur
-   */
-  public static fromSql(codeSql: string): AuthProvider {
-    const bEstValide : boolean = this.isValidCode(codeSql);
+  /** 🌐 GOOG - Google SSO : Authentification déléguée OAuth2 [Mémoria] */
+  public static readonly GOOGLE = new AuthProvider('Google SSO', 'GOOG', true, 20);
 
-    if (!bEstValide) {
-      throw new Error(`[Erreur Sécurité] Fournisseur d'authentification inconnu : '${codeSql}'`);
-    }
+  /** 🏢 AZUR - Microsoft Azure : Infrastructure d'authentification AD [Mémoria] */
+  public static readonly AZURE = new AuthProvider('Microsoft Azure', 'AZUR', true, 30);
 
-    return this.values().find(p => p.code === codeSql)!;
-  }
+  /** 🍏 APPL - Apple ID : Identification sécurisée de l'écosystème Apple [Mémoria] */
+  public static readonly APPLE = new AuthProvider('Apple ID', 'APPL', true, 40);
 }
 
 export default AuthProvider;

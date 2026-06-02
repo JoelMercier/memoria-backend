@@ -5,7 +5,7 @@ import { AppEventSeverity } from '@/constants/AppEventSeverity';
 import { AppEventType } from '@/constants/AppEventType';
 import { UserId, ItemId, ShareId } from '@/domain/value-objects/IdMetier';
 import { DatabaseConnection } from '@/config/DatabaseConnection';
-import { PgAppEventRepository } from '@/repositories/PgAppEventRepository';
+import { PgAppEventRepository } from '@/infrastructure/repositories/AppEventRepository';
 
 /**
  * 🏛️ Classe AppEventService

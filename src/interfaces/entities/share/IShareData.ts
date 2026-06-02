@@ -1,31 +1,39 @@
 // ——— fichier : src/interfaces/entities/share/IShareData.ts
 
 import type { ItemId,
-              ShareId        } from '@/domain/value-objects/IdMetier';
+              ShareId,
+              UserId         } from '@/domain/value-objects/IdMetier';
 import type { IAccessConfig  } from '@/interfaces/entities/share/IAccessConfig';
 import type { IBaseEntityData } from '@/interfaces/entities/IBaseEntityData';
 
 /**
- * 📦 Interface IShareData
- * ----------------------
+ * 📦 Interface IShareData 🧮 (Le Sac de Données Brutes des Passerelles 🤖)
+ * ----------------------------------------------------------------------------
  * Contrat de structure passive pour les données brutes d'un Partage (Share).
  * Entièrement calé sur le mécanisme de type mapping générique absolu.
  *
  * @interface IShareData
  * @extends {IBaseEntityData<'share', ShareId>}
- * @author Joël, Gaïa & Co
+ * @author Vision : Joël (Compilateur de l'Ancien Temps)
+ * @author Frapperie du code : Gaïa (Greveuse de pépites d'or)
+ * @author Héritage Git->Origin : La Vague Initiale (Ouvriers du code en surchauffe)
  */
 export interface IShareData extends IBaseEntityData<'share', ShareId> {
+  /** 🤖 L'identifiant unique fort de la trace du partage en BDD (shIdShare) */
+  shIdShare       : ShareId;
 
-  /** 📦 Identifiant unique et fortement typé de la Pépite (Item) partagée. */
-  itemId : ItemId;
+  /** 📦 Identifiant unique et fortement typé de la Pépite partagée (shItemId). */
+  shItemId        : ItemId;
 
-  /** 📧 Adresse e-mail du destinataire (Ou NULL si le partage est public par lien). */
-  recipientEmail : string | null;
+  /** 👥 Propriétaire de la ressource sous-jacente (Indispensable pour le Mock sans jointure). */
+  itemOwnerId     : UserId;
 
-  /** 🔑 Jeton de sécurité unique inséré dans la route HTTP de partage. */
-  shareToken : string;
+  /** 📧 Adresse e-mail du destinataire normalisée (shCourrielDest) [Mémoria]. */
+  shCourrielDest  : string | null;
 
-  /** ⚙️ Configuration fine des restrictions et de la validité temporelle de l'accès. */
-  accessConfig : IAccessConfig;
+  /** 🔑 Jeton de sécurité unique inséré dans la route HTTP (shJeton) [Mémoria]. */
+  shJeton         : string;
+
+  /** ⚙️ Configuration des restrictions (shConfiguration mapped to JSONB). */
+  shConfiguration : IAccessConfig;
 }

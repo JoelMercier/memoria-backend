@@ -1,5 +1,5 @@
 -- ============================================================================
--- SEEDER 05 : ITEM_TAGS (TABLE PIVOT) - TOTALEMENT CORRIGÉ
+-- script d'ensemencement 05 : ITEM_TAGS (TABLE PIVOT) - TOTALEMENT CORRIGÉ
 -- Fichier: database/seeders/05_add_item_tags_seeders.sql
 -- ============================================================================
 
@@ -43,7 +43,6 @@ INSERT INTO item_tags (id_tag, id_item) VALUES
 ('018d5c8e-7001-7001-a001-000000000003', '018d5c8e-8001-7001-b001-000000000008'), -- Node.js
 ('018d5c8e-7001-7001-a001-000000000001', '018d5c8e-8001-7001-b001-000000000008')
  ON CONFLICT DO NOTHING;
-; -- JavaScript
 
 
 -- ============================================================================
@@ -107,3 +106,42 @@ INSERT INTO item_tags (id_tag, id_item) VALUES
 -- Item 7: L'art de la mémoire (Mémoire + Histoire)
 ('018d5c8e-7001-7001-a003-000000000003', '018d5c8e-8001-7001-b003-000000000007')  -- Mémoire
  ON CONFLICT DO NOTHING;
+
+-- ============================================================================
+-- RECONSTITUTION TECHNIQUE DE LA FIN DU SCRIPT 05 (LIAISONS COMPLÉMENTAIRES)
+-- Alignement sémantique et relationnel exact V1 [Mémoria]
+-- ============================================================================
+
+INSERT INTO item_tags (id_tag, id_item) VALUES
+-- Liaisons pour LUCAS (Le designer oublié par l Ancien Régime)
+('018d5c8e-7001-7001-a004-000000000001', '018d5c8e-8001-7001-b004-000000000001'), -- UX Design -> Atomic Design
+('018d5c8e-7001-7001-a004-000000000004', '018d5c8e-8001-7001-b004-000000000001'), -- Design System -> Atomic Design
+('018d5c8e-7001-7001-a004-000000000003', '018d5c8e-8001-7001-b004-000000000002'), -- Figma -> Auto Layout
+('018d5c8e-7001-7001-a004-000000000002', '018d5c8e-8001-7001-b004-000000000002'), -- UI Design -> Auto Layout
+('018d5c8e-7001-7001-a004-000000000001', '018d5c8e-8001-7001-b004-000000000003'), -- UX Design -> Don t Make Me Think
+('018d5c8e-7001-7001-a004-000000000005', '018d5c8e-8001-7001-b004-000000000003'), -- Inspiration -> Don t Make Me Think
+('018d5c8e-7001-7001-a004-000000000001', '018d5c8e-8001-7001-b004-000000000004'), -- UX Design -> Accessibilité WCAG
+('018d5c8e-7001-7001-a004-000000000004', '018d5c8e-8001-7001-b004-000000000005'), -- Design System -> Production DS
+('018d5c8e-7001-7001-a004-000000000001', '018d5c8e-8001-7001-b004-000000000006'), -- UX Design -> Ma checklist UX
+('018d5c8e-7001-7001-a004-000000000001', '018d5c8e-8001-7001-b004-000000000007'), -- UX Design -> Loi de Fitts
+('018d5c8e-7001-7001-a004-000000000003', '018d5c8e-8001-7001-b004-000000000008'), -- Figma -> Prototypage Framer
+
+-- Liaisons pour ALICE (Entrepreneur)
+('018d5c8e-7001-7001-a005-000000000001', '018d5c8e-8001-7001-b005-000000000001'), -- Startup -> Growth Hacking
+('018d5c8e-7001-7001-a005-000000000003', '018d5c8e-8001-7001-b005-000000000001'), -- Growth Hacking -> Growth Hacking
+
+-- Liaisons pour PAUL (Philosophie)
+('018d5c8e-7001-7001-a006-000000000001', '018d5c8e-8001-7001-b006-000000000001'), -- Philosophie -> Discours de la méthode
+('018d5c8e-7001-7001-a006-000000000003', '018d5c8e-8001-7001-b006-000000000001'), -- Épistémologie -> Discours de la méthode
+
+-- Liaisons pour JULIE (Journaliste tech)
+('018d5c8e-7001-7001-a007-000000000001', '018d5c8e-8001-7001-b007-000000000001'), -- Tech News -> Impact IA
+('018d5c8e-7001-7001-a007-000000000002', '018d5c8e-8001-7001-b007-000000000001'), -- IA -> Impact IA
+
+-- Liaisons pour THOMAS (Chef cuisinier)
+('018d5c8e-7001-7001-a008-000000000001', '018d5c8e-8001-7001-b008-000000000001'), -- Recettes -> Basse température
+('018d5c8e-7001-7001-a008-000000000003', '018d5c8e-8001-7001-b008-000000000001'), -- Techniques -> Basse température
+
+-- Liaisons pour CAMILLE (Architecte)
+('018d5c8e-7001-7001-a009-000000000001', '018d5c8e-8001-7001-b009-000000000001')  -- Architecture -> Vers une architecture
+ON CONFLICT DO NOTHING;

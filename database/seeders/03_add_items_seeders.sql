@@ -1,5 +1,5 @@
 -- ============================================================================
--- SEEDER 03 : ITEMS (PÉPITES)
+-- script d'ensemencement 03 : ITEMS (PÉPITES)
 -- Fichier: database/seeders/03_add_items_seeders.sql
 -- ============================================================================
 
@@ -292,7 +292,7 @@ INSERT INTO items (
     ) ON CONFLICT DO NOTHING;
 
 -- ============================================================================
--- ITEMS POUR ALICE (Designer UX/UI) - 8 pépites
+-- ITEMS POUR Lucas (00004) (Designer UX/UI) - 8 pépites (et pas Alice 000005)
 -- ID pattern : 018d5c8e-8001-7001-b004-00000000000X
 -- ============================================================================
 
@@ -395,4 +395,3 @@ INSERT INTO items (
     'Framer Team',
     '{"duration": "14:30", "platform": "YouTube", "tool_version": "2026.1", "source_url": "https://youtube.com/watch?v=framer-proto"}'::jsonb
     ) ON CONFLICT DO NOTHING;
-

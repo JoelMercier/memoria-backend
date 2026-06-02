@@ -3,7 +3,7 @@
 import { IdBinaire } from '@/domain/base/IdBinaire';
 
 /**
- * 👥 Identifiant unique et fortement typé pour la table USERS.
+ * 👥 Identifiant unique et fortement typé pour la table "Users".
  *
  * 💡 POURQUOI LE "BRANDING" (declare private readonly) ?
  * TypeScript utilise par défaut un système de typage "structurel" (si deux classes ont les
@@ -14,129 +14,142 @@ import { IdBinaire } from '@/domain/base/IdBinaire';
  *
  * @class UserId
  * @extends {IdBinaire}
- * @author Joël, Gaïa & Co
+ * @author Conception : Joël (Purement infonctionnel)
+ * @author Rabotage de code : Gaïa (Vigilante de la virgule)
+ * @author Reliques Git->Origin : L'Ancien Régime & Co (Artisans du temps imparti)
  */
 export class UserId extends IdBinaire {
-  /** 🛡️ Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants */
+  /** 🔒 Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants */
   declare private readonly __brandUserId: undefined;
 
   /**
-   * Encapsule l'UUID d'un utilisateur sous l'armure nominale du domaine.
+   * Encapsule l'UUID d'un acteur sous l'armure nominale du domaine.
+   * Accepte le flux binaire direct ou textuel de Cour Basse.
    *
    * @constructor
-   * @param {string} p_chaineBrute - La chaîne UUIDv4 brute à valider et affecter
+   * @param {string | Buffer} p_Brut - L'identifiant brut sous sa forme textuelle ou binaire
    */
-  public constructor(p_chaineBrute: string) {
-    super(p_chaineBrute);
+  public constructor(p_Brut: string | Buffer) {
+    super(p_Brut);
   }
 }
 
 /**
- * 📦 Identifiant unique et fortement typé pour la table ITEMS (Pépites).
+ * 📦 Identifiant unique et fortement typé pour la table "Items" (Pépites).
  *
  * @class ItemId
  * @extends {IdBinaire}
- * @author Joël, Gaïa & Co
+ * @author Conception : Joël (Purement infonctionnel)
+ * @author Rabotage de code : Gaïa (Vigilante de la virgule)
+ * @author Reliques Git->Origin : L'Ancien Régime & Co (Artisans du temps imparti)
  */
 export class ItemId extends IdBinaire {
-  /** 🛡️ Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants */
+  /** 📥 Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants */
   declare private readonly __brandItemId: undefined;
 
   /**
    * Encapsule l'UUID d'une pépite sous l'armure nominale du domaine.
    *
    * @constructor
-   * @param {string} p_chaineBrute - La chaîne UUIDv4 brute à valider et affecter
+   * @param {string | Buffer} p_Brut - L'identifiant brut sous sa forme textuelle ou binaire
    */
-  public constructor(p_chaineBrute: string) {
-    super(p_chaineBrute);
+  public constructor(p_Brut: string | Buffer) {
+    super(p_Brut);
   }
 }
 
 /**
- * 🔔 Identifiant unique et fortement typé pour la table APP_EVENTS (Logs d'audit).
+ * 🚨 Identifiant unique et fortement typé pour la table "Events" (Journal d'audit immuable).
  *
- * @class EventId
+ * @class AppEventId
  * @extends {IdBinaire}
- * @author Joël, Gaïa & Co
+ * @author Conception : Joël (Purement infonctionnel)
+ * @author Rabotage de code : Gaïa (Vigilante de la virgule)
+ * @author Reliques Git->Origin : L'Ancien Régime & Co (Artisans du temps imparti)
  */
-export class EventId extends IdBinaire {
-  /** 🛡️ Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants */
+export class AppEventId extends IdBinaire {
+  /** 🤖 Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants */
   declare private readonly __brandEventId: undefined;
 
   /**
    * Encapsule l'UUID d'un événement sous l'armure nominale du domaine.
    *
    * @constructor
-   * @param {string} p_chaineBrute - La chaîne UUIDv4 brute à valider et affecter
+   * @param {string | Buffer} p_Brut - L'identifiant brut sous sa forme textuelle ou binaire
    */
-  public constructor(p_chaineBrute: string) {
-    super(p_chaineBrute);
+  public constructor(p_Brut: string | Buffer) {
+    super(p_Brut);
   }
 }
 
 /**
- * 🔗 Identifiant unique et fortement typé pour la table SHARES (Partages de pépites).
+ * 🔗 Identifiant unique et fortement typé pour la table "Shares" (Passerelles de partage).
  *
  * @class ShareId
  * @extends {IdBinaire}
- * @author Joël, Gaïa & Co
+ * @author Conception : Joël (Purement infonctionnel)
+ * @author Rabotage de code : Gaïa (Vigilante de la virgule)
+ * @author Reliques Git->Origin : L'Ancien Régime & Co (Artisans du temps imparti)
  */
 export class ShareId extends IdBinaire {
-  /** 🛡️ Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants */
+  /** 🎛️ Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants */
   declare private readonly __brandShareId: undefined;
 
   /**
    * Encapsule l'UUID d'un partage sous l'armure nominale du domaine.
    *
    * @constructor
-   * @param {string} p_chaineBrute - La chaîne UUIDv4 brute à valider et affecter
+   * @param {string | Buffer} p_Brut - L'identifiant brut sous sa forme textuelle ou binaire
    */
-  public constructor(p_chaineBrute: string) {
-    super(p_chaineBrute);
+  public constructor(p_Brut: string | Buffer) {
+    super(p_Brut);
   }
 }
 
 /**
- * 🔐 Identifiant unique et fortement typé pour la table SESSIONS (Jetons).
+ * 💾 Identifiant unique et fortement typé pour la table d'infrastructure "user_sessions".
  *
  * @class SessionId
  * @extends {IdBinaire}
- * @author Joël, Gaïa & Co
+ * @author Conception : Joël (Purement infonctionnel)
+ * @author Rabotage de code : Gaïa (Vigilante de la virgule)
+ * @author Reliques Git->Origin : L'Ancien Régime & Co (Artisans du temps imparti)
  */
 export class SessionId extends IdBinaire {
-  /** 🛡️ Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants */
+  /** 💾 Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants */
   declare private readonly __brandSessionId: undefined;
 
   /**
    * Encapsule l'UUID d'une session sous l'armure nominale du domaine.
    *
    * @constructor
-   * @param {string} p_chaineBrute - La chaîne UUIDv4 brute à valider et affecter
+   * @param {string | Buffer} p_Brut - L'identifiant brut sous sa forme textuelle ou binaire
    */
-  public constructor(p_chaineBrute: string) {
-    super(p_chaineBrute);
+  public constructor(p_Brut: string | Buffer) {
+    super(p_Brut);
   }
 }
 
 /**
- * 🏷️ Identifiant unique et fortement typé pour la table TAGS (Mots-clés).
+ * 🏷️ Identifiant unique et fortement typé pour la table "Tags" (Mots-clés).
  *
  * @class TagId
  * @extends {IdBinaire}
- * @author Joël, Gaïa & Co
+ * @author Conception : Joël (Purement infonctionnel)
+ * @author Rabotage de code : Gaïa (Vigilante de la virgule)
+ * @author Reliques Git->Origin : L'Ancien Régime & Co (Artisans du temps imparti)
  */
 export class TagId extends IdBinaire {
-  /** 🛡️ Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants */
+  /** ⚡ Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants */
   declare private readonly __brandTagId: undefined;
 
   /**
    * Encapsule l'UUID d'une étiquette sous l'armure nominale du domaine.
    *
    * @constructor
-   * @param {string} p_chaineBrute - La chaîne UUIDv4 brute à valider et affecter
+   * @param {string | Buffer} p_Brut - L'identifiant brut sous sa forme textuelle ou binaire
    */
-  public constructor(p_chaineBrute: string) {
-    super(p_chaineBrute);
+  public constructor(p_Brut: string | Buffer) {
+    super(p_Brut);
   }
 }

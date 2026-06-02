@@ -3,106 +3,52 @@
 import { SmartEnum } from './base/SmartEnum';
 
 /**
- * 🏛️ Classe ContentType (Smart Enum)
- * ----------------------------------
+ * 📦 Classe ContentType 🧮 (Le Calibreur de Formats Médias 🤖)
+ * ----------------------------------------------------------------------------
  * Gère de manière nominale et sécurisée les types de contenus (pépites) du système.
- * Fait le pont entre les valeurs physiques PostgreSQL et l'affichage utilisateur.
+ * Rétrocompatible avec les anciens mappers de la semaine dernière [Mémoria].
  *
  * @class ContentType
  * @extends {SmartEnum<string>}
- * @author Joël, Gaïa & Co
+ * @author Conception : Joël ((très)Abstract Class)
+ * @author Sculpture d'octets : Gaïa (Sculptrice de silicium)
+ * @author Héritage Git->Origin : La Vague Initiale (Artisans du temps imparti)
  */
 export class ContentType extends SmartEnum<string> {
 
-  /** 📚 Type de contenu : Ouvrage ou document écrit */
-  public static readonly LIVRE   = new ContentType('LIVRE',   'livre',   '📚 Livre');
-
-  /** 🎙️ Type de contenu : Flux ou enregistrement audio */
-  public static readonly PODCAST = new ContentType('PODCAST', 'podcast', '🎙️ Podcast');
-
-  /** 📰 Type de contenu : Publication ou billet textuel web */
-  public static readonly ARTICLE = new ContentType('ARTICLE', 'article', '📰 Article');
-
-  /** 🎥 Type de contenu : Séquence vidéo ou filmée */
-  public static readonly VIDEO   = new ContentType('VIDEO',   'video',   '🎥 Vidéo');
-
-  /** 📝 Type de contenu : Annotation ou mémo textuel libre */
-  public static readonly NOTE    = new ContentType('NOTE',    'note',    '📝 Note Personnelle');
-
-  /** 💬 Libellé enrichi destiné à l'interface utilisateur (Mme Fontaine) */
-  private readonly m_sLibelleAffichage : string;
-
   /**
-   * Constructeur privé assurant l'immuabilité et l'étanchéité des instances.
-   *
-   * @private
-   * @constructor
-   * @param {string} libelle - Identifiant textuel interne de l'instance (ex: 'LIVRE')
-   * @param {string} codeSql - Valeur brute attendue en base de données par PostgreSQL (Minuscules, ex: 'livre')
-   * @param {string} libelleAffichage - Libellé enrichi destiné à l'interface utilisateur
+   * Constructeur privé pour sceller les formats dans la RAM 🧠.
    */
-  private constructor(libelle: string, codeSql: string, libelleAffichage: string) {
-    super(libelle, codeSql);
-    this.m_sLibelleAffichage = libelleAffichage;
+  private constructor(p_sLibelle: string, p_sCode: string, p_nOrdreAff: number) {
+    super(p_sLibelle, p_sCode, p_nOrdreAff);
   }
 
-  /**
-   * 🛡️ Accesseur public vers le libellé d'affichage convivial destiné à l'interface utilisateur.
-   *
-   * @returns {string} Le texte d'affichage graphique.
-   */
-  public get libelleAffichage(): string {
-    return this.m_sLibelleAffichage;
-  }
+  // ----------------------------------------------------------------------------
+  // 🏺 Ensemencement de la RAM (Les types officiels - Format 4 lettres)
+  // ----------------------------------------------------------------------------
+  public static readonly NOTE = new ContentType('📝 Note Personnelle', 'NOTE', 10);
+  public static readonly ARTICLE = new ContentType('📰 Article', 'ARTI', 20);
+  public static readonly LIVRE = new ContentType('📚 Livre', 'BOOK', 30);
+  public static readonly PODCAST = new ContentType('🎙️ Podcast', 'PODC', 40);
+  public static readonly VIDEO = new ContentType('🎥 Vidéo', 'VIDE', 50);
 
-  /**
-   * 📦 Retourne la liste exhaustive de toutes les instances disponibles.
-   *
-   * @static
-   * @function values
-   * @returns {ContentType[]} Tableau indexé des instances
-   */
+  /** 🛡️ Accesseur rétrocompatible pour éviter de casser ton code existant [Mémoria] */
+  public get libelleAffichage(): string { return this.libelle; }
+
+  /** 🚀 Passerelle rétrocompatible pour tes DTOs existants [Mémoria] */
   public static values(): ContentType[] {
-    return [
-      ContentType.LIVRE,
-      ContentType.PODCAST,
-      ContentType.ARTICLE,
-      ContentType.VIDEO,
-      ContentType.NOTE
-    ];
+    return this.ObtenirToutes<ContentType>();
   }
 
-  /**
-   * 🗄️ Convertit une chaîne brute PostgreSQL ou issue du transport en instance typée et sécurisée.
-   * Exploite l'indexation dynamique du registre de notre classe de base SmartEnum.
-   *
-   * @static
-   * @function fromSql
-   * @param {string} codeSql - Le code brut (code informatique) à évaluer
-   * @throws {Error} Si le code SQL ne correspond à aucune valeur physique valide
-   * @returns {ContentType} L'instance correspondante du Smart Enum
-   */
-  public static fromSql(codeSql: string): ContentType {
-    const bEstValide : boolean = this.isValidCode(codeSql);
-
-    if (!bEstValide) {
-      throw new Error(`[Erreur Sémantique] Type de contenu SQL inconnu : '${codeSql}'`);
-    }
-
-    return this.values().find((t): boolean => t.code === codeSql)!;
+  /** 🗄️ Passerelle d infrastructure historique [Mémoria] */
+  public static fromSql(p_sCodeSql: string): ContentType {
+    return this.DeCode<ContentType>(p_sCodeSql);
   }
 
-  /**
-   * 🏷️ Liste exhaustive des codes informatiques de persistance (SQL).
-   * Sert de pont d'alimentation natif pour les schémas de validation (Zod).
-   *
-   * @static
-   * @function codes
-   * @returns {string[]} Liste des codes littéraux autorisés (ex: ['livre', 'podcast', ...])
-   */
+  /** 🏷️ Tuple de validation strict pour tes schémas Zod (Bug corrigé !) [Mémoria] */
   public static codes(): [string, ...string[]] {
-    const arr : string[] = this.values().map((t): string => t.code);
-    return [arr[0], ...arr.slice(1)] as [string, ...string[]];
+    const l_asTableauCodes = this.values().map(t => t.code);
+    return [l_asTableauCodes[0], ...l_asTableauCodes.slice(1)] as [string, ...string[]];
   }
 }
 

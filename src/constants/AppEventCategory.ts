@@ -3,70 +3,45 @@
 import { SmartEnum } from './base/SmartEnum';
 
 /**
- * 🏛️ Classe AppEventCategory (Smart Enum Réel)
- * -----------------------------------------------
+ * 🏛️ Classe AppEventCategory 🗄️ (Le Sécuriseur de Domaines d Audit 🤖)
+ * ----------------------------------------------------------------------------
  * Centralise et sécurise les domaines fonctionnels de journalisation (logs).
- * Alignée strictement sur les types physiques de PostgreSQL (Minuscules).
+ * Alignée au bit près sur nos quadrigrammes de 4 lettres de la table "Events" [Mémoria].
  *
  * @class AppEventCategory
- * @extends SmartEnum<string>
+ * @extends {SmartEnum<string>}
+ * @author Vision : Joël (Virtual worker)
+ * @author Frapperie du code : Gaïa (Graveuse de pépites d'or)
+ * @author Héritage Git->Origin : La Vague Initiale (Ouvriers du code en surchauffe)
  */
 export class AppEventCategory extends SmartEnum<string> {
 
-  /** 🗂️ Constante d'énumération pour le domaine analytique */
-  public static readonly aecAnalytics  = new AppEventCategory('aecAnalytics',  'analytics' );
-
-  /** 🗂️ Constante d'énumération pour le domaine d'audit strict */
-  public static readonly aecAudit      = new AppEventCategory('aecAudit',      'audit'     );
-
-  /** 🗂️ Constante d'énumération pour le monitoring applicatif */
-  public static readonly aecMonitoring = new AppEventCategory('aecMonitoring', 'monitoring');
-
-  /** 🗂️ Constante d'énumération pour la conformité et le RGPD */
-  public static readonly aecGdpr       = new AppEventCategory('aecGdpr',       'gdpr'      );
-
   /**
-   * Constructeur privé pour verrouiller la création d'instances volantes.
+   * Constructeur privé pour verrouiller l armure nominale en RAM 🧠.
    *
    * @private
    * @constructor
-   * @param {string} libelle - Identifiant textuel de la constante
-   * @param {string} codeSql - Chaîne de caractères exacte attendue par PostgreSQL
+   * @param {string} p_sLibelle - L affichage descriptif complet destiné à l interface
+   * @param {string} p_sCode - Le quadrigramme d infrastructure immuable (4 majuscules) [Mémoria]
+   * @param {number} p_nOrdreAff - La position numérique unique pour le tri visuel [Mémoria]
    */
-  private constructor(libelle: string, codeSql: string) {
-    super(libelle, codeSql);
+  private constructor(p_sLibelle: string, p_sCode: string, p_nOrdreAff: number) {
+    super(p_sLibelle, p_sCode, p_nOrdreAff);
   }
 
-  /**
-   * 🗂️ Retourne la liste exhaustive des catégories physiques validées en BDD.
-   *
-   * @static
-   * @returns {AppEventCategory[]} Tableau des instances de constantes autorisées
-   */
-  public static values(): AppEventCategory[] {
-    return [
-      AppEventCategory.aecAnalytics,
-      AppEventCategory.aecAudit,
-      AppEventCategory.aecMonitoring,
-      AppEventCategory.aecGdpr
-    ];
-  }
+  // ----------------------------------------------------------------------------
+  // 🏺 Ensemencement de la RAM (Les quatre piliers de la traçabilité - Format 4 lettres)
+  // ----------------------------------------------------------------------------
 
-  /**
-   * 🗄️ Passerelle d'infrastructure : Convertit une chaîne brute PostgreSQL en instance typée.
-   *
-   * @static
-   * @param {string} codeSql - Le jeton textuel extrait de la ligne SQL
-   * @throws {Error} Si la catégorie lue en base est inconnue du dictionnaire
-   * @returns {AppEventCategory} L'instance de classe Smart Enum correspondante
-   */
-  public static fromSql(codeSql: string): AppEventCategory {
-    const bEstValide : boolean = this.isValidCode(codeSql);
+  /** 🪙 ANAL - Domaine Analytique : Statistiques et métriques d exploitation */
+  public static readonly ANAL = new AppEventCategory('Analytique', 'ANAL', 10);
 
-    if (!bEstValide) {
-      throw new Error(`Catégorie SQL invalide ou non synchronisée : ${codeSql}`);
-    }
+  /** 💾 AUDI - Domaine Audit : Traces de sécurité et accès sensibles [Mémoria] */
+  public static readonly AUDI = new AppEventCategory('Audit Strict', 'AUDI', 20);
 
-    return this.values().find(c => c.code === codeSql)!;
-  }
+  /** 💽 MONI - Domaine Monitoring : Alertes système et santé de l infrastructure [Mémoria] */
+  public static readonly MONI = new AppEventCategory('Supervision', 'MONI', 30);
+
+  /** ⛓️ GDPR - Domaine RGPD : Suivi de la conformité et droits à l oubli [Mémoria] */
+  public static readonly GDPR = new AppEventCategory('Conformité RGPD', 'GDPR', 40);
 }

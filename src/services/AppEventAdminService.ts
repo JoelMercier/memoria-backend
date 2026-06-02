@@ -1,7 +1,7 @@
 // ——— fichier : src/services/AppEventAdminService.ts
 
 import      { DatabaseConnection   } from '@/config/DatabaseConnection';
-import      { PgAppEventRepository } from '@/repositories/PgAppEventRepository';
+import      { PgAppEventRepository } from '@/infrastructure/repositories/AppEventRepository';
 import      { AppEventId           } from '@/domain/value-objects/IdMetier';
 import type { AppEvent             } from '@/entities/AppEvent';
 

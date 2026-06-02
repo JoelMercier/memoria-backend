@@ -1,5 +1,5 @@
 -- ============================================================================
--- SEEDER 04 : SHARES (PARTAGES) - CORRIGÉ
+-- script d'ensemencement 04 : SHARES (PARTAGES) - CORRIGÉ
 -- Fichier: database/seeders/04_add_shares_seeders.sql
 -- ============================================================================
 

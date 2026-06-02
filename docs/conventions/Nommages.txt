@@ -1,0 +1,25 @@
+1/ Scopes
+m_  membre d'une classe
+g_  variable globale
+s_  variable statique
+l_  variable locale
+p_  paramètre d'une fonction/procédure
+r_  variable renvoyée comme résultat
+
+2/ Préfixes de Types
+i	integer (entier, entier court, entier long)
+f	float (nombre à virgule flottante simple ou double)
+d	date (Date, date ou timestamp)
+c	char (caractère, de un à quelques uns (20 ?), de longueur fixe)
+b	booléen
+w	word (mot, le plus souvent non signé)
+s	string (chaîne de caractères de longueur variable : varchar, ...)
+h	handle
+o   object
+v	void ou any
+e   enum (Énumération)
+
+3/ Modificateurs
+u   unsigned (non signé)
+p   pointer (pointeur)
+a   array (tableau)

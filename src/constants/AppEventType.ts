@@ -1,84 +1,59 @@
 // ——— fichier : src/constants/AppEventType.ts
 
-import { SmartEnum        } from './base/SmartEnum';
+import { SmartEnum } from './base/SmartEnum';
 import { AppEventCategory } from './AppEventCategory';
 
 /**
- * 🏛️ Classe AppEventType (Smart Enum Extensible)
- * -----------------------------------------------
- * Verrouille les chaînes de caractères autorisées pour les types d'événements.
- * Liée fonctionnellement aux catégories parentes pour le monitoring.
+ * 🏛️ Classe AppEventType 🗄️ (Le Verrouilleur d Actions Systèmes 🤖)
+ * ----------------------------------------------------------------------------
+ * Valide et sécurise les chaînes de caractères autorisées pour les types d événements.
+ * Rattachée fonctionnellement aux catégories parentes pour le monitoring.
  *
  * @class AppEventType
- * @extends SmartEnum<string>
+ * @extends {SmartEnum<string>}
+ * @author Vision : Joël (<Struct> périmée)
+ * @author Frapperie du code : Gaïa (Gardienne du feu binaire)
+ * @author Héritage Git->Origin : La Vague Initiale (Ouvriers de la première heure)
  */
 export class AppEventType extends SmartEnum<string> {
-
-  // 🔐 Événements du module AUTH
-  public static readonly AUTH_LOGIN_SUCCESS = new AppEventType('AUTH_LOGIN_SUCCESS', 'auth.login_success', AppEventCategory.aecAudit);
-  public static readonly AUTH_LOGIN_FAILURE = new AppEventType('AUTH_LOGIN_FAILURE', 'auth.login_failure', AppEventCategory.aecAudit);
-
-  // 📦 Événements du module ITEM
-  public static readonly ITEM_CREATED       = new AppEventType('ITEM_CREATED',       'item.created',       AppEventCategory.aecAnalytics);
-  public static readonly ITEM_DELETED       = new AppEventType('ITEM_DELETED',       'item.deleted',       AppEventCategory.aecAnalytics);
-
-  /** 🗂️ Catégorie sémantique parente associée à ce type d'événement */
-  private readonly m_rCategorie : AppEventCategory;
+  /** 🗂️ Catégorie sémantique parente associée à ce type d événement d audit */
+  private readonly m_oCategorie: AppEventCategory;
 
   /**
-   * Le constructeur privé associe le libellé, le code SQL et la catégorie parente.
+   * Moule une instance immuable de type d action en RAM 🧠.
    *
    * @private
    * @constructor
-   * @param {string} libelle - Identifiant textuel de la constante
-   * @param {string} codeSql - Chaîne de caractères exacte attendue par PostgreSQL
-   * @param {AppEventCategory} categorie - Catégorie d'audit de rattachement
+   * @param {string} p_sLibelle - Affichage textuel explicite pour l écran de supervision
+   * @param {string} p_sCodeSql - La chaîne exacte attendue et stockée en BDD
+   * @param {AppEventCategory} p_oCategorie - Le domaine d audit parent associé
+   * @param {number} p_nOrdreAff - La position de tri pour les listes administratives
    */
-  private constructor(libelle: string, codeSql: string, categorie: AppEventCategory) {
-    super(libelle, codeSql);
-    this.m_rCategorie = categorie;
+  private constructor(p_sLibelle: string, p_sCodeSql: string, p_oCategorie: AppEventCategory, p_nOrdreAff: number) {
+    super(p_sLibelle, p_sCodeSql, p_nOrdreAff);
+    this.m_oCategorie = p_oCategorie;
   }
 
   /**
-   * 🗂️ Obtient la catégorie parente de l'événement d'audit.
-   *
-   * @returns {AppEventCategory} La catégorie rattachée.
+   * 🗂️ Obtient la catégorie parente de l événement d audit.
    */
   public get categorie(): AppEventCategory {
-    return this.m_rCategorie;
+    return this.m_oCategorie;
   }
 
-  /**
-   * 🎯 Retourne la liste exhaustive des types d'événements validés en BDD.
-   *
-   * @static
-   * @returns {AppEventType[]} Tableau des instances de constantes autorisées
-   */
-  public static values(): AppEventType[] {
-    return [
-      AppEventType.AUTH_LOGIN_SUCCESS,
-      AppEventType.AUTH_LOGIN_FAILURE,
-      AppEventType.ITEM_CREATED,
-      AppEventType.ITEM_DELETED
-    ];
-  }
+  // ----------------------------------------------------------------------------
+  // 🏺 ENSEMENCEMENT DE LA RAM (Les actions officielles de production - Raccord V4)
+  // ----------------------------------------------------------------------------
 
-  /**
-   * 🗄️ Passerelle d'infrastructure : Convertit une chaîne brute PostgreSQL en instance typée.
-   * Exploite l'indexation dynamique du registre de notre classe de base SmartEnum.
-   *
-   * @static
-   * @param {string} codeSql - Le jeton textuel extrait de la ligne SQL
-   * @throws {Error} Si le type d'événement lu en base est inconnu du dictionnaire
-   * @returns {AppEventType} L'instance de classe Smart Enum correspondante
-   */
-  public static fromSql(codeSql: string): AppEventType {
-    const bEstValide : boolean = this.isValidCode(codeSql);
+  // 🔐 Module AUTHENTIFICATION & COMPTES (Catégorie : AUDI / ANAL)
+  public static readonly UTILISATEUR_CONNEXION = new AppEventType('Connexion réussie', 'utilisateur.connexion', AppEventCategory.AUDI, 10);
+  public static readonly AUTHENTIFICATION_ECHEC = new AppEventType('Échec d authentification', 'authentification.echec', AppEventCategory.AUDI, 20);
+  public static readonly UTILISATEUR_ENREGISTREMENT = new AppEventType('Nouvelle inscription', 'utilisateur.enregistrement', AppEventCategory.ANAL, 30);
 
-    if (!bEstValide) {
-      throw new Error(`Type d'événement SQL inconnu : ${codeSql}`);
-    }
+  // 📦 Module PEPITES / ITEMS (Catégorie : ANAL)
+  public static readonly PEPITE_CREATION = new AppEventType('Création de pépite', 'pepite.creation', AppEventCategory.ANAL, 40);
 
-    return this.values().find(t => t.code === codeSql)!;
-  }
+  // 🚨 Module MONITORING & RGPD (Catégorie : MONI / GDPR)
+  public static readonly RGPD_EXPORTATION = new AppEventType('Exportation de données', 'rgpd.exportation', AppEventCategory.GDPR, 50);
+  public static readonly BD_REQUETE_LENTE = new AppEventType('Requête SQL lente', 'bd.requete_lente', AppEventCategory.MONI, 60);
 }

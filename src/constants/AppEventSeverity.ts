@@ -3,94 +3,67 @@
 import { SmartEnum } from './base/SmartEnum';
 
 /**
- * 🏛️ Classe AppEventSeverity (Smart Enum Symétrique)
- * --------------------------------------------------
- * Gère les niveaux de gravité des journaux d'audit.
- * Version alignée strictement sur la casse physique de PostgreSQL (Minuscules).
+ * 🚨 Classe AppEventSeverity 🧮 (L Armure des Gravités Système 🤖)
+ * ----------------------------------------------------------------------------
+ * Gère de manière immuable les niveaux de gravité des journaux d audit "Events".
+ * Intègre notre double niveau d infrastructure : niveau (machine) et ordreAff (humain).
  *
  * @class AppEventSeverity
- * @extends SmartEnum<string>
+ * @extends {SmartEnum<string>}
+ * @author Vision : Joël (Compilateur de l'Ancien Temps)
+ * @author Frapperie du code : Gaïa (Graveuse de lignes d'acier)
+ * @author Héritage Git->Origin : La Vague Initiale (Artisans de la Vague Alpha)
  */
 export class AppEventSeverity extends SmartEnum<string> {
-
-  /** ⚠️ Constante de gravité pour les informations informatives simples */
-  public static readonly aesInfo     = new AppEventSeverity('aesInfo',     'info',     1);
-
-  /** ⚠️ Constante de gravité pour les avertissements et anomalies mineures */
-  public static readonly aesWarning  = new AppEventSeverity('aesWarning',  'warning',  2);
-
-  /** ⚠️ Constante de gravité pour les erreurs applicatives standards */
-  public static readonly aesError    = new AppEventSeverity('aesError',    'error',    3);
-
-  /** ⚠️ Constante de gravité pour les alertes critiques et blocages système */
-  public static readonly aesCritical = new AppEventSeverity('aesCritical', 'critical', 4);
-
-  /** ⚖️ Poids numérique ou niveau d'importance arithmétique de la gravité */
-  private readonly m_nPoids : number;
+  /** 🤖 Le poids numérique unique pour les calculs de comparaison logique (ex: 10, 20, 30, 40) [Mémoria] */
+  private readonly m_nNiveau: number;
 
   /**
-   * Le constructeur privé associe le libellé, le code SQL et son poids numérique.
+   * Moule une instance immuable de sévérité dans la RAM 🧠.
    *
    * @private
    * @constructor
-   * @param {string} libelle - Identifiant textuel de la constante
-   * @param {string} codeSql - Chaîne de caractères exacte attendue par PostgreSQL
-   * @param {number} poids - Valeur d'importance pour les tris et filtrages
+   * @param {string} p_sLibelle - Libellé complet et intelligible destiné à l interface
+   * @param {string} p_sCode - Le quadrigramme d infrastructure obligatoire (4 majuscules) [Mémoria]
+   * @param {number} p_nNiveau - Poids numérique d importance pour la logique machine [Mémoria]
+   * @param {number} p_nOrdreAff - Position numérique unique pour le tri visuel [Mémoria]
    */
-  private constructor(libelle: string, codeSql: string, poids: number) {
-    super(libelle, codeSql);
-    this.m_nPoids = poids;
+  private constructor(p_sLibelle: string, p_sCode: string, p_nNiveau: number, p_nOrdreAff: number) {
+    super(p_sLibelle, p_sCode, p_nOrdreAff);
+    this.m_nNiveau = Math.floor(p_nNiveau);
   }
 
   /**
-   * ⚖️ Obtient le poids numérique associé à la sévérité.
-   *
-   * @returns {number} Le poids arithmétique.
+   * ⚖️ Obtient le poids numérique associé à la sévérité pour les filtres machines.
    */
-  public get poids(): number {
-    return this.m_nPoids;
+  public get niveau(): number {
+    return this.m_nNiveau;
   }
 
   /**
-   * ⚠️ Retourne la liste exhaustive des sévérités validées en BDD.
+   * ⚖️ Comparaison mathématique : Détermine si le niveau actuel surpasse ou égale un autre [Mémoria].
+   * Foudroie l utilisation des chaînes de caractères brutes dans le Domaine.
    *
-   * @static
-   * @returns {AppEventSeverity[]} Tableau des instances de constantes autorisées
-   */
-  public static values(): AppEventSeverity[] {
-    return [
-      AppEventSeverity.aesInfo,
-      AppEventSeverity.aesWarning,
-      AppEventSeverity.aesError,
-      AppEventSeverity.aesCritical
-    ];
-  }
-
-  /**
-   * ⚖️ Comparaison arithmétique : Détermine si le niveau actuel surpasse ou égale un autre.
-   *
-   * @param {AppEventSeverity} autreSeverity - Le palier comparatif à évaluer
+   * @param {AppEventSeverity} p_oAutreSeverity - Le palier comparatif à évaluer
    * @returns {boolean} True si la sévérité courante est hiérarchiquement supérieure ou égale
    */
-  public estSuperieurOuEgalA(autreSeverity: AppEventSeverity): boolean {
-    return this.poids >= autreSeverity.poids;
+  public estSuperieurOuEgalA(p_oAutreSeverity: AppEventSeverity): boolean {
+    return this.m_nNiveau >= p_oAutreSeverity.niveau;
   }
 
-  /**
-   * 🗄️ Passerelle d'infrastructure : Convertit une chaîne brute PostgreSQL en instance typée.
-   *
-   * @static
-   * @param {string} codeSql - Le jeton textuel extrait de la ligne SQL
-   * @throws {Error} Si la sévérité lue en base est inconnue du dictionnaire
-   * @returns {AppEventSeverity} L'instance de classe Smart Enum correspondante
-   */
-  public static fromSql(codeSql: string): AppEventSeverity {
-    const bEstValide : boolean = this.isValidCode(codeSql);
+  // ----------------------------------------------------------------------------
+  // 🏺 ENSEMENCEMENT DE LA RAM (Les quatre piliers de la sécurité - Format 4 lettres)
+  // ----------------------------------------------------------------------------
 
-    if (!bEstValide) {
-      throw new Error(`Sévérité SQL invalide : ${codeSql}`);
-    }
+  /** 🪙 INFO - Niveau Information : Traces d exploitation standards */
+  public static readonly INFO = new AppEventSeverity('Information', 'INFO', 10, 10);
 
-    return this.values().find(s => s.code === codeSql)!;
-  }
+  /** 💾 WARN - Niveau Avertissement : Comportements suspects ou requêtes lentes [Mémoria] */
+  public static readonly WARN = new AppEventSeverity('Avertissement', 'WARN', 20, 20);
+
+  /** 💽 ERRO - Niveau Erreur : Dysfonctionnements applicatifs bloquants */
+  public static readonly ERRO = new AppEventSeverity('Erreur', 'ERRO', 30, 30);
+
+  /** ⛓️ CRIT - Niveau Critique : Alertes maximales exigeant une intervention immédiate [Mémoria] */
+  public static readonly CRIT = new AppEventSeverity('Critique', 'CRIT', 40, 40);
 }
