@@ -121,24 +121,25 @@ export class ShareService implements IShareService {
    * @async
    */
   public async create(userId: UserId, dto: CreateShareDto): Promise<IShare> {
-    const item : Item | null = await this.itemRepository.findById(dto.itemId);
+    const item : Item | null = await this.itemRepository.findById(dto.idItem);
     if (!item) {
-      throw ItemErrorFactory.notFound(dto.itemId);
+      throw ItemErrorFactory.notFound(dto.idItem);
     }
     // 🪓 ALIGNEMENT INDUSTRIEL : Utilisation du getter getUserId() de l'Ancien Régime sur Item
     if (item.getUserId().valeur !== userId.valeur) {
-      throw ItemErrorFactory.accessDenied(dto.itemId, userId);
+      throw ItemErrorFactory.accessDenied(dto.idItem, userId);
     }
 
     const token : string = await this.generateUniqueToken();
 
     // 🪓 ALIGNEMENT INDUSTRIEL : Utilisation de randomUUID() propre au lieu de undefined
     const data : IShareData = {
-      idShare        : new ShareId(randomUUID()),
-      itemId         : dto.itemId,
-      recipientEmail : dto.recipientEmail,
-      shareToken     : token,
-      accessConfig   : dto.accessConfig
+      idShare         : new ShareId(randomUUID()),
+      shItemOwnerId   : dto.idUser,
+      shItemId        : dto.idItem,
+      shCourrielDest  : dto.recipientEmail,
+      shJeton         : token,
+      shConfiguration : dto.accessConfig
     };
 
     return await this.shareRepository.create(data);
@@ -175,10 +176,10 @@ export class ShareService implements IShareService {
 
     const updates : Partial<IShareData> = {};
     if (dto.recipientEmail !== undefined) {
-      updates.recipientEmail = dto.recipientEmail;
+      updates.shCourrielDest = dto.recipientEmail;
     }
     if (dto.accessConfig !== undefined) {
-      updates.accessConfig = dto.accessConfig;
+      updates.shConfiguration = dto.accessConfig;
     }
 
     const updated : Share | null = await this.shareRepository.update(shareId, updates);

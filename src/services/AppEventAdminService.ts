@@ -1,9 +1,9 @@
 // ——— fichier : src/services/AppEventAdminService.ts
 
-import      { DatabaseConnection   } from '@/config/DatabaseConnection';
-import      { PgAppEventRepository } from '@/infrastructure/repositories/AppEventRepository';
-import      { AppEventId           } from '@/domain/value-objects/IdMetier';
-import type { AppEvent             } from '@/entities/AppEvent';
+import      { DatabaseConnection } from '@/config/DatabaseConnection';
+import      { AppEventRepository } from '@/infrastructure/repositories/AppEventRepository';
+import      { AppEventId         } from '@/domain/value-objects/IdMetier';
+import type { AppEvent           } from '@/entities/AppEvent';
 
 /**
  * 🏛️ Classe AppEventAdminService
@@ -29,7 +29,7 @@ export class AppEventAdminService {
    */
   public static async getById(idEvent: AppEventId): Promise<AppEvent | null> {
     const db = DatabaseConnection.getInstance();
-    const repo = new PgAppEventRepository(db);
+    const repo = new AppEventRepository(db);
     return repo.findById(idEvent);
   }
 
@@ -54,7 +54,7 @@ export class AppEventAdminService {
    */
   public static async getAllLogs(): Promise<AppEvent[]> {
     const db = DatabaseConnection.getInstance();
-    const repo = new PgAppEventRepository(db);
+    const repo = new AppEventRepository(db);
     return repo.findAll();
   }
 
@@ -66,8 +66,8 @@ export class AppEventAdminService {
    * @async
    */
   public static async getStats(): Promise<{ total: number; parType: any[] }> {
-    const total = await PgAppEventRepository.count();
-    const parType = await PgAppEventRepository.countByType();
+    const total = await AppEventRepository.count();
+    const parType = await AppEventRepository.countByType();
     return { total, parType };
   }
 
@@ -79,7 +79,7 @@ export class AppEventAdminService {
    * @async
    */
   public static async getVolumeHistory(days: number): Promise<any[]> {
-    return PgAppEventRepository.countByDay({ days });
+    return AppEventRepository.countByDay({ days });
   }
 
   /**
@@ -102,6 +102,6 @@ export class AppEventAdminService {
    * @async
    */
   public static async purgeOlderThan(cutoffDate: Date): Promise<number> {
-    return PgAppEventRepository.deleteOlderThan(cutoffDate);
+    return AppEventRepository.deleteOlderThan(cutoffDate);
   }
 }

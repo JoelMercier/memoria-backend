@@ -56,9 +56,9 @@ export class ResponseShareDto {
     this.id             = share.getShareId();
     this.itemId         = share.getItemId();
 
-    this.recipientEmail = share.getRecipientEmail();
-    this.shareToken     = share.getShareToken();
-    this.shareUrl       = `${baseUrl}/v1/public/shared/${share.getShareToken()}`;
+    this.recipientEmail = share.getCourrielDest();
+    this.shareToken     = share.getJeton();
+    this.shareUrl       = `${baseUrl}/v1/public/shared/${share.getJeton()}`;
     this.accessConfig   = share.getAccessConfig();
     this.isExpired      = share.isExpired();
 

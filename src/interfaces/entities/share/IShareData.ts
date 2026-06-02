@@ -20,13 +20,13 @@ import type { IBaseEntityData } from '@/interfaces/entities/IBaseEntityData';
  */
 export interface IShareData extends IBaseEntityData<'share', ShareId> {
   /** 🤖 L'identifiant unique fort de la trace du partage en BDD (shIdShare) */
-  shIdShare       : ShareId;
+  idShare         : ShareId;
 
   /** 📦 Identifiant unique et fortement typé de la Pépite partagée (shItemId). */
   shItemId        : ItemId;
 
   /** 👥 Propriétaire de la ressource sous-jacente (Indispensable pour le Mock sans jointure). */
-  itemOwnerId     : UserId;
+  shItemOwnerId   : UserId;
 
   /** 📧 Adresse e-mail du destinataire normalisée (shCourrielDest) [Mémoria]. */
   shCourrielDest  : string | null;

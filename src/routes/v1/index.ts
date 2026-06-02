@@ -10,11 +10,11 @@ import { ShareController } from '@/controllers/ShareController';
 import { TagController } from '@/controllers/TagController';
 import { UserController } from '@/controllers/UserController';
 import { AuthMiddleware } from '@/middlewares/AuthMiddleware';
-import { PgItemRepository } from '@/infrastructure/repositories/ItemRepository';
-import { PgItemTagRepository } from '@/infrastructure/repositories/ItemTagRepository';
-import { PgShareRepository } from '@/infrastructure/repositories/ShareRepository';
-import { PgTagRepository } from '@/infrastructure/repositories/TagRepository';
-import { PgUserRepository } from '@/infrastructure/repositories/UserRepository';
+import { ItemRepository } from '@/infrastructure/repositories/ItemRepository';
+import { ItemTagRepository } from '@/infrastructure/repositories/ItemTagRepository';
+import { ShareRepository } from '@/infrastructure/repositories/ShareRepository';
+import { TagRepository } from '@/infrastructure/repositories/TagRepository';
+import { UserRepository } from '@/infrastructure/repositories/UserRepository';
 import { createAuthRouter } from '@/routes/v1/auth.routes';
 import { createItemRouter } from '@/routes/v1/item.routes';
 import { createPublicRouter } from '@/routes/v1/public.routes';
@@ -41,11 +41,11 @@ export function createV1Router(): Router {
   const db = DatabaseConnection.getInstance();
 
   // Repositories
-  const userRepository = new PgUserRepository(db as any);
-  const itemRepository = new PgItemRepository(db as any);
-  const tagRepository = new PgTagRepository(db as any);
-  const itemTagRepository = new PgItemTagRepository(db as any);
-  const shareRepository = new PgShareRepository(db as any);
+  const userRepository    = new UserRepository(db as any);
+  const itemRepository    = new ItemRepository(db as any);
+  const tagRepository     = new TagRepository(db as any);
+  const itemTagRepository = new ItemTagRepository(db as any);
+  const shareRepository   = new ShareRepository(db as any);
 
   // Services
   const authService = new AuthService(

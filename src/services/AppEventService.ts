@@ -5,7 +5,7 @@ import { AppEventSeverity } from '@/constants/AppEventSeverity';
 import { AppEventType } from '@/constants/AppEventType';
 import { UserId, ItemId, ShareId } from '@/domain/value-objects/IdMetier';
 import { DatabaseConnection } from '@/config/DatabaseConnection';
-import { PgAppEventRepository } from '@/infrastructure/repositories/AppEventRepository';
+import { AppEventRepository } from '@/infrastructure/repositories/AppEventRepository';
 
 /**
  * 🏛️ Classe AppEventService
@@ -40,7 +40,7 @@ export class AppEventService {
     metadata?      : Record<string, any>;
   }): Promise<any> {
     const db = DatabaseConnection.getInstance();
-    const repo = new PgAppEventRepository(db);
+    const repo = new AppEventRepository(db);
 
     return repo.create({
       idAppEvent    : undefined as any,

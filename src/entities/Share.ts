@@ -26,10 +26,10 @@ export class Share extends BaseEntity<'share', IShareData, ShareId> implements I
   private readonly m_idItem          : ItemId;
 
   /** 📧 Courriel du destinataire ciblé ou NULL si le lien est public */
-  private readonly m_sRecipientEmail : string | null;
+  private readonly m_sCourrielDest : string | null;
 
   /** 🔑 Jeton de sécurité aléatoire unique intégré dans la route HTTP d'accès */
-  private readonly m_sShareToken     : string;
+  private readonly m_sJetonPartage     : string;
 
   /** ⚙️ Règles de restriction d'infrastructure (Dates de péremption, etc.) */
   private readonly m_rAccessConfig   : IAccessConfig;
@@ -42,11 +42,11 @@ export class Share extends BaseEntity<'share', IShareData, ShareId> implements I
    */
   public constructor(data: IShareData) {
     super(data);
-    this.m_idShare         = data.idShare;
-    this.m_idItem          = data.itemId;
-    this.m_sRecipientEmail = data.recipientEmail;
-    this.m_sShareToken     = data.shareToken;
-    this.m_rAccessConfig   = data.accessConfig;
+    this.m_idShare       = data.idShare;
+    this.m_idItem        = data.shItemId;
+    this.m_sCourrielDest = data.shCourrielDest;
+    this.m_sJetonPartage = data.shJeton;
+    this.m_rAccessConfig = data.shConfiguration;
   }
 
   /**
@@ -79,8 +79,8 @@ export class Share extends BaseEntity<'share', IShareData, ShareId> implements I
    * @function getRecipientEmail
    * @returns {string | null} L'adresse de correspondance ou NULL.
    */
-  public getRecipientEmail(): string | null {
-    return this.m_sRecipientEmail;
+  public getCourrielDest(): string | null {
+    return this.m_sCourrielDest;
   }
 
   /**
@@ -90,8 +90,8 @@ export class Share extends BaseEntity<'share', IShareData, ShareId> implements I
    * @function getShareToken
    * @returns {string} Le token de sécurité brut.
    */
-  public getShareToken(): string {
-    return this.m_sShareToken;
+  public getJeton(): string {
+    return this.m_sJetonPartage;
   }
 
   /**
@@ -129,13 +129,13 @@ export class Share extends BaseEntity<'share', IShareData, ShareId> implements I
    */
   public toData(): IShareData {
     return {
-      idShare        : this.getShareId(),
-      itemId         : this.getItemId(),
-      recipientEmail : this.getRecipientEmail(),
-      shareToken     : this.getShareToken(),
-      accessConfig   : this.getAccessConfig(),
-      createdAt      : this.createdAt,
-      updatedAt      : this.updatedAt
+      idShare         : this.getShareId(),
+      shItemId        : this.getItemId(),
+      shCourrielDest  : this.getCourrielDest(),
+      shJeton         : this.getJeton(),
+      shConfiguration : this.getAccessConfig(),
+      createdAt       : this.createdAt,
+      updatedAt       : this.updatedAt
     };
   }
 

@@ -5,14 +5,14 @@ import cors         from 'cors';
 import express, { type Express,
                   type NextFunction,
                   type Request,
-                  type Response    } from 'express';
+                  type Response   } from 'express';
 import rateLimit                    from 'express-rate-limit';
 import helmet                       from 'helmet';
 import swaggerUi                    from 'swagger-ui-express';
 import { DatabaseConnection } from '@/config/DatabaseConnection';
 import { LoggerSingleton }    from '@/config/LoggerSingleton';
 import { SwaggerConfig }      from '@/config/SwaggerConfig';
-import { RequestId }          from '@/domain/value-objects/IdMetier';
+import { SessionId }          from '@/domain/value-objects/IdMetier';
 import { createV1Router }     from '@/routes/v1';
 import { HandlerService }     from '@/services/http/HandlerService';
 import { ApiResponseFactory } from '@/utils/ApiResponseFactory';
@@ -69,7 +69,7 @@ export function createApp(): Express {
     res.setHeader('x-request-id', sIdBrute);
 
     // 🪓 ALIGNEMENT SÉMANTIQUE : Plus de collision possible avec req.user.id !
-    req.requestId = new RequestId(sIdBrute);
+    req.requestId = new SessionId(sIdBrute);
 
     next();
   });

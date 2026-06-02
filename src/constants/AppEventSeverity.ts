@@ -55,15 +55,15 @@ export class AppEventSeverity extends SmartEnum<string> {
   // 🏺 ENSEMENCEMENT DE LA RAM (Les quatre piliers de la sécurité - Format 4 lettres)
   // ----------------------------------------------------------------------------
 
-  /** 🪙 INFO - Niveau Information : Traces d exploitation standards */
+  /** 🪙 INFO - Niveau Information : Traces d'exploitation standards */
   public static readonly INFO = new AppEventSeverity('Information', 'INFO', 10, 10);
 
-  /** 💾 WARN - Niveau Avertissement : Comportements suspects ou requêtes lentes [Mémoria] */
+  /** 💾 WARN - Niveau Avertissement : Comportements suspects ou requêtes lentes */
   public static readonly WARN = new AppEventSeverity('Avertissement', 'WARN', 20, 20);
 
   /** 💽 ERRO - Niveau Erreur : Dysfonctionnements applicatifs bloquants */
   public static readonly ERRO = new AppEventSeverity('Erreur', 'ERRO', 30, 30);
 
-  /** ⛓️ CRIT - Niveau Critique : Alertes maximales exigeant une intervention immédiate [Mémoria] */
+  /** ⛓️ CRIT - Niveau Critique : Alertes maximales exigeant une intervention immédiate */
   public static readonly CRIT = new AppEventSeverity('Critique', 'CRIT', 40, 40);
 }

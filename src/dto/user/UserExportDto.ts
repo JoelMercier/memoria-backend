@@ -151,8 +151,8 @@ export class UserExportDto {
       (s): IExportedShare => ({
         id             : s.getShareId() as unknown as string, // Utilisation de la clé nominale scellée
         itemId         : s.getItemId() as unknown as string,
-        recipientEmail : s.getRecipientEmail(),
-        shareToken     : s.getShareToken(),
+        recipientEmail : s.getCourrielDest(),
+        shareToken     : s.getJeton(),
         accessConfig   : s.getAccessConfig(),
         createdAt      : s.createdAt,                         // Accès aux propriétés directes d'IEntity
         updatedAt      : s.updatedAt

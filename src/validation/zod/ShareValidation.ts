@@ -25,11 +25,18 @@ const accessConfigSchema = z.object({ expiresAt: expiresAtSchema }).default({});
  */
 const itemIdSchema = z.string().trim().min(1, 'L\'identifiant de la pépite (itemId) est requis');
 
+const shareIdSchema = z.string().trim().min(1, 'L\'identifiant du partage (shareId) est requis');
+
+const userIdSchema = z.string().trim().min(1, 'L\'identifiant de l\'utilisateur (userId) est requis'); 
+
+
 /**
  * 🔗 Schéma de validation Zod pour la création d'un Partage (Share).
  */
 const createShareSchema = z.object({
   itemId         : itemIdSchema,
+  userId         : userIdSchema,
+  shareId        : shareIdSchema,
   recipientEmail : recipientEmailSchema,
   accessConfig   : accessConfigSchema
 });

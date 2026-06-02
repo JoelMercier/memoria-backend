@@ -10,6 +10,8 @@ import type { IItemController } from '@/interfaces/controllers/IItemController';
 import type { IItemService } from '@/interfaces/services/IItemService';
 import { ApiResponseFactory } from '@/utils/ApiResponseFactory';
 import { RequestIdGenerator } from '@/utils/RequestIdGenerator';
+import { IItemListOptions } from '@/interfaces/repositories/IItemRepository';
+import ContentType from '@/constants/ContentType';
 
 /**
  * 🏛️ Classe ItemController
@@ -48,10 +50,10 @@ export class ItemController implements IItemController {
         throw UserErrorFactory.invalidCredentials();
       }
       // Extraction des critères de pagination et filtres optionnels avec protection contre les objets complexes
-      const options = {
+      const options : IItemListOptions = {
         limit: req.query.limit ? Number(req.query.limit) : undefined,
         offset: req.query.offset ? Number(req.query.offset) : undefined,
-        contentType: typeof req.query.contentType === 'string' ? req.query.contentType : undefined,
+        contentType: typeof req.query.contentType === 'string' ? ContentType.fromSql(req.query.contentType) : undefined,
         search: typeof req.query.search === 'string' ? req.query.search : undefined
       };
 

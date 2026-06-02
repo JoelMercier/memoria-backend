@@ -1,6 +1,6 @@
 // ——— fichier : src/dto/share/CreateShareDto.ts
 
-import { ItemId              } from '@/domain/value-objects/IdMetier';
+import      { ItemId, ShareId, UserId         } from '@/domain/value-objects/IdMetier';
 import type { IAccessConfig  } from '@/interfaces/entities/share/IAccessConfig';
 import { type CreateShareSchemaType,
          ShareValidation     } from '@/validation/zod/ShareValidation';
@@ -18,7 +18,11 @@ import { type CreateShareSchemaType,
 export class CreateShareDto {
 
   /** 📦 Caillou de couleur : Identifiant unique immuable de la pépite à partager */
-  public readonly itemId : ItemId;
+  public readonly idItem : ItemId;
+
+  public readonly idShare : ShareId;
+
+  public readonly idUser : UserId;
 
   /** 📧 Adresse électronique optionnelle du destinataire du partage */
   public readonly recipientEmail : string | null;
@@ -37,9 +41,12 @@ export class CreateShareDto {
     const validated : CreateShareSchemaType = ShareValidation.validateCreate(data);
 
     // Passage sécurisé de la frontière : conversion directe vers le type nominal fort
-    this.itemId         = new ItemId(validated.itemId);
+    this.idItem         = new ItemId(validated.itemId);
+    this.idUser         = new UserId(validated.userId);
+    this.idShare        = new ShareId(validated.shareId)
     this.recipientEmail = validated.recipientEmail ?? null;
-    this.accessConfig   = validated.accessConfig;
+    this.accessConfig   = new (validated.accessConfig.expiresAt, validated.allow_download)
+
   }
 
 }
