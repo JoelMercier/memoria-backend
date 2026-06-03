@@ -5,7 +5,7 @@
 -- Fonction trigger_set_timestamp a utiliser sur les tables avec une colonne updated_at
 -- ============================================================================
 
-CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+/** OBSOLÈTEE CREATE OR REPLACE FUNCTION trigger_set_timestamp() **/
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = CURRENT_TIMESTAMP;

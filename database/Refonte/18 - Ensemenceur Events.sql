@@ -1,4 +1,3 @@
-
 -- ----------------------------------------------------------------------------
 -- 🚨 3. Injection des données de la table Events (Journal d audit Append-Only)
 -- ----------------------------------------------------------------------------
@@ -6,7 +5,7 @@ Insert Into "Events" (
     "aeIdEvent",
     "aeUserId",
     "aeCreatedAt",
-    "aeIdCategory",
+    "aeCategoryId",
     "aeSeverityId",
     "aeType",
     "aeMessage",
@@ -14,7 +13,7 @@ Insert Into "Events" (
 ) Values
 -- Log 1 : Démarrage du système (aeUserId = NULL)
 (
-    decode('018d5c8ea0017001d002000000000001', 'hex'),
+    "Bin-UUID"(decode('018d5c8ea0017001d002000000000001', 'hex')),
     Null,
     '2024-01-15 09:10:04',
     'MONI',
@@ -26,8 +25,8 @@ Insert Into "Events" (
 
 -- Log 2 : Inscription de Sophie
 (
-    decode('018d5c8ea0017001d002000000000003', 'hex'),
-    decode('018d5c8e567870019001000000000001', 'hex'),
+    "Bin-UUID"(decode('018d5c8ea0017001d002000000000003', 'hex')),
+    "Bin-UUID"(decode('018d5c8e567870019001000000000001', 'hex')),
     '2024-01-15 10:00:01',
     'ANAL',
     'INFO',
@@ -38,8 +37,8 @@ Insert Into "Events" (
 
 -- Log 3 : Alerte sécurité Emma (Poids 20 - WARN)
 (
-    decode('018d5c8ea0017001d002000000000010', 'hex'),
-    decode('018d5c8e567870019001000000000003', 'hex'),
+    "Bin-UUID"(decode('018d5c8ea0017001d002000000000010', 'hex')),
+    "Bin-UUID"(decode('018d5c8e567870019001000000000003', 'hex')),
     '2024-01-15 11:02:00',
     'AUDI',
     'WARN',
@@ -50,8 +49,8 @@ Insert Into "Events" (
 
 -- Log 4 : Requête RGPD d Alice
 (
-    decode('018d5c8ea0017001d002000000000020', 'hex'),
-    decode('018d5c8e567870019001000000000005', 'hex'),
+    "Bin-UUID"(decode('018d5c8ea0017001d002000000000020', 'hex')),
+    "Bin-UUID"(decode('018d5c8e567870019001000000000005', 'hex')),
     '2024-01-15 12:05:00',
     'GDPR',
     'INFO',
@@ -62,7 +61,7 @@ Insert Into "Events" (
 
 -- Log 5 : Alerte performance base de données (Poids 20 - WARN)
 (
-    decode('018d5c8ea0017001d002000000000099', 'hex'),
+    "Bin-UUID"(decode('018d5c8ea0017001d002000000000099', 'hex')),
     Null,
     '2024-01-15 13:45:12',
     'MONI',
@@ -71,4 +70,4 @@ Insert Into "Events" (
     'Requête SQL lente détectée sur la table items',
     '{"duration_ms": 1250, "query": "SELECT * FROM items WHERE content @@ ...", "optimisation_needed": true}'::jsonb
 )
-On Conflict Do Nothing;
+On Conflict do Nothing;

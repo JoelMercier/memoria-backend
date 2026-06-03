@@ -1,4 +1,3 @@
-
 -- ----------------------------------------------------------------------------
 -- 🔗 2. Injection des données de la table Shares (Passerelles URL-Safe)
 -- ----------------------------------------------------------------------------
@@ -13,8 +12,8 @@ Insert Into "Shares" (
 ) Values
 -- Partage 1 : Sophie vers Marc (Sur la pépite SOLID)
 (
-    decode('018d5c8e90017001c001000000000001', 'hex'),
-    decode('018d5c8e80017001b001000000000001', 'hex'),
+    "Bin-UUID"(decode('018d5c8e90017001c001000000000001', 'hex')),
+    "Bin-UUID"(decode('018d5c8e80017001b001000000000001', 'hex')),
     '2024-01-15 10:50:00',
     Null,
     'marc.dubois@entreprise.fr',
@@ -24,8 +23,8 @@ Insert Into "Shares" (
 
 -- Partage 2 : Marc vers Sophie (Sur la pépite Scrum Guide)
 (
-    decode('018d5c8e90017001c002000000000001', 'hex'),
-    decode('018d5c8e80017001b002000000000001', 'hex'),
+    "Bin-UUID"(decode('018d5c8e90017001c002000000000001', 'hex')),
+    "Bin-UUID"(decode('018d5c8e80017001b002000000000001', 'hex')),
     '2024-01-15 10:55:00',
     Null,
     'sophie.laurent@tech.io',

@@ -26,7 +26,7 @@ Insert Into "Users" (
 ) Values
 -- Acteur 1 : Sophie (Développeuse)
 (
-    decode('018d5c8e567870019001000000000001', 'hex'),
+    "Bin-UUID"(decode('018d5c8e567870019001000000000001', 'hex')),
     '2024-01-15 10:00:00',
     Null,
     '2024-01-15 10:00:00',
@@ -41,7 +41,7 @@ Insert Into "Users" (
 
 -- Acteur 2 : Marc (Chef de projet)
 (
-    decode('018d5c8e567870019001000000000002', 'hex'),
+     "Bin-UUID"(decode('018d5c8e567870019001000000000002', 'hex')),
     '2024-01-15 10:30:00',
     Null,
     '2024-01-15 10:30:00',
@@ -56,7 +56,7 @@ Insert Into "Users" (
 
 -- Acteur 3 : Emma (Étudiante en psychologie)
 (
-    decode('018d5c8e567870019001000000000003', 'hex'),
+     "Bin-UUID"(decode('018d5c8e567870019001000000000003', 'hex')),
     '2024-01-15 11:00:00',
     Null,
     '2024-01-15 11:00:00',
@@ -71,7 +71,7 @@ Insert Into "Users" (
 
 -- Acteur 4 : Lucas (Designer UX/UI)
 (
-    decode('018d5c8e567870019001000000000004', 'hex'),
+     "Bin-UUID"(decode('018d5c8e567870019001000000000004', 'hex')),
     '2024-01-15 11:30:00',
     Null,
     '2024-01-15 11:30:00',
@@ -86,7 +86,7 @@ Insert Into "Users" (
 
 -- Acteur 5 : Alice (Entrepreneuse)
 (
-    decode('018d5c8e567870019001000000000005', 'hex'),
+     "Bin-UUID"(decode('018d5c8e567870019001000000000005', 'hex')),
     '2024-01-15 12:00:00',
     Null,
     '2024-01-15 12:00:00',
@@ -101,7 +101,7 @@ Insert Into "Users" (
 
 -- Acteur 6 : Paul (Professeur de philosophie)
 (
-    decode('018d5c8e567870019001000000000006', 'hex'),
+     "Bin-UUID"(decode('018d5c8e567870019001000000000006', 'hex')),
     '2024-01-15 12:00:00',
     Null,
     '2024-01-15 12:00:00',
@@ -116,7 +116,7 @@ Insert Into "Users" (
 
 -- Acteur 7 : Julie (Journaliste tech)
 (
-    decode('018d5c8e567870019001000000000007', 'hex'),
+     "Bin-UUID"(decode('018d5c8e567870019001000000000007', 'hex')),
     '2024-01-15 12:30:00',
     Null,
     '2024-01-15 12:30:00',
@@ -131,7 +131,7 @@ Insert Into "Users" (
 
 -- Acteur 8 : Thomas (Chef cuisinier)
 (
-    decode('018d5c8e567870019001000000000008', 'hex'),
+     "Bin-UUID"(decode('018d5c8e567870019001000000000008', 'hex')),
     '2024-01-15 13:00:00',
     Null,
     '2024-01-15 13:00:00',
@@ -146,7 +146,7 @@ Insert Into "Users" (
 
 -- Acteur 9 : Camille (Architecte)
 (
-    decode('018d5c8e567870019001000000000009', 'hex'),
+     "Bin-UUID"(decode('018d5c8e567870019001000000000009', 'hex')),
     '2024-01-15 13:30:00',
     Null,
     '2024-01-15 13:30:00',
@@ -161,7 +161,7 @@ Insert Into "Users" (
 
 -- Acteur 10 : Maxime (Tech Lead d infrastructure)
 (
-    decode('018d5c8e567870019001000000000010', 'hex'),
+     "Bin-UUID"(decode('018d5c8e567870019001000000000010', 'hex')),
     '2024-01-15 09:00:00',
     Null,
     '2024-01-15 09:00:00',
@@ -176,7 +176,7 @@ Insert Into "Users" (
 
 -- Acteur 11 : Léa (Modératrice de contenu)
 (
-    decode('018d5c8e567870019001000000000011', 'hex'),
+     "Bin-UUID"(decode('018d5c8e567870019001000000000011', 'hex')),
     '2024-01-15 09:15:00',
     Null,
     '2024-01-15 09:15:00',
@@ -191,7 +191,7 @@ Insert Into "Users" (
 
 -- Acteur 12 : Pierre (Super Administrateur Réseau)
 (
-    decode('018d5c8e567870019001000000000012', 'hex'),
+     "Bin-UUID"(decode('018d5c8e567870019001000000000012', 'hex')),
     '2024-01-15 08:00:00',
     Null,
     '2024-01-15 08:00:00',

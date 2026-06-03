@@ -16,7 +16,7 @@ BEGIN
     "NomColonne" := TG_ARGV[0];
 
     IF "NomColonne" IS NULL THEN
-        RAISE EXCEPTION 'Infrastructure 🚨 : Le trigger doit obligatoirement recevoir le nom de la zone de modification en paramètre.';
+        RAISE EXCEPTION 'Infrastructure : Le trigger doit obligatoirement recevoir le nom de la zone de modification en paramètre.';
     END IF;
 
     -- 2. Injection dynamique de la date UTC brute sans calcul lourd dans l'enregistrement NEW ⚙️
@@ -26,4 +26,4 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql VOLATILE STRICT;
 
-COMMENT ON FUNCTION "TraceModif"() IS '⚡ Fonction d infrastructure universelle injectant dynamiquement l horodatage de modification dans la colonne spécifiée en paramètre.';
+COMMENT ON FUNCTION "TraceModif"() IS '⚡ Fonction d''infrastructure universelle injectant dynamiquement l''horodatage de modification dans la colonne spécifiée en paramètre.';

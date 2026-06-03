@@ -1,5 +1,5 @@
 -- ============================================
--- 🔐 Permissions for app_memoria
+-- 🔐 Permissions pour le rôle 'app_memoria'
 -- ============================================
 
 -- Accès au schéma
