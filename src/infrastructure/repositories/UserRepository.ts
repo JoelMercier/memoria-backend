@@ -1,6 +1,5 @@
 // ——— fichier : src/infrastructure/repositories/UserRepository.ts
 
-import { Pool                 } from 'pg';
 import { BaseRepository       } from '@/infrastructure/repositories/BaseRepositories';
 import { UserId               } from '@/domain/value-objects/IdMetier';
 import { User                 } from '@/entities/User';
@@ -8,17 +7,20 @@ import { Role                 } from '@/constants/Role';
 import { AuthProvider         } from '@/constants/AuthProvider';
 import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
 import { UserErrorFactory     } from '@/exceptions/UserErrorFactory';
+import { IListOptions         } from '@/interfaces/shared/IListOptions';
+import { IUserRepository      } from '@/interfaces/repositories/IUserRepository';
+import { IDatabaseConnection  } from '@/interfaces/database/IDatabaseConnection';
 
 /**
  * 🗄️ Interface IUserRow (Miroir Physique Jojo-Style des Souterrains 🔌)
  */
 interface IUserRow {
-  usIdUser        : Buffer; // Segment binaire 128 bits
-  usCourriel      : string; // Courriel francisé unifié
+  usIdUser        : UserId;
+  usCourriel      : string;
   usPasswordHash  : string;
   usPseudo        : string;
-  usIdRole        : string; // Trigramme fixe (ex: 'CST')
-  usIdProvider    : string; // Trigramme fixe (ex: 'LOC')
+  usIdRole        : string;
+  usIdProvider    : string;
   usSettingsUser  : Record<string, unknown>;
   usGdprConsent   : boolean;
   usGdprDate      : Date | null;
@@ -37,16 +39,17 @@ interface IUserRow {
  * @author Tréfilage du code : Gaïa (Polisseuse de bronze)
  * @author Reliques Git->Origin : L'Ancien Régime & Co (Artisans du temps imparti)
  */
-export class UserRepository extends BaseRepository {
+export class UserRepository extends BaseRepository implements IUserRepository {
 
   /**
-   * Initialise le dépôt de persistance via le pool global d infrastructure 🔌.
+   * Initialise le dépôt de persistance via le gestionnaire de connexion universel 🔌.
    *
    * @constructor
-   * @param {Pool} p_oPool - Le pool de connexions réseau partagé
+   * @param {IDatabaseConnection} p_oDb - Le gestionnaire de connexion officiel de la Forge.
    */
-  public constructor(p_oPool: Pool) {
-    super(p_oPool);
+  public constructor(p_oDb: IDatabaseConnection) {
+    // On extrait le pool proprement pour la classe mère, comme son grand frère Item !
+    super(p_oDb);
   }
 
   /**
@@ -171,7 +174,7 @@ export class UserRepository extends BaseRepository {
       throw DatabaseErrorFactory.queryFailed('existsByPseudo', (l_oErreur as Error).message);
     }
   }
-// ——— fichier : src/infrastructure/repositories/UserRepository_Partie2.ts
+
 
   /**
    * 🪓 Écriture concrète : Insère un nouvel acteur via les types d acier de la Cour Basse 🪙.
@@ -266,15 +269,15 @@ export class UserRepository extends BaseRepository {
    * @param {UserId} p_oIdUser - L identifiant fort du profil à éradiquer
    * @returns {Promise<boolean>} True si l impact physique est validé sur le disque
    */
-  public async deletePhysical(p_oIdUser: UserId): Promise<boolean> {
+  public async delete(p_oIdUser: UserId): Promise<boolean> {
     try {
       await this.executer<any>(
-        'Delete From "Users" Where "usIdUser" = $1;',
+        'Delete From "Users" Where "usIdUser" = "Bin-UUID"($1);',
         [p_oIdUser]
       );
       return true;
     } catch (l_oErreur) {
-      throw DatabaseErrorFactory.queryFailed('deletePhysical', (l_oErreur as Error).message);
+      throw DatabaseErrorFactory.queryFailed('delete', (l_oErreur as Error).message);
     }
   }
 
@@ -299,5 +302,23 @@ export class UserRepository extends BaseRepository {
     } catch (l_oErreur) {
       throw DatabaseErrorFactory.queryFailed('obtenirActeursPagine', (l_oErreur as Error).message);
     }
+  }
+
+  /**
+   * 📊 Récupération paginée contractuelle des utilisateurs (Anti-Cramage Jojo-Style 🛡️).
+   * Raccordée directement sur l'usine de fonction stockée de la base de données.
+   *
+   * @public
+   * @async
+   * @param {IListOptions} [p_oOptions] - Les filtres d'excellence (pagination, tri, limite).
+   * @returns {Promise<User[]>} La liste bridée et réarmée des instances Domaines.
+   */
+  public async findAll(p_oOptions?: IListOptions): Promise<User[]> {
+    // Extraction des options avec nos gardes-fous réglementaires
+    const l_nLimit = p_oOptions?.NbLignesMax ?? 100;
+    const l_nOffset = p_oOptions?.IndexDepart ?? 0;
+
+    // Raccordement direct sur votre fonction stockée performante !
+    return this.obtenirActeursPagine(l_nLimit, l_nOffset);
   }
 }

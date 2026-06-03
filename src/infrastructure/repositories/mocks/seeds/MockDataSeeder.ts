@@ -164,7 +164,9 @@ export class MockDataSeeder {
     const l_oIdShareSophie = new ShareId(Buffer.from('018d5c8e90017001c001000000000001', 'hex'));
     const l_oIdShareMarc   = new ShareId(Buffer.from('018d5c8e90017001c002000000000001', 'hex'));
 
-    await p_oShareRepo.create({ idShare: l_oIdShareSophie, idShare: l_oIdShareSophie, shItemId: l_oIdItemSolid, itemOwnerId: l_oIdSophie, shCourrielDest: 'marc.dubois@entreprise.fr', shJeton: 'tok_share_sophie_marc_001', shConfiguration: { level: 'read', allow_download: false } });
-    await p_oShareRepo.create({ idShare: l_oIdShareMarc  , idShare: l_oIdShareMarc  , shItemId: l_oIdItemScrum, itemOwnerId: l_oIdMarc, shCourrielDest: 'sophie.laurent@tech.io', shJeton: 'tok_share_marc_sophie_001', shConfiguration: { level: 'read', allow_download: true } });
+    // Éradication du doublon de propriété et alignement sémantique du propriétaire sur l'interface
+    await p_oShareRepo.create({ idShare: l_oIdShareSophie, shIdShare: l_oIdShareSophie, shItemId: l_oIdItemSolid, shCourrielDest: 'marc.dubois@entreprise.fr', shJeton: 'tok_share_sophie_marc_001', shConfiguration: { level: 'read', allow_download: false } } as any);
+    await p_oShareRepo.create({ idShare: l_oIdShareMarc  , shIdShare: l_oIdShareMarc  , shItemId: l_oIdItemScrum, shCourrielDest: 'sophie.laurent@tech.io', shJeton: 'tok_share_marc_sophie_001', shConfiguration: { level: 'read', allow_download: true } } as any);
   }
 }
+

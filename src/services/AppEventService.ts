@@ -30,6 +30,14 @@ export class AppEventService {
    * @public
    * @static
    * @async
+   * @param {Object} data - Les données de l'événement à logguer.
+   * @param {UserId | null} [data.userId] - L'identifiant de l'utilisateur.
+   * @param {AppEventCategory} data.eventCategory - La catégorie du SmartEnum.
+   * @param {AppEventType} data.eventType - Le type d'événement SmartEnum précis.
+   * @param {AppEventSeverity} [data.severity] - Le niveau de sévérité SmartEnum.
+   * @param {string} data.message - Le message textuel de description.
+   * @param {Record<string, any>} [data.metadata] - Les métadonnées additionnelles.
+   * @returns {Promise<any>} Le résultat de la création du log en base.
    */
   public static async log(data: {
     userId?        : UserId | null;
@@ -47,7 +55,7 @@ export class AppEventService {
       userId        : data.userId ?? null,
       eventCategory : data.eventCategory,
       eventType     : data.eventType,
-      severity      : data.severity || AppEventSeverity.fromSql('info'),
+      severity      : data.severity || AppEventSeverity.INFO,
       message       : data.message,
       metadata      : data.metadata || {}
     });
@@ -59,12 +67,14 @@ export class AppEventService {
    * @public
    * @static
    * @async
+   * @param {UserId} userId - L'identifiant de l'utilisateur connecté.
+   * @returns {Promise<any>} Le log généré.
    */
   public static async authSuccess(userId: UserId): Promise<any> {
     return this.log({
       userId,
-      eventCategory : AppEventCategory.aecAudit,
-      eventType     : AppEventType.AUTH_LOGIN_SUCCESS,
+      eventCategory : AppEventCategory.AUDI,
+      eventType     : AppEventType.UTILISATEUR_CONNEXION,
       message       : 'Connexion réussie'
     });
   }
@@ -75,12 +85,14 @@ export class AppEventService {
    * @public
    * @static
    * @async
+   * @param {string} email - L'email ayant échoué à se connecter.
+   * @returns {Promise<any>} Le log généré.
    */
   public static async authFailure(email: string): Promise<any> {
     return this.log({
-      eventCategory : AppEventCategory.aecAudit,
-      eventType     : AppEventType.AUTH_LOGIN_FAILURE,
-      severity      : AppEventSeverity.fromSql('warning'),
+      eventCategory : AppEventCategory.AUDI,
+      eventType     : AppEventType.AUTHENTIFICATION_ECHEC,
+      severity      : AppEventSeverity.WARN,
       message       : 'Échec de connexion',
       metadata      : { email }
     });
@@ -92,12 +104,15 @@ export class AppEventService {
    * @public
    * @static
    * @async
+   * @param {UserId} userId - L'auteur de la création.
+   * @param {ItemId} itemId - L'identifiant de la pépite.
+   * @returns {Promise<any>} Le log généré.
    */
   public static async itemCreated(userId: UserId, itemId: ItemId): Promise<any> {
     return this.log({
       userId,
-      eventCategory : AppEventCategory.aecAnalytics,
-      eventType     : AppEventType.ITEM_CREATED,
+      eventCategory : AppEventCategory.ANAL,
+      eventType     : AppEventType.PEPITE_CREATION,
       message       : 'Pépite créée',
       metadata      : { itemId: itemId.valeur }
     });
@@ -109,12 +124,15 @@ export class AppEventService {
    * @public
    * @static
    * @async
+   * @param {UserId} userId - L'auteur du partage.
+   * @param {ShareId} shareId - L'identifiant du partage généré.
+   * @returns {Promise<any>} Le log généré.
    */
   public static async shareCreated(userId: UserId, shareId: ShareId): Promise<any> {
     return this.log({
       userId,
-      eventCategory : AppEventCategory.aecAnalytics,
-      eventType     : AppEventType.ITEM_DELETED,
+      eventCategory : AppEventCategory.ANAL,
+      eventType     : AppEventType.PEPITE_PARTAGE, // Corrigé avec la toute nouvelle instance !
       message       : 'Pépite partagée',
       metadata      : { shareId: shareId.valeur }
     });

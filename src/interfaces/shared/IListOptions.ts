@@ -1,6 +1,6 @@
 // ——— fichier : src/interfaces/shared/IListOptions.ts
 
-import { OrdreAff } from '@/constants/OrdreTriEnum';
+import OrdreTriEnum from "@/constants/OrdreTriEnum";
 
 /**
  * 📊 Interface IListOptions (Version Jojo Excellence)
@@ -23,7 +23,7 @@ export interface IListOptions {
   ColTri?      : string;
 
   /** Direction de l'ordonnancement en base de données (Smart Enum) */
-  OrdreAff?    : OrdreAff;
+  OrdreAff?    : OrdreTriEnum;
 
   /** Date de coupure optionnelle pour l'isolation des historiques */
   DatePivot?   : Date;

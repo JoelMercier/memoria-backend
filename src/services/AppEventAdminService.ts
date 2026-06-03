@@ -26,6 +26,8 @@ export class AppEventAdminService {
    * @public
    * @static
    * @async
+   * @param {AppEventId} idEvent - L'identifiant fort du log d'audit.
+   * @returns {Promise<AppEvent | null>} Le log trouvé ou nul s'il n'existe pas.
    */
   public static async getById(idEvent: AppEventId): Promise<AppEvent | null> {
     const db = DatabaseConnection.getInstance();
@@ -40,6 +42,7 @@ export class AppEventAdminService {
    * @public
    * @static
    * @async
+   * @throws {Error} Systématiquement pour verrouiller la sécurité.
    */
   public static async updateLog(): Promise<never> {
     throw new Error('[Erreur Sécurité] Violation d\'intégrité : L\'administration n\'a pas le droit de modifier un log d\'audit.');
@@ -51,6 +54,7 @@ export class AppEventAdminService {
    * @public
    * @static
    * @async
+   * @returns {Promise<AppEvent[]>} La liste exhaustive des logs d'audit.
    */
   public static async getAllLogs(): Promise<AppEvent[]> {
     const db = DatabaseConnection.getInstance();
@@ -59,39 +63,18 @@ export class AppEventAdminService {
   }
 
   /**
-   * 📊 Récupère les métriques volumétriques de la table des logs.
-   *
-   * @public
-   * @static
-   * @async
-   */
-  public static async getStats(): Promise<{ total: number; parType: any[] }> {
-    const total = await AppEventRepository.count();
-    const parType = await AppEventRepository.countByType();
-    return { total, parType };
-  }
-
-  /**
-   * 📅 Récupère l'historique des volumes d'audit sur une période donnée.
-   *
-   * @public
-   * @static
-   * @async
-   */
-  public static async getVolumeHistory(days: number): Promise<any[]> {
-    return AppEventRepository.countByDay({ days });
-  }
-
-  /**
    * 🚨 Opération interdite : Les suppressions unitaires de logs sont prohibées.
    *
    * @public
    * @static
    * @async
+   * @throws {Error} Systématiquement pour verrouiller la sécurité.
    */
   public static async deleteLog(): Promise<never> {
     throw new Error('[Erreur Sécurité] Violation d\'intégrité : L\'administration n\'a pas le droit de supprimer un log unitaire.');
   }
+
+// ——— fichier : src/services/AppEventAdminService.ts
 
   /**
    * 🧹 Purge historique réglementaire automatique (Conformité RGPD).
@@ -100,8 +83,22 @@ export class AppEventAdminService {
    * @public
    * @static
    * @async
+   * @param {Date} cutoffDate - La date pivot d'ancienneté maximale autorisée.
+   * @returns {Promise<number>} Le nombre d'enregistrements purgés sur le disque.
+   * @throws {Error} Si la date pivot viole la durée minimale de conservation de 6 mois de la CNIL.
    */
   public static async purgeOlderThan(cutoffDate: Date): Promise<number> {
-    return AppEventRepository.deleteOlderThan(cutoffDate);
+    // 🛡️ REMPART RGPD (CNIL) DU DOMAINE : Calcul de la date limite légale (180 jours)
+    const l_nSixMoisEnMillisecondes = 180 * 24 * 60 * 60 * 1000;
+    const l_dDateMinimumLegale = new Date(Date.now() - l_nSixMoisEnMillisecondes);
+
+    if (cutoffDate.getTime() > l_dDateMinimumLegale.getTime()) {
+      throw new Error('[Erreur RGPD] Violation de conformité CNIL : Il est interdit de purger des journaux d\'audit de moins de 6 mois (180 jours).');
+    }
+
+    const db = DatabaseConnection.getInstance();
+    const repo = new AppEventRepository(db);
+
+    return repo.deleteOlderThan(cutoffDate);
   }
 }

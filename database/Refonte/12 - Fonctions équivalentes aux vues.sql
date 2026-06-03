@@ -144,7 +144,7 @@ Begin
     Select "Tags"."tgIdTag", "tgUserId", "tgCreatedAt", "tgName", Count("ItemTags"."tiItemId") As "NombrePepites"
     From "Tags"
     Left Outer Join "ItemTags"
-      On "Tags"."tgIdTag" = "ItemTags"."tiTagId" -- Corrigé anti-collision [Mémoria]
+      On "Tags"."tgIdTag" = "ItemTags"."tiTagId" 
     Where "tgUserId" = p_usIdUser
     Group By "Tags"."tgIdTag", "tgUserId", "tgName", "tgCreatedAt"
     Order By "tgName" Asc;

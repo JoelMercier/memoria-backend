@@ -1,4 +1,4 @@
-// ——— fichier : src/constants/base/OrdreTriEnum.ts
+// ——— fichier : src/constants/OrdreTriEnum.ts
 
 import { SmartEnum } from '@/constants/base/SmartEnum';
 
@@ -56,10 +56,8 @@ export class OrdreTriEnum extends SmartEnum<string> {
 
   /** 🗄️ Convertisseur d infrastructure sécurisé convertissant le texte en instance typée [Mémoria] */
   public static fromSql(p_sCodeSql: string): OrdreTriEnum {
-    // Normalisation de sécurité pour aligner le texte sur les majuscules de notre noyau [Mémoria]
     const l_sCodeNettoye = p_sCodeSql ? p_sCodeSql.trim().toUpperCase() : '';
 
-    // Rétrocompatibilité : si la chaîne d entrée est vide, on fléche vers notre quadrigramme NATU
     if (l_sCodeNettoye === '') {
       return this.DeCode<OrdreTriEnum>('NATU');
     }

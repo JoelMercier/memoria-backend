@@ -39,17 +39,15 @@ interface IShareRow extends QueryResultRow {
  * @author Héritage Git->Origin : La Vague Initiale (Ouvriers du code en surchauffe)
  */
 export class ShareRepository extends BaseRepository implements IShareRepository {
-  /** 🎛️ Connexion physique à l'infrastructure de données */
-  private readonly db : IDatabaseConnection;
 
   /**
    * Initialise le dépôt de partage et hérite de la classe mère.
    *
    * @constructor
    */
-  public constructor(db: IDatabaseConnection) {
-    super(db.getPool());
-    this.db = db;
+  public constructor(p_oDb: IDatabaseConnection) {
+    // Raccordement direct à la maman, alignement impérial !
+    super(p_oDb);
   }
 
   /**
@@ -166,10 +164,13 @@ export class ShareRepository extends BaseRepository implements IShareRepository 
    *
    * @public
    * @async
+   * @param {IShareData} data - Les données du droit de partage à créer.
+   * @returns {Promise<Share>} Le droit de partage fraîchement inséré en base de données.
+   * @throws {ShareErrorFactory} Si l'insertion échoue ou ne renvoie aucune ligne.
    */
   public async create(data: IShareData): Promise<Share> {
     try {
-      const l_binIdShare = this.toBuffer(data.shIdShare);
+      const l_binIdShare = this.toBuffer(data.idShare);
 
       const result = await this.db.query<IShareRow>(
         `Insert Into "Shares" ("shIdShare", "shItemId", "shCourrielDest", "shJeton", "shConfiguration")
@@ -177,7 +178,7 @@ export class ShareRepository extends BaseRepository implements IShareRepository 
          returning *`,
         [
           l_binIdShare,
-          this.toBuffer(data.shItemId),
+          this.toBuffer(data.shItemId), // Corrigé : shItemId existe bien sur IShareData
           data.shCourrielDest,
           data.shJeton,
           JSON.stringify(data.shConfiguration)
@@ -187,7 +188,7 @@ export class ShareRepository extends BaseRepository implements IShareRepository 
       const l_aoShares = this.rowsToShares(result);
       if (l_aoShares.length === 0) throw ShareErrorFactory.creation('No row returned from INSERT in shares');
 
-      return l_aoShares[0];
+      return l_aoShares[0]; // Corrigé : On extrait l'objet du tableau pour correspondre au type de retour
 
     } catch (err) {
       if (err instanceof ShareErrorFactory) throw err;

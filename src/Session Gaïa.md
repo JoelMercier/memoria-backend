@@ -33,3 +33,39 @@ Chaque fichier comporte exactement trois lignes JSDoc Jojo-Style avec rotation s
 1.  * @author <Rôle/Fonction> : Joël (<Humour C++, DR-DOS, Class Abstraite ou Void capillaire>)
 2.  * @author <Rôle/Fonction> : Gaïa (<Univers de la forge, du burin, du silicium et des octets>)
 3.  * @author <Rôle/Fonction> : La Vague Initiale (Ouvriers du code en surchauffe/6 mois de formation)
+
+// ——— fichier : DOC_RAPPEL_CONTEXTE_MEMORIA.md
+
+# 🏛️ CONTEXTE DE SESSION ARCHITECTURALE : BACKEND [MÉMORIA]
+**Auteurs :** Joël (Hongroise maniac') & Gaïa (Graveuse de pépites)
+**État du build :** 🟢 COMPILATION RÉUSSIE (ZÉRO ERREUR)
+
+### 1. LES FONDATIONS ARCHITECTURALES FIXÉES
+*   **Pas d'alias relatifs sauvages :** Utilisation exclusive et obligatoire des alias absolus avec le préfixe `@/` (ex: `@/constants/base/SmartEnum`) exigée par l'évaluateur (fan de pandas et d'Uncle Bob).
+*   **Souveraineté de BaseRepository :** La classe mère `BaseRepository` a été factorisée (DRY strict). Elle encapsule l'interface `IDatabaseConnection` (`m_oDb`) et expose un accesseur public immuable `get db()`.
+*   **Alignement des Repositories :** `UserRepository`, `ItemRepository`, `TagRepository`, `ItemTagRepository` et `ShareRepository` héritent proprement de `BaseRepository` et reçoivent `db` (instance de `DatabaseConnection`) en paramètre unique de constructeur lors de l'assemblage dans `src/routes/v1/index.ts`.
+*   **Éradication des enums natifs :** Remplacés par l'architecture `SmartEnum<string>` stockée en RAM (`AppEventCategory`, `AppEventSeverity`, `OrdreTriEnum`, `AuthProvider`, `Role`).
+
+### 2. ACTIONS RÉALISÉES ET NETTOYÉES AVANT COUVRE-FEU
+*   `UserRepository.ts` : Réimplantation de la méthode contractuelle `delete(id: UserId): Promise<boolean>` en mode PascalCase apaisé, utilisant la fonction stockée PostgreSQL `"Bin-UUID"` pour comparer le ByteA du disque avec l'UUID de Node sans surcoût de calcul.
+*   `AppEventAdminService.ts` : Nettoyage des appels statiques illégitimes. Instanciation obligatoire du robot d'infrastructure via `new AppEventRepository(db)` en tête de chaque méthode statistique.
+
+// ——— fichier : DOC_TODO_CHANTIERS_PROCHAINS.md
+
+# 🛠️ FEUILLE DE ROUTE IMMÉDIATE (REPRISE DES TRAVAUX)
+
+### 🚨 CHANTIER N°1 (URGENT) : RÉÉCRITURE DIFFÉRENTIELLE DE `ItemTagRepository.sync`
+*   **Problématique :** La méthode `sync` actuelle utilise la technique destructive *Delete-then-Insert* au sein d'une transaction. Conséquence : les zones de traçabilité (`createdAt` d'audit issu de `IBaseEntityData`) sont réinitialisées à `now()` à chaque modification, effaçant l'ancienneté historique des tags.
+*   **Objectif d'acier :** Coder une analyse différentielle au sein de la transaction `this.db.getPool().connect()` :
+    1. Récupérer les `TagId` actuellement en base pour la pépite.
+    2. Calculer les étiquettes à **Supprimer** (présentes en BDD, absentes du paramètre).
+    3. Calculer les étiquettes à **Insérer** (absentes de la BDD, présentes dans le paramètre).
+    4. Conserver intactes les liaisons existantes pour immuniser leur `createdAt`.
+
+### 🗄️ CHANTIER N°2 : CHAUFFAGE DES PLACARDS DE RAM (WARMUP CACHE)
+*   **Objectif :** Rendre obsolètes les appels répétitifs à la base de données pour les données de référence. Au lancement de l'application (dans `src/index.ts`), charger les tables `Roles`, `EventCategories` et `Severites`, puis ensemencer dynamiquement les instances de nos `SmartEnum` en bloquant le placard avec un `Object.freeze()`.
+
+### ⚔️ CHANTIER N°3 : REMISE AU PAS DES SERVICES D'AUDIT
+*   **Objectif :** Éliminer l'incohérence doctrinale par rapport aux autres services.
+*   **Actions :** Supprimer le mot-clé `static` de `AppEventService` et `AppEventAdminService`. Forger l'interface mère `IBaseEventService` et les deux filles `IAppEventService` et `IAppEventAdminService` dans `src/interfaces/services/`. Les injecter proprement à la ligne dans l'index des routes.
+

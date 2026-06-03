@@ -41,8 +41,6 @@ interface IAppEventRow extends QueryResultRow {
  * @author Héritage Git->Origin : La Vague Initiale (Artisans du temps imparti)
  */
 export class AppEventRepository extends BaseRepository implements IAppEventRepository {
-  /** 🎛️ Connexion physique à l'infrastructure de données de Cour Basse */
-  private readonly m_oDb: IDatabaseConnection;
 
   /**
    * Initialise le dépôt de persistance via l'interface abstraite de connexion.
@@ -51,8 +49,7 @@ export class AppEventRepository extends BaseRepository implements IAppEventRepos
    */
   public constructor(p_oDb: IDatabaseConnection) {
     // Raccordement d'acier : On transmet le pool brut extrait de l'interface au parent historique
-    super(p_oDb.getPool());
-    this.m_oDb = p_oDb;
+    super(p_oDb);
   }
 
   /**
@@ -87,7 +84,7 @@ export class AppEventRepository extends BaseRepository implements IAppEventRepos
    */
   public async findById(p_axEventId: AppEventId): Promise<AppEvent | null> {
     try {
-      const l_rResult = await this.m_oDb.query<IAppEventRow>(
+      const l_rResult = await this.db.query<IAppEventRow>(
         'Select * From "Events" Where "aeIdEvent" = $1',
         [this.toBuffer(p_axEventId)]
       );
@@ -102,7 +99,7 @@ export class AppEventRepository extends BaseRepository implements IAppEventRepos
    */
   public async findBySeverity(p_eSeverity: AppEventSeverity, p_iNbLignesMax: number = 50): Promise<AppEvent[] | null> {
     try {
-      const l_rResult = await this.m_oDb.query<IAppEventRow>(
+      const l_rResult = await this.db.query<IAppEventRow>(
         'Select * From "Events" Where "aeSeverityId" = $1 Order By "aeCreatedAt" Desc Limit $2',
         [p_eSeverity.code, p_iNbLignesMax]
       );
@@ -117,7 +114,7 @@ export class AppEventRepository extends BaseRepository implements IAppEventRepos
    */
   public async findByCategory(p_eCategory: AppEventCategory, p_iNbLignesMax: number = 50): Promise<AppEvent[] | null> {
     try {
-      const l_rResult = await this.m_oDb.query<IAppEventRow>(
+      const l_rResult = await this.db.query<IAppEventRow>(
         'Select * From "Events" Where "aeIdCategory" = $1 Order By "aeCreatedAt" Desc Limit $2',
         [p_eCategory.code, p_iNbLignesMax]
       );
@@ -136,7 +133,7 @@ export class AppEventRepository extends BaseRepository implements IAppEventRepos
         .filter((l_oSeverity: AppEventSeverity) => l_oSeverity.estSuperieurOuEgalA(AppEventSeverity.WARN))
         .map((l_oSeverity: AppEventSeverity) => l_oSeverity.code);
 
-      const l_rResult = await this.m_oDb.query<IAppEventRow>(
+      const l_rResult = await this.db.query<IAppEventRow>(
         'Select * From "Events" Where "aeSeverityId"::text = any($1) Order By "aeCreatedAt" Desc Limit $2',
         [l_asCodes, p_iNbLignesMax]
       );
@@ -151,7 +148,7 @@ export class AppEventRepository extends BaseRepository implements IAppEventRepos
    */
   public async findByUserId(p_axUserId: UserId, p_iNbLignesMax: number = 50): Promise<AppEvent[] | null> {
     try {
-      const l_rResult = await this.m_oDb.query<IAppEventRow>(
+      const l_rResult = await this.db.query<IAppEventRow>(
         'Select * From "Events" Where "aeUserId" = $1 Order By "aeCreatedAt" Desc Limit $2',
         [this.toBuffer(p_axUserId), p_iNbLignesMax]
       );
@@ -183,12 +180,12 @@ export class AppEventRepository extends BaseRepository implements IAppEventRepos
     const l_iIdxOffset = l_aParams.length + 2;
 
     try {
-      const l_rAppEventsResult = await this.m_oDb.query<IAppEventRow>(
+      const l_rAppEventsResult = await this.db.query<IAppEventRow>(
         `Select * From "Events" Where ${l_asConditions.join(' and ')} Order By "aeCreatedAt" Desc Limit $${l_iIdxLimit} Offset $${l_iIdxOffset}`,
         [...l_aParams, l_iLimit, l_iOffset]
       );
 
-      const l_rCountResult = await this.m_oDb.query<{ count: string } & QueryResultRow>(
+      const l_rCountResult = await this.db.query<{ count: string } & QueryResultRow>(
         `Select Count(*)::text as count From "Events" Where ${l_asConditions.join(' and ')}`,
         l_aParams
       );
@@ -209,7 +206,7 @@ export class AppEventRepository extends BaseRepository implements IAppEventRepos
     try {
       const l_binIdEvent = this.toBuffer(p_oData.idAppEvent);
 
-      const l_rResult = await this.m_oDb.query<IAppEventRow>(
+      const l_rResult = await this.db.query<IAppEventRow>(
         `Insert Into "Events" ("aeIdEvent", "aeUserId", "aeIdCategory", "aeType", "aeSeverityId", "aeMessage", "aeMetadata")
          Values ($1, $2, $3, $4, $5, $6, $7)
          returning *`,
@@ -242,10 +239,30 @@ export class AppEventRepository extends BaseRepository implements IAppEventRepos
   public async findAll(): Promise<AppEvent[]> {
     try {
       // Injection du type générique d'acier <IAppEventRow> pour éteindre le crash de type
-      const l_rResult = await this.m_oDb.query<IAppEventRow>('Select * From "Events" Order By "aeCreatedAt" Desc');
+      const l_rResult = await this.db.query<IAppEventRow>('Select * From "Events" Order By "aeCreatedAt" Desc');
       return this.rowsToAppEvents(l_rResult);
     } catch (l_oErr) {
       throw DatabaseErrorFactory.queryFailed('findAll', l_oErr instanceof Error ? l_oErr.message : 'unknown');
     }
   }
+
+// ——— fichier : src/infrastructure/repositories/AppEventRepository.ts
+
+  /**
+   * 🧹 Purge historique physique des lignes d'audit obsolètes (Conformité RGPD).
+   *
+   * @public
+   * @async
+   * @param {Date} p_dCutoffDate - La date pivot au-delà de laquelle tout est carbonisé.
+   * @returns {Promise<number>} Le nombre exact de lignes d'audit purgées.
+   */
+  public async deleteOlderThan(p_dCutoffDate: Date): Promise<number> {
+    const l_oResult = await this.db.query(
+      `Delete From "Events" Where "aeCreatedAt" < $1`,
+      [p_dCutoffDate]
+    );
+
+    return l_oResult.rowCount ?? 0;
+  }
+
 }

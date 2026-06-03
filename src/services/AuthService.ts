@@ -80,7 +80,7 @@ export class AuthService implements IAuthService {
       passwordHash    : passwordHash,
       pseudo          : dto.pseudo,
       role            : Role.fromSql('customer')!,
-      authProvider    : AuthProvider.fromSql('local')!,
+      authProvider    : AuthProvider.LOCAL!,
       settingsUser    : {},
       gdprConsent     : dto.gdprConsent,
       gdprConsentDate : new Date()

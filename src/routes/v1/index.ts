@@ -1,7 +1,6 @@
 // ——— fichier : src/routes/v1/index.ts
 
 import { Router } from 'express';
-// 🪓 Importation du vrai gestionnaire de connexion PostgreSQL de Gaïa
 import { DatabaseConnection } from '@/config/DatabaseConnection';
 import { AuthController } from '@/controllers/AuthController';
 import { ItemController } from '@/controllers/ItemController';
@@ -41,11 +40,11 @@ export function createV1Router(): Router {
   const db = DatabaseConnection.getInstance();
 
   // Repositories
-  const userRepository    = new UserRepository(db as any);
-  const itemRepository    = new ItemRepository(db as any);
-  const tagRepository     = new TagRepository(db as any);
-  const itemTagRepository = new ItemTagRepository(db as any);
-  const shareRepository   = new ShareRepository(db as any);
+  const userRepository    = new UserRepository(db);
+  const itemRepository    = new ItemRepository(db);
+  const tagRepository     = new TagRepository(db);
+  const itemTagRepository = new ItemTagRepository(db.getPool());
+  const shareRepository   = new ShareRepository(db);
 
   // Services
   const authService = new AuthService(
@@ -54,10 +53,10 @@ export function createV1Router(): Router {
     tokenManager,
     blacklistService
   );
-  const itemService = new ItemService(itemRepository, itemTagRepository, tagRepository);
-  const tagService = new TagService(tagRepository);
-  const shareService = new ShareService(shareRepository, itemRepository);
-  const userService = new UserService(userRepository, passwordHasher);
+  const itemService       = new ItemService(itemRepository, itemTagRepository, tagRepository);
+  const tagService        = new TagService(tagRepository);
+  const shareService      = new ShareService(shareRepository, itemRepository);
+  const userService       = new UserService(userRepository, passwordHasher);
   const userExportService = new UserExportService(
     userRepository,
     itemRepository,
@@ -65,6 +64,7 @@ export function createV1Router(): Router {
     tagRepository,
     shareRepository
   );
+
   // Middleware
   const authMiddleware = new AuthMiddleware(tokenManager, blacklistService);
 

@@ -1,6 +1,5 @@
 // ——— fichier : src/infrastructure/repositories/TagRepository.ts
 
-import { Pool                 } from 'pg';
 import { BaseRepository       } from '@/infrastructure/repositories/BaseRepositories';
 import { UserId, TagId        } from '@/domain/value-objects/IdMetier';
 import { Tag                  } from '@/entities/Tag';
@@ -8,6 +7,7 @@ import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
 import { TagErrorFactory      } from '@/exceptions/TagErrorFactory';
 import type { ITagData        } from '@/interfaces/entities/tag/ITagData';
 import type { ITagRepository  } from '@/interfaces/repositories/ITagRepository';
+import { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
 
 /**
  * 🗄️ Interface ITagRow (Miroir Physique Jojo-Style des Souterrains 🔌)
@@ -36,15 +36,15 @@ interface ITagRow {
 export class TagRepository extends BaseRepository implements ITagRepository {
 
   /**
-   * Initialise le dépôt des étiquettes via le pool global d infrastructure 🔌.
+   * Initialise le dépôt des étiquettes via le gestionnaire de connexion universel 🔌.
    *
    * @constructor
-   * @param {Pool} p_oPool - Le pool de connexions réseau partagé
+   * @param {IDatabaseConnection} p_oDb - Le gestionnaire de connexion officiel de la Forge.
    */
-  public constructor(p_oPool: Pool) {
-    super(p_oPool);
+  public constructor(p_oDb: IDatabaseConnection) {
+    // On l'envoie direct à la maman qui s'occupe de tout !
+    super(p_oDb);
   }
-
   /**
    * Mappe une ligne PostgreSQL brute unifiée vers une entité typée Tag 🔄.
    *

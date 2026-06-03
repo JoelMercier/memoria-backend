@@ -43,7 +43,6 @@ interface IItemRow extends QueryResultRow {
  */
 export class ItemRepository extends BaseRepository implements IItemRepository {
   /** 🎛️ Connexion physique à l'infrastructure de données de Cour Basse */
-  private readonly m_oDb: IDatabaseConnection;
 
   /**
    * Initialise le dépôt avec sa connexion physique et hérite de l'usine binaire.
@@ -51,8 +50,8 @@ export class ItemRepository extends BaseRepository implements IItemRepository {
    * @constructor
    */
   public constructor(p_oDb: IDatabaseConnection) {
-    super(p_oDb.getPool());
-    this.m_oDb = p_oDb;
+    super(p_oDb);
+
   }
 
   /**
@@ -93,7 +92,7 @@ export class ItemRepository extends BaseRepository implements IItemRepository {
    */
   public async findById(id: ItemId): Promise<Item | null> {
     try {
-      const result = await this.m_oDb.query<IItemRow>(
+      const result = await this.db.query<IItemRow>(
         'Select * From "Items" Where "itIdItem" = $1',
         [this.toBuffer(id)]
       );
@@ -112,7 +111,7 @@ export class ItemRepository extends BaseRepository implements IItemRepository {
    */
   public async findBySlug(userId: UserId, slug: string): Promise<Item | null> {
     try {
-      const result = await this.m_oDb.query<IItemRow>(
+      const result = await this.db.query<IItemRow>(
         'Select * From "Items" Where "itUserId" = $1 and "itSlug" = $2',
         [this.toBuffer(userId), slug]
       );
@@ -131,7 +130,7 @@ export class ItemRepository extends BaseRepository implements IItemRepository {
    */
   public async findByTitle(userId: UserId, title: string): Promise<Item | null> {
     try {
-      const result = await this.m_oDb.query<IItemRow>(
+      const result = await this.db.query<IItemRow>(
         'Select * From "Items" Where "itUserId" = $1 and "itTitle" = $2',
         [this.toBuffer(userId), title]
       );
@@ -169,11 +168,11 @@ export class ItemRepository extends BaseRepository implements IItemRepository {
     const l_iIdxOffset = params.length + 2;
 
     try {
-      const itemsResult = await this.m_oDb.query<IItemRow>(
+      const itemsResult = await this.db.query<IItemRow>(
         `Select * From "Items" Where ${conditions.join(' and ')} Order By "itCreatedAt" Desc Limit $${l_iIdxLimit} Offset $${l_iIdxOffset}`,
         [...params, limit, offset]
       );
-      const countResult = await this.m_oDb.query<{ count: string } & QueryResultRow>(
+      const countResult = await this.db.query<{ count: string } & QueryResultRow>(
         `Select Count(*)::text as count From "Items" Where ${conditions.join(' and ')}`,
         params
       );
@@ -197,7 +196,7 @@ export class ItemRepository extends BaseRepository implements IItemRepository {
     try {
       const l_binIdItem = this.toBuffer(data.idItem);
 
-      const result = await this.m_oDb.query<IItemRow>(
+      const result = await this.db.query<IItemRow>(
         `Insert Into "Items"
            ("itIdItem", "itUserId", "itContentTypeId", "itTitle", "itSlug", "itContent", "itSourceAuthor", "itThumbnailUrl", "itMetadata")
          Values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
@@ -269,7 +268,7 @@ export class ItemRepository extends BaseRepository implements IItemRepository {
     params.push(this.toBuffer(id));
 
     try {
-      const result = await this.m_oDb.query<IItemRow>(
+      const result = await this.db.query<IItemRow>(
         `Update "Items" Set ${fields.join(', ')} Where "itIdItem" = $${i} returning *`,
         params
       );
@@ -289,7 +288,7 @@ export class ItemRepository extends BaseRepository implements IItemRepository {
    */
   public async delete(id: ItemId): Promise<boolean> {
     try {
-      const result = await this.m_oDb.query('Delete From "Items" Where "itIdItem" = $1', [this.toBuffer(id)]);
+      const result = await this.db.query('Delete From "Items" Where "itIdItem" = $1', [this.toBuffer(id)]);
       return (result.rowCount ?? 0) > 0;
     } catch (err) {
       const msg: string = err instanceof Error ? err.message : 'unknown';
@@ -305,7 +304,7 @@ export class ItemRepository extends BaseRepository implements IItemRepository {
    */
   public async findAll(): Promise<Item[]> {
     try {
-      const result = await this.m_oDb.query<IItemRow>('Select * From "Items" Order By "itCreatedAt" Desc');
+      const result = await this.db.query<IItemRow>('Select * From "Items" Order By "itCreatedAt" Desc');
       return this.rowsToItems(result);
     } catch (err) {
       const msg: string = err instanceof Error ? err.message : 'unknown';

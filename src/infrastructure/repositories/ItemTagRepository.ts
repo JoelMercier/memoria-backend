@@ -1,11 +1,11 @@
 // ——— fichier : src/infrastructure/repositories/ItemTagRepository.ts
 
-import { Pool                 } from 'pg';
 import { BaseRepository       } from '@/infrastructure/repositories/BaseRepositories';
 import { UserId, ItemId, TagId } from '@/domain/value-objects/IdMetier';
 import { Tag                  } from '@/entities/Tag';
 import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
 import type { IItemTagRepository } from '@/interfaces/repositories/IItemTagRepository';
+import { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
 
 /**
  * 🗄️ Interface ITagRow (Miroir Physique Jojo-Style de la table "Tags" 🔌)
@@ -39,8 +39,9 @@ export class ItemTagRepository extends BaseRepository implements IItemTagReposit
    * @constructor
    * @param {Pool} p_oPool - L instance de connexion partagée du serveur Express
    */
-  public constructor(p_oPool: Pool) {
-    super(p_oPool);
+  public constructor(p_oDb: IDatabaseConnection) {
+    // Raccordement direct à la maman, alignement impérial !
+    super(p_oDb);
   }
 
   /**
@@ -139,7 +140,7 @@ export class ItemTagRepository extends BaseRepository implements IItemTagReposit
    * @returns {Promise<void>}
    */
   public async sync(p_oItemId: ItemId, p_aoTagIds: ReadonlyArray<TagId>): Promise<void> {
-    const r_Client = await this.m_rPool.connect(); // Utilisation légitime du pool hérité pour la transaction brute
+    const r_Client = await this.db.getPool().connect(); // Utilisation légitime du pool hérité pour la transaction brute
     try {
       await r_Client.query('Begin;');
       await r_Client.query('Delete From "ItemTags" Where "tiItemId" = $1;', [this.toBuffer(p_oItemId)]);

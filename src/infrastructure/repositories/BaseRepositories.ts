@@ -2,6 +2,8 @@
 
 import { Pool, PoolClient } from 'pg';
 import { IdBinaire } from '@/domain/base/IdBinaire';
+import { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
+
 
 /**
  * 🧱 Classe Abstraite BaseRepository 🗄️ (La Dalle de Fondation des Souterrains 🔌)
@@ -16,10 +18,29 @@ import { IdBinaire } from '@/domain/base/IdBinaire';
  */
 export abstract class BaseRepository {
   /** 🔌 Le pool de connexions persistant de l infrastructure PostgreSQL 💽 */
-  protected readonly m_rPool: Pool;
+  private readonly m_rPool: Pool;
 
-  protected constructor(p_Pool: Pool) {
-    this.m_rPool = p_Pool;
+  /** 🎛️ Connexion physique universelle encapsulée [Mémoria] */
+  private readonly m_oDb: IDatabaseConnection;
+
+  /**
+   * @constructor
+   * @param {IDatabaseConnection} p_oDb - Le gestionnaire de connexion universel.
+   */
+  protected constructor(p_oDb: IDatabaseConnection) {
+    this.m_oDb = p_oDb;
+    this.m_rPool = p_oDb.getPool();
+  }
+
+  /**
+   * ⚖️ Accesseur Public (Getter) : Permet aux classes filles de récupérer proprement
+   * la connexion sans manipuler directement le membre privé.
+   *
+   * @public
+   * @returns {IDatabaseConnection} L'instance vivante du gestionnaire de connexion.
+   */
+  public get db(): IDatabaseConnection {
+    return this.m_oDb;
   }
 
   protected toBuffer(p_Id: IdBinaire | undefined | null): Buffer | null {

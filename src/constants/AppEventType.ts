@@ -50,8 +50,10 @@ export class AppEventType extends SmartEnum<string> {
   public static readonly AUTHENTIFICATION_ECHEC = new AppEventType('Échec d authentification', 'authentification.echec', AppEventCategory.AUDI, 20);
   public static readonly UTILISATEUR_ENREGISTREMENT = new AppEventType('Nouvelle inscription', 'utilisateur.enregistrement', AppEventCategory.ANAL, 30);
 
-  // 📦 Module PEPITES / ITEMS (Catégorie : ANAL)
+  // 📦 Module PEPITES / ITEMS & PARTAGES (Catégorie : ANAL)
   public static readonly PEPITE_CREATION = new AppEventType('Création de pépite', 'pepite.creation', AppEventCategory.ANAL, 40);
+  // Correction de ma bêtise : Ajout de la clé de partage manquante au catalogue !
+  public static readonly PEPITE_PARTAGE = new AppEventType('Partage de pépite', 'pepite.partage', AppEventCategory.ANAL, 45);
 
   // 🚨 Module MONITORING & RGPD (Catégorie : MONI / GDPR)
   public static readonly RGPD_EXPORTATION = new AppEventType('Exportation de données', 'rgpd.exportation', AppEventCategory.GDPR, 50);
