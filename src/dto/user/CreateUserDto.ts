@@ -24,7 +24,7 @@ export class CreateUserDto {
   public readonly pseudo : string;
 
   /** ⚖️ Consentement explicite aux conditions RGPD et politiques de confidentialité */
-  public readonly gdprConsent : boolean;
+  public readonly rgpdConsent : boolean;
 
   /**
    * Valide les données brutes de la requête HTTP via la douane Zod.
@@ -38,7 +38,7 @@ export class CreateUserDto {
     this.email       = validated.email;
     this.password    = validated.password;
     this.pseudo      = validated.pseudo;
-    this.gdprConsent = validated.gdprConsent;
+    this.rgpdConsent = validated.gdprConsent;
   }
 
 }

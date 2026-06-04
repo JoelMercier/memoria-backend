@@ -29,6 +29,12 @@ export class AppEventCategory extends SmartEnum<string> {
     super(p_sLibelle, p_sCode, p_nOrdreAff);
   }
 
+  /** 🗄️ Convertisseur d'infrastructure historique branché sur le décodeur central [Mémoria] */
+  public static fromSql(p_sCodeSql: string): AppEventCategory {
+    return this.DeCode<AppEventCategory>(p_sCodeSql);
+  }
+
+
   // ----------------------------------------------------------------------------
   // 🏺 Ensemencement de la RAM (Les quatre piliers de la traçabilité - Format 4 lettres)
   // ----------------------------------------------------------------------------

@@ -1,10 +1,9 @@
 // ——— fichier : src/infrastructure/repositories/UserRepository.ts
 
 import { BaseRepository       } from '@/infrastructure/repositories/BaseRepositories';
-import { UserId               } from '@/domain/value-objects/IdMetier';
+import { ProviderId, RoleId,
+         UserId               } from '@/domain/value-objects/IdMetier';
 import { User                 } from '@/entities/User';
-import { Role                 } from '@/constants/Role';
-import { AuthProvider         } from '@/constants/AuthProvider';
 import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
 import { UserErrorFactory     } from '@/exceptions/UserErrorFactory';
 import { IListOptions         } from '@/interfaces/shared/IListOptions';
@@ -22,8 +21,8 @@ interface IUserRow {
   usIdRole        : string;
   usIdProvider    : string;
   usSettingsUser  : Record<string, unknown>;
-  usGdprConsent   : boolean;
-  usGdprDate      : Date | null;
+  usRgpdConsent   : boolean;
+  usRgpdDate      : Date | null;
   usCreatedAt     : Date;
   usUpdatedAt     : Date | null;
 }
@@ -65,11 +64,11 @@ export class UserRepository extends BaseRepository implements IUserRepository {
       email           : p_oLigne.usCourriel,
       passwordHash    : p_oLigne.usPasswordHash,
       pseudo          : p_oLigne.usPseudo,
-      role            : Role.DeCode<Role>(p_oLigne.usIdRole),
-      authProvider    : AuthProvider.DeCode<AuthProvider>(p_oLigne.usIdProvider),
+      roleId          : new RoleId(p_oLigne.usIdRole),
+      authProviderId  : new ProviderId(p_oLigne.usIdProvider),
       settingsUser    : p_oLigne.usSettingsUser,
-      gdprConsent     : p_oLigne.usGdprConsent,
-      gdprConsentDate : p_oLigne.usGdprDate ?? undefined,
+      rgpdConsent     : p_oLigne.usRgpdConsent,
+      rgpdConsentDate : p_oLigne.usRgpdDate ?? undefined,
       createdAt       : p_oLigne.usCreatedAt,
       updatedAt       : p_oLigne.usUpdatedAt ?? undefined
     });

@@ -51,6 +51,11 @@ export class AppEventSeverity extends SmartEnum<string> {
     return this.m_nNiveau >= p_oAutreSeverity.niveau;
   }
 
+  /** 🗄️ Convertisseur d'infrastructure historique branché sur le décodeur central [Mémoria] */
+  public static fromSql(p_sCodeSql: string): AppEventSeverity {
+    return this.DeCode<AppEventSeverity>(p_sCodeSql);
+  }
+
   // ----------------------------------------------------------------------------
   // 🏺 ENSEMENCEMENT DE LA RAM (Les quatre piliers de la sécurité - Format 4 lettres)
   // ----------------------------------------------------------------------------

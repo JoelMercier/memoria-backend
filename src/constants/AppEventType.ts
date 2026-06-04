@@ -41,6 +41,12 @@ export class AppEventType extends SmartEnum<string> {
     return this.m_oCategorie;
   }
 
+  /** 🗄️ Convertisseur d'infrastructure historique branché sur le décodeur central [Mémoria] */
+  public static fromSql(p_sCodeSql: string): AppEventType {
+    // La maman va scanner le placard de la RAM pour retrouver l'instance vivante de l'action !
+    return this.DeCode<AppEventType>(p_sCodeSql);
+  }
+
   // ----------------------------------------------------------------------------
   // 🏺 ENSEMENCEMENT DE LA RAM (Les actions officielles de production - Raccord V4)
   // ----------------------------------------------------------------------------

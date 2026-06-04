@@ -1,22 +1,28 @@
 // ——— fichier : src/entities/User.ts
 
-import { BaseEntity    } from '@/entities/BaseEntity';
-import type { IUser    } from '@/interfaces/entities/user/IUser';
-import type { IUserData } from '@/interfaces/entities/user/IUserData';
-import type { UserId   } from '@/domain/value-objects/IdMetier';
-import type { Role     } from '@/constants/Role';
-import type { AuthProvider } from '@/constants/AuthProvider';
+import      { BaseEntity         } from '@/entities/BaseEntity';
+import      { Role               } from '@/constants/Role';
+import      { AuthProvider       } from '@/constants/AuthProvider';
+import      { RoleId, ProviderId } from '@/domain/value-objects/IdMetier';
+import type { IUser              } from '@/interfaces/entities/user/IUser';
+import type { IUserData          } from '@/interfaces/entities/user/IUserData';
+import type { UserId             } from '@/domain/value-objects/IdMetier';
 
 /**
- * 🏛️ Classe User
- * --------------
- * Modèle métier immuable représentant un utilisateur de la plateforme.
- * Protégé par l'armure de la notation hongroise et piloté par les Smart Enums.
+ * 🏛️ Classe User 👥 (Le Modèle Métier Immuable de l'Acteur)
+ * ----------------------------------------------------------------------------
+ * Représente un utilisateur authentifié au sein du Domaine de Mémoria.
+ * Protégé nominalement par la notation hongroise et piloté par les Smart Enums.
+ *
+ * SOLID :
+ *  - SRP 📐 : Unique responsabilité de piloter le cycle de vie et les droits de l'acteur.
  *
  * @class User
  * @extends {BaseEntity<'user', IUserData, UserId>}
  * @implements {IUser}
- * @author Joël, Gaïa & Co
+ * @author Conception & Vision : Joël (Purement infonctionnel et Void capillaire)
+ * @author Rabotage du Code : Gaïa (Vigilante du silicium et du creuset)
+ * @author Garde d Élite des Types : La Vague Initiale (Artisans du code de la V4)
  */
 export class User extends BaseEntity<'user', IUserData, UserId> implements IUser {
 
@@ -59,11 +65,15 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
     this.m_sEmail           = data.email;
     this.m_sPasswordHash    = data.passwordHash;
     this.m_sPseudo          = data.pseudo;
-    this.m_eRole            = data.role;
-    this.m_eAuthProvider    = data.authProvider;
+
+    // 🪓 TRADUCTION CHIRURGICALE : Conversion des nouveaux IDs d'infrastructure en SmartEnums vivants
+    // (Passe la chaîne de caractères brute via .valeur ou .code selon l'implémentation du SmartEnum)
+    this.m_eRole            = Role.fromSql ? Role.fromSql(data.roleId.valeur) : (data as any).role;
+    this.m_eAuthProvider    = AuthProvider.fromSql(data.authProviderId.valeur);
+
     this.m_rSettingsUser    = data.settingsUser || {};
-    this.m_bGdprConsent     = data.gdprConsent;
-    this.m_dGdprConsentDate = data.gdprConsentDate ?? null;
+    this.m_bGdprConsent     = data.rgpdConsent;
+    this.m_dGdprConsentDate = data.rgpdConsentDate ?? null;
   }
 
   /**
@@ -173,11 +183,11 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
       email           : this.getEmail(),
       passwordHash    : this.getPasswordHash(),
       pseudo          : this.getPseudo(),
-      role            : this.getRole(),
-      authProvider    : this.getAuthProvider(),
+      roleId          : new RoleId(this.getRole().code.toString()),
+      authProviderId  : new ProviderId(this.getAuthProvider().code.toString()),
       settingsUser    : this.getSettingsUser(),
-      gdprConsent     : this.getGdprConsent(),
-      gdprConsentDate : this.getGdprConsentDate(),
+      rgpdConsent     : this.getGdprConsent(),
+      rgpdConsentDate : this.getGdprConsentDate() ?? new Date(),
       createdAt       : this.createdAt,
       updatedAt       : this.updatedAt
     };

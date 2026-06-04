@@ -1,13 +1,11 @@
 // ——— fichier : src/services/AuthService.ts
 
 import { randomUUID } from 'node:crypto';
-import { AuthProvider } from '@/constants/AuthProvider';
-import { Role } from '@/constants/Role';
 import { User } from '@/entities/User';
 import { ConflictErrorFactory } from '@/exceptions/ConflictErrorFactory';
 import { TokenError } from '@/exceptions/TokenError';
 import { UserErrorFactory } from '@/exceptions/UserErrorFactory';
-import { UserId } from '@/domain/value-objects/IdMetier';
+import { ProviderId, RoleId, UserId } from '@/domain/value-objects/IdMetier';
 import type { CreateUserDto } from '@/dto/user/CreateUserDto';
 import type { LoginDto } from '@/dto/user/auth/LoginDto';
 import type { RefreshTokenDto } from '@/dto/user/auth/RefreshTokenDto';
@@ -73,17 +71,18 @@ export class AuthService implements IAuthService {
 
     const passwordHash : string = await this.passwordHasher.hash(dto.password);
 
-    // 🪓 ALIGNEMENT 128-BIT : Allocation d'un véritable UserId d'acier pur généré à la volée !
     const userData : IUserData = {
       idUser          : new UserId(randomUUID()),
       email           : dto.email,
       passwordHash    : passwordHash,
       pseudo          : dto.pseudo,
-      role            : Role.fromSql('customer')!,
-      authProvider    : AuthProvider.LOCAL!,
+      roleId          : new RoleId('CUST'),
+      authProviderId  : new ProviderId('LOCA'),
       settingsUser    : {},
-      gdprConsent     : dto.gdprConsent,
-      gdprConsentDate : new Date()
+      rgpdConsent     : dto.rgpdConsent,
+      rgpdConsentDate : new Date(),
+      createdAt       : new Date()
+
     };
 
     return await this.userRepository.create(userData);

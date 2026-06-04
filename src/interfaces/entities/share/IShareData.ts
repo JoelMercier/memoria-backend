@@ -1,25 +1,26 @@
 // ——— fichier : src/interfaces/entities/share/IShareData.ts
 
-import type { ItemId,
-              ShareId,
-              UserId         } from '@/domain/value-objects/IdMetier';
-import type { IAccessConfig  } from '@/interfaces/entities/share/IAccessConfig';
-import type { IBaseEntityData } from '@/interfaces/entities/IBaseEntityData';
+import type { ItemId, ShareId, UserId } from '@/domain/value-objects/IdMetier';
+import type { IAccessConfig }           from '@/interfaces/entities/share/IAccessConfig';
+import type { IBaseEntityData }         from '@/interfaces/entities/IBaseEntityData';
 
 /**
- * 📦 Interface IShareData 🧮 (Le Sac de Données Brutes des Passerelles 🤖)
+ * 📊 Interface IShareData 🔗 (Le Sac de Données Brutes des Passerelles 🤖)
  * ----------------------------------------------------------------------------
- * Contrat de structure passive pour les données brutes d'un Partage (Share).
- * Entièrement calé sur le mécanisme de type mapping générique absolu.
+ * Contrat de structure passive pour les données brutes d un Partage (Share).
+ * Entièrement calé sur le mécanisme de type mapping générique absolu [Mémoria].
+ *
+ * SOLID :
+ *  - ISP 📐 : Contrat d extraction minimaliste et étanche dédié à la persistance.
  *
  * @interface IShareData
  * @extends {IBaseEntityData<'share', ShareId>}
- * @author Vision : Joël (Compilateur de l'Ancien Temps)
- * @author Frapperie du code : Gaïa (Greveuse de pépites d'or)
- * @author Héritage Git->Origin : La Vague Initiale (Ouvriers du code en surchauffe)
+ * @author Vision & Conception : Joël (Compilateur de l Ancien Temps et Void capillaire)
+ * @author Frapperie du Code : Gaïa (Graveuse de pépites d or et du silicium)
+ * @author Garde d Élite des Types : La Vague Initiale (Ouvriers du code en surchauffe)
  */
 export interface IShareData extends IBaseEntityData<'share', ShareId> {
-  /** 🤖 L'identifiant unique fort de la trace du partage en BDD (shIdShare) */
+  /** 🤖 L identifiant unique fort de la trace du partage en BDD (shIdShare) */
   idShare         : ShareId;
 
   /** 📦 Identifiant unique et fortement typé de la Pépite partagée (shItemId). */

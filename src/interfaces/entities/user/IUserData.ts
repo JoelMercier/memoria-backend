@@ -1,46 +1,47 @@
 // ——— fichier : src/interfaces/entities/user/IUserData.ts
 
-import type { AuthProvider    } from '@/constants/AuthProvider';
-import type { Role            } from '@/constants/Role';
-import type { UserId          } from '@/domain/value-objects/IdMetier';
-import type { IBaseEntityData } from '@/interfaces/entities/IBaseEntityData';
+import type { IBaseEntityData }            from '@/interfaces/entities/IBaseEntityData';
+import type { UserId, RoleId, ProviderId } from '@/domain/value-objects/IdMetier';
 
 /**
- * 📦 Interface IUserData
- * ----------------------
- * Contrat de structure passive pour les données brutes d'un utilisateur.
- * Entièrement calé sur le mécanisme de type mapping générique absolu.
+ * 📊 Interface IUserData 👥 (Le Contrat de Structure de l Acteur de Cour Basse)
+ * ------------------------------------------------------------------------------
+ * Définition nominale et hermétique d un enregistrement de la table "Users".
+ * Éradique définitivement l utilisation des primitives sur les clés de dictionnaire.
+ *
+ * SOLID :
+ *  - ISP 📐 : Contrat d extraction minimaliste et étanche dédié à la persistance.
  *
  * @interface IUserData
  * @extends {IBaseEntityData<'user', UserId>}
- * @author Joël, Gaïa & Co
+ * @author Conception & Vision : Joël (Purement infonctionnel et Void capillaire)
+ * @author Rabotage de la Virgule : Gaïa (Vigilante du silicium et du creuset)
+ * @author Garde d Élite des Types : La Vague Initiale (Ouvriers en surchauffe de la V4)
  */
 export interface IUserData extends IBaseEntityData<'user', UserId> {
+  // L'identifiant "idUser: UserId" et "createdAt / updatedAt" sont hérités de IBaseEntityData !
 
-  /** 🆔 Identifiant unique et fortement typé de l'utilisateur (idUser). */
-  idUser : UserId;
+  /** 📧 Adresse courriel unique et vérifiée de connexion réseau */
+  email: string;
 
-  /** 📧 Adresse email unique servant d'identifiant de connexion principale. */
-  email : string;
+  /** 🔑 Empreinte cryptographique (Hachage d'acier) du secret d'accès */
+  passwordHash: string;
 
-  /** 🔑 Empreinte cryptographique (Hachage) du mot de passe utilisateur. */
-  passwordHash : string;
+  /** 👥 Pseudonyme d'apparat public de l'utilisateur */
+  pseudo: string;
 
-  /** 👤 Pseudonyme ou nom d'affichage public sur la plateforme. */
-  pseudo : string;
+  /** 🎛️ L identifiant fort du Rôle de l acteur (CHAR(4) -> lié à la table Roles) */
+  roleId: RoleId;
 
-  /** 🗂️ Rôle de privilège hiérarchique (Smart Enum : CUSTOMER, ADMIN...). */
-  role : Role;
+  /** 🔌 L identifiant fort du fournisseur d authentification (CHAR(4) -> lié à Providers) */
+  authProviderId: ProviderId;
 
-  /** 🌐 Fournisseur d'authentification d'origine (Smart Enum : LOCAL, GOOGLE...). */
-  authProvider : AuthProvider;
+  /** ⚙️ Préférences locales d affichage et configurations système au format JSONB */
+  settingsUser: Record<string, any>;
 
-  /** 🗄️ Configurations et préférences de l'interface au format JSON. */
-  settingsUser : Record<string, any>;
+  /** 📜 Consentement explicite aux réglementations de protection des données (RGPD) */
+  rgpdConsent: boolean;
 
-  /** 🛡️ Indicateur d'acceptation des conditions d'utilisation et du RGPD. */
-  gdprConsent : boolean;
-
-  /** ⏱️ Horodatage précis de la signature du consentement RGPD (Peut être NULL). */
-  gdprConsentDate? : Date | null;
+  /** 📅 Date et heure exactes de la signature du consentement numérique RGPD */
+  rgpdConsentDate: Date | undefined;
 }

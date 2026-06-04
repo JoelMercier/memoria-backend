@@ -1,7 +1,7 @@
 // ——— fichier : src/services/ItemService.ts
 
 import { randomUUID } from 'node:crypto';
-import { UserId, ItemId, TagId } from '@/domain/value-objects/IdMetier';
+import { UserId, ItemId, TagId, ContentTypeId } from '@/domain/value-objects/IdMetier';
 import { Item } from '@/entities/Item';
 import { Tag } from '@/entities/Tag';
 import { ItemErrorFactory } from '@/exceptions/ItemErrorFactory';
@@ -97,16 +97,17 @@ export class ItemService implements IItemService {
 
     // 🪓 ALIGNEMENT INDUSTRIEL : Création propre de la pépite via crypto native
     const data : IItemData = {
-      idItem       : new ItemId(randomUUID()),
-      idUser       : userMetierId,
-      contentType  : dto.contentType,
-      title        : dto.title,
-      slug         : slug,
-      content      : dto.content,
-      sourceAuthor : dto.sourceAuthor,
-      thumbnailUrl : dto.thumbnailUrl,
-      metadata     : dto.metadata
-    };
+      idItem        : new ItemId(randomUUID()),
+      idUser        : userMetierId,
+      contentTypeId : new ContentTypeId(dto.contentType.code.toString()),
+      title         : dto.title,
+      slug          : slug,
+      content       : dto.content,
+      sourceAuthor  : dto.sourceAuthor,
+      thumbnailUrl  : dto.thumbnailUrl,
+      metadata      : dto.metadata,
+      createdAt     : new Date()
+};
 
     const item : Item = await this.itemRepository.create(data);
 

@@ -1,15 +1,18 @@
 // ——— fichier : src/infrastructure/repositories/ItemRepository.ts
 
-import type { QueryResult, QueryResultRow } from 'pg';
-import { BaseRepository } from '@/infrastructure/repositories/BaseRepositories';
-import { UserId, ItemId } from '@/domain/value-objects/IdMetier';
-import { Item } from '@/entities/Item';
-import { ContentType } from '@/constants/ContentType';
-import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
-import { ItemErrorFactory } from '@/exceptions/ItemErrorFactory';
-import type { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
-import type { IItemData } from '@/interfaces/entities/item/IItemData';
-import type { IItemListOptions, IItemListResult, IItemRepository } from '@/interfaces/repositories/IItemRepository';
+import type { QueryResult,
+              QueryResultRow       } from 'pg';
+import      { BaseRepository       } from '@/infrastructure/repositories/BaseRepositories';
+import      { UserId, ItemId, ContentTypeId       } from '@/domain/value-objects/IdMetier';
+import      { Item                 } from '@/entities/Item';
+import      { ContentType          } from '@/constants/ContentType';
+import      { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
+import      { ItemErrorFactory     } from '@/exceptions/ItemErrorFactory';
+import type { IDatabaseConnection  } from '@/interfaces/database/IDatabaseConnection';
+import type { IItemData            } from '@/interfaces/entities/item/IItemData';
+import type { IItemListOptions,
+              IItemListResult,
+              IItemRepository      } from '@/interfaces/repositories/IItemRepository';
 
 /**
  * 🗄️ Interface interne calée au bit près sur le stockage physique décroissant de la table "Items"
@@ -61,19 +64,20 @@ export class ItemRepository extends BaseRepository implements IItemRepository {
    */
   private rowToItem(row: IItemRow): Item {
     return new Item({
-      idItem: this.toDomainId(row.itIdItem, ItemId),
-      idUser: this.toDomainId(row.itUserId, UserId),
-      contentType: ContentType.DeCode<ContentType>(row.itContentTypeId),
-      title: row.itTitle,
-      slug: row.itSlug,
-      content: row.itContent,
-      sourceAuthor: row.itSourceAuthor,
-      thumbnailUrl: row.itThumbnailUrl,
-      metadata: row.itMetadata,
-      createdAt: row.itCreatedAt,
-      updatedAt: row.itUpdatedAt ?? undefined
+      idItem        : this.toDomainId(row.itIdItem, ItemId),
+      idUser        : this.toDomainId(row.itUserId, UserId),
+      contentTypeId : new ContentTypeId(row.itContentTypeId),
+      title         : row.itTitle,
+      slug          : row.itSlug,
+      content       : row.itContent,
+      sourceAuthor  : row.itSourceAuthor,
+      thumbnailUrl  : row.itThumbnailUrl,
+      metadata      : row.itMetadata,
+      createdAt     : row.itCreatedAt,
+      updatedAt     : row.itUpdatedAt ?? new Date() // Cordon sanitaire temporel
     });
   }
+
 
   /**
    * Transforme un jeu de résultats SQL complet en tableau d'entités métiers.
@@ -204,7 +208,7 @@ export class ItemRepository extends BaseRepository implements IItemRepository {
         [
           l_binIdItem,
           this.toBuffer(data.idUser),
-          data.contentType.code,
+          data.contentTypeId.code,
           data.title,
           data.slug,
           data.content,

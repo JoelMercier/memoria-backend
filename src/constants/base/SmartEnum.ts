@@ -27,7 +27,7 @@ export abstract class SmartEnum<TCode extends string | number> {
   private readonly m_nOrdreAff: number;
 
   /**
-   * Initialise les fondations immuables du Smart Enum et enregistre l instance ⛓️.
+   * Initialise les fondations immuables du Smart Enum et enregistre l'instance ⛓️.
    */
   protected constructor(p_sLibelle: string, p_code: TCode, p_nOrdreAff: number) {
     this.m_sLibelle = p_sLibelle;
@@ -46,8 +46,8 @@ export abstract class SmartEnum<TCode extends string | number> {
   public get ordreAff(): number { return this.m_nOrdreAff; }
 
   /**
-   * 🔍 Extracteur universel d instance riche par son code de Cour Basse ⚙️.
-   * L expression 'this: any' résout l erreur 2684 face aux constructeurs privés [Mémoria].
+   * 🔍 Extracteur universel d'instance riche par son code de Cour Basse ⚙️.
+   *
    */
   public static DeCode<E extends SmartEnum<any>>(this: any, p_vCode: string | number): E {
     const l_sNomClasse = this.name;
@@ -84,4 +84,5 @@ export abstract class SmartEnum<TCode extends string | number> {
   }
 
   public toString(): string { return JSON.stringify(this.code); }
+
 }

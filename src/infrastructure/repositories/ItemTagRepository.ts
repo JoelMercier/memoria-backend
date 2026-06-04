@@ -1,11 +1,11 @@
 // ——— fichier : src/infrastructure/repositories/ItemTagRepository.ts
 
-import { BaseRepository       } from '@/infrastructure/repositories/BaseRepositories';
-import { UserId, ItemId, TagId } from '@/domain/value-objects/IdMetier';
-import { Tag                  } from '@/entities/Tag';
-import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
-import type { IItemTagRepository } from '@/interfaces/repositories/IItemTagRepository';
-import { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
+import      { BaseRepository          } from '@/infrastructure/repositories/BaseRepositories';
+import      { UserId, ItemId, TagId   } from '@/domain/value-objects/IdMetier';
+import      { Tag                     } from '@/entities/Tag';
+import      { DatabaseErrorFactory    } from '@/exceptions/DatabaseErrorFactory';
+import type { IItemTagRepository      } from '@/interfaces/repositories/IItemTagRepository';
+import      { IDatabaseConnection     } from '@/interfaces/database/IDatabaseConnection';
 
 /**
  * 🗄️ Interface ITagRow (Miroir Physique Jojo-Style de la table "Tags" 🔌)
@@ -19,17 +19,20 @@ interface ITagRow {
 }
 
 /**
- * 🔗 Classe ItemTagRepository 🗄️ (Le Câbleur de Liaisons Associatives 🤖)
+ * 🧱 Classe ItemTagRepository 🏷️ (Le Maître de Liaison des Étiquettes 🔌)
  * ----------------------------------------------------------------------------
- * Dépôt d infrastructure gérant les pivots Many-to-Many de la table "ItemTags".
- * Pureté nominale absolue : zéro alias, les préfixes exclusifs règnent [Mémoria].
+ * Centralise les opérations physiques d affectation de mots-clés sur les pépites.
+ * Ré-architecturée en mode différentiel chirurgical pour préserver la traçabilité.
+ *
+ * SOLID :
+ *  - SRP 📐 : Unique responsabilité de piloter la table pivot Many-to-Many "ItemTags".
  *
  * @class ItemTagRepository
  * @extends {BaseRepository}
  * @implements {IItemTagRepository}
- * @author Déconstruction : Joël (Nostalgique de l'ADA)
- * @author Ciselage du code : Gaïa (Meilleure ouvrière du Donjon)
- * @author Reliques Git->Origin : L'Ancien Régime & Co (Artisans du temps imparti)
+ * @author Conception & Vision : Joël (MANIAC du PascalCase et DR-DOS Addict')
+ * @author Frapperie du Code : Gaïa (Graveuse de pépites et du silicium)
+ * @author Garde d Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 export class ItemTagRepository extends BaseRepository implements IItemTagRepository {
 
@@ -129,40 +132,83 @@ export class ItemTagRepository extends BaseRepository implements IItemTagReposit
     }
   }
 
-  /**
+/**
    * 🪓 Transaction Commando : Synchronise la collection d étiquettes d une pépite en RAM 🧠.
    * Ré-alignée géométriquement en colonnes étanches pour tes neurones carbones.
+   * Algorithme du "Tri sélectif des valises" : Préserve le createdAt des tags existants.
    *
    * @public
    * @async
    * @param {ItemId} p_oItemId - L identifiant fort de la pépite
-   * @param {ReadonlyArray<TagId>} p_aoTagIds - Le tableau des nouvelles étiquettes cibles
+   * @param {ReadonlyArray<TagId>} p_aoTagIdsCibles - Le tableau des nouvelles étiquettes cibles
    * @returns {Promise<void>}
    */
-  public async sync(p_oItemId: ItemId, p_aoTagIds: ReadonlyArray<TagId>): Promise<void> {
-    const r_Client = await this.db.getPool().connect(); // Utilisation légitime du pool hérité pour la transaction brute
+  public async sync(p_oItemId: ItemId, p_aoTagIdsCibles: ReadonlyArray<TagId>): Promise<void> {
+    const l_oPoolClient = await this.db.getPool().connect(); // Extraction via l accesseur public
+
     try {
-      await r_Client.query('Begin;');
-      await r_Client.query('Delete From "ItemTags" Where "tiItemId" = $1;', [this.toBuffer(p_oItemId)]);
+      await l_oPoolClient.query('Begin;');
 
-      if (p_aoTagIds.length > 0) {
+      // ----------------------------------------------------------------------------
+      // ÉTAPE 1 : Lecture des liaisons actuellement stockées sur le disque (ByteA)
+      // ----------------------------------------------------------------------------
+      const l_sRequeteSelect = `Select "tiTagId" From "ItemTags" Where "tiItemId" = $1;`;
+      const l_rResultatLect = await l_oPoolClient.query(l_sRequeteSelect, [this.toBuffer(p_oItemId)]);
+
+      // Extraction des buffers bruts de la base sous forme de chaînes Hexa pour faciliter la comparaison
+      const l_asTagsEnBaseHex = l_rResultatLect.rows.map((row: any) => row.tiTagId.toString('hex'));
+      const l_asTagsCiblesHex = p_aoTagIdsCibles.map((id: TagId) => this.toBuffer(id)!.toString('hex'));
+
+      // ----------------------------------------------------------------------------
+      // ÉTAPE 2 : Analyse différentielle géométrique (Calcul des Entrants / Sortants)
+      // ----------------------------------------------------------------------------
+
+      // Sortants : Présents en base, mais absents de la nouvelle liste ➔ À exterminer
+
+      const l_aTagIdsSortantsCibles = l_rResultatLect.rows.filter((row: any) =>
+        !l_asTagsCiblesHex.includes(row.tiTagId.toString('hex'))
+      ).map((row: any) => row.tiTagId as Buffer);
+
+      // Entrants : Absents de la base, mais présents sur la nouvelle liste ➔ À insérer fraîchement
+      const l_aoTagIdsEntrants = p_aoTagIdsCibles.filter((id: TagId) =>
+        !l_asTagsEnBaseHex.includes(this.toBuffer(id)!.toString('hex'))
+      );
+
+      // ----------------------------------------------------------------------------
+      // ÉTAPE 3 : Exécution des purges chirurgicales (Sortants)
+      // ----------------------------------------------------------------------------
+      if (l_aTagIdsSortantsCibles.length > 0) {
+        const l_sMarqueursDel = l_aTagIdsSortantsCibles.map((_, idx) => `$${idx + 2}`).join(', ');
+        const l_sRequeteDelete = `Delete From "ItemTags" Where "tiItemId" = $1 And "tiTagId" In (${l_sMarqueursDel});`;
+        await l_oPoolClient.query(l_sRequeteDelete, [this.toBuffer(p_oItemId), ...l_aTagIdsSortantsCibles]);
+      }
+
+      // ----------------------------------------------------------------------------
+      // ÉTAPE 4 : Exécution des insertions fraîches (Entrants)
+      // ----------------------------------------------------------------------------
+      if (l_aoTagIdsEntrants.length > 0) {
         // Ciselage matriciel des marqueurs de position ordonnés en arrière-plan ⚙️
-        const l_sMarqueurs = p_aoTagIds.map((_, l_iIndex) => `($1, $${l_iIndex + 2})`).join(', ');
+        const l_sMarqueursIns = l_aoTagIdsEntrants.map((_, l_iIndex) => `($1, $${l_iIndex + 2})`).join(', ');
+        const l_sRequeteInsert = `Insert Into "ItemTags" ("tiItemId", "tiTagId") Values ${l_sMarqueursIns};`;
 
-        await r_Client.query(
-          `Insert Into "ItemTags" ("tiItemId", "tiTagId") Values ${l_sMarqueurs};`,
+        await l_oPoolClient.query(
+          l_sRequeteInsert,
           [
             this.toBuffer(p_oItemId),
-            ...p_aoTagIds.map(t => this.toBuffer(t))
+            ...l_aoTagIdsEntrants.map((id: TagId) => this.toBuffer(id))
           ]
         );
       }
-      await r_Client.query('Commit;');
+
+      // Si la liste différentielle n a touché ni aux entrants ni aux sortants,
+      // les liaisons rescapées conservent leur createdAt intact d il y a 3 ans !
+      await l_oPoolClient.query('Commit;');
+
     } catch (l_oErreur) {
-      await r_Client.query('Rollback;'); // Libération défensive immédiate des Shared Buffers
+      await l_oPoolClient.query('Rollback;'); // Libération défensive immédiate des Shared Buffers
       throw DatabaseErrorFactory.queryFailed('ItemTag.sync', (l_oErreur as Error).message);
     } finally {
-      r_Client.release();
+      l_oPoolClient.release();
     }
   }
 

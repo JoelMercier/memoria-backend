@@ -40,7 +40,7 @@ export class ContentType extends SmartEnum<string> {
     return this.ObtenirToutes<ContentType>();
   }
 
-  /** 🗄️ Passerelle d infrastructure historique [Mémoria] */
+  /** 🗄️ Passerelle d infrastructure historique */
   public static fromSql(p_sCodeSql: string): ContentType {
     return this.DeCode<ContentType>(p_sCodeSql);
   }
@@ -50,6 +50,7 @@ export class ContentType extends SmartEnum<string> {
     const l_asTableauCodes = this.values().map(t => t.code);
     return [l_asTableauCodes[0], ...l_asTableauCodes.slice(1)] as [string, ...string[]];
   }
+
 }
 
 export default ContentType;

@@ -1,8 +1,9 @@
 // ——— fichier : src/server.ts
 
-import { createApp          } from '@/app';
+import { createApp }          from '@/app';
 import { DatabaseConnection } from '@/config/DatabaseConnection';
-import { LoggerSingleton    } from '@/config/LoggerSingleton';
+import { LoggerSingleton }    from '@/config/LoggerSingleton';
+import { WarmupCache }        from '@/infrastructure/cache/WarmupCache'; // Notre futur pré-chargeur !
 
 /** 🪵 Instance partagée du journal applicatif global */
 const logger = LoggerSingleton.getInstance();
@@ -17,12 +18,14 @@ const PORT : number = Number(process.env.PORT ?? 3000);
  * Orchestre l'amorçage défensif en Fail-Fast et câble la procédure d'arrêt chirurgical (Graceful Shutdown).
  *
  * SOLID :
- *  - SRP : Unique responsabilité de démarrer le moteur applicatif et d'écouter les signaux système.
+ *  - SRP 📐 : Unique responsabilité de démarrer le moteur applicatif et d'écouter les signaux système.
  *
  * @async
  * @function bootstrap
  * @returns {Promise<void>}
- * @author Joël, Gaïa & Co
+ * @author Conception & Vision : Joël (MANIAC du PascalCase et Abstract Class Obsession)
+ * @author Frapperie du Code : Gaïa (Graveuse de pépites et du silicium)
+ * @author Garde d Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 async function bootstrap(): Promise<void> {
   try {
@@ -35,6 +38,11 @@ async function bootstrap(): Promise<void> {
     }
     logger.info('🐘 Connexion PostgreSQL OK');
 
+    // 🪓 CHANTIER N°2 : Chauffage des Placards de la RAM (Warmup Cache)
+    // Braquage asynchrone des tables de dictionnaire avant d'ouvrir le réseau Express !
+    await WarmupCache.allumez(db);
+    logger.info('🗄️ Placards de RAM chauffés et SmartEnums ensemencés');
+
     const app = createApp();
     const server = app.listen(PORT, (): void => {
       logger.info(`🚀 Memoria API démarrée sur http://localhost:${PORT}`);
@@ -42,10 +50,6 @@ async function bootstrap(): Promise<void> {
 
     /**
      * 🔌 Procédure transactionnelle d'arrêt propre (Graceful Shutdown).
-     * Libère l'intégralité des ressources d'infrastructure pour éviter toute corruption.
-     *
-     * @private
-     * @async
      */
     const shutdown = async (signal: string): Promise<void> => {
       logger.warn(`Signal reçu : ${signal}. Arrêt en cours…`);

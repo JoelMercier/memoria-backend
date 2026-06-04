@@ -153,3 +153,128 @@ export class TagId extends IdBinaire {
     super(p_Brut);
   }
 }
+
+// ——— À ajouter TOUT EN BAS du fichier : src/domain/value-objects/IdMetier.ts ———
+
+import { IdCodeFixe }     from '@/domain/base/IdCodeFixe';
+import { TailleCodeEnum } from '@/constants/base/TailleCodeEnum';
+
+/**
+ * 👥 Identifiant unique et fortement typé pour la table "Roles".
+ *
+ * @class RoleId
+ * @extends {IdCodeFixe}
+ * @author Conception : Joël (Purement infonctionnel)
+ * @author Rabotage de code : Gaïa (Vigilante de la virgule)
+ * @author Reliques Git->Origin : L'Ancien Régime & Co (Artisans du temps imparti)
+ */
+export class RoleId extends IdCodeFixe {
+  /** 🔒 Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants dictionnaire */
+  declare private readonly __brandRoleId: undefined;
+
+  /**
+   * Encapsule le quadrigramme d'un rôle sous l'armure nominale du domaine.
+   *
+   * @constructor
+   * @param {string} p_sCodeRole - Le code textuel du rôle à caler
+   */
+  public constructor(p_sCodeRole: string) {
+    super(p_sCodeRole, TailleCodeEnum.DIM_4);
+  }
+}
+
+/**
+ * 📊 Identifiant unique et fortement typé pour la table "EventCategories".
+ *
+ * @class EventCategoryId
+ * @extends {IdCodeFixe}
+ * @author Conception : Joël (Purement infonctionnel)
+ * @author Rabotage de code : Gaïa (Vigilante de la virgule)
+ * @author Reliques Git->Origin : L'Ancien Régime & Co (Artisans du temps imparti)
+ */
+export class EventCategoryId extends IdCodeFixe {
+  /** 🎛️ Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants dictionnaire */
+  declare private readonly __brandEventCategoryId: undefined;
+
+  /**
+   * Encapsule le quadrigramme d'une catégorie d'événement d'audit.
+   *
+   * @constructor
+   * @param {string} p_sCodeCategory - Le code textuel de la catégorie
+   */
+  public constructor(p_sCodeCategory: string) {
+    super(p_sCodeCategory, TailleCodeEnum.DIM_4);
+  }
+}
+
+/**
+ * 🚨 Identifiant unique et fortement typé pour la table "Severites".
+ *
+ * @class SeverityId
+ * @extends {IdCodeFixe}
+ * @author Conception : Joël (Purement infonctionnel)
+ * @author Rabotage de code : Gaïa (Vigilante de la virgule)
+ * @author Reliques Git->Origin : L'Ancien Régime & Co (Artisans du temps imparti)
+ */
+export class SeverityId extends IdCodeFixe {
+  /** 🤖 Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants dictionnaire */
+  declare private readonly __brandSeverityId: undefined;
+
+  /**
+   * Encapsule le quadrigramme d'une sévérité d'événement d'audit.
+   *
+   * @constructor
+   * @param {string} p_sCodeSeverity - Le code textuel de la sévérité
+   */
+  public constructor(p_sCodeSeverity: string) {
+    super(p_sCodeSeverity, TailleCodeEnum.DIM_4);
+  }
+}
+
+/**
+ * 🌐 Identifiant unique et fortement typé pour la table "Providers" (Fournisseurs d'accès).
+ *
+ * @class ProviderId
+ * @extends {IdCodeFixe}
+ * @author Conception : Joël (Purement infonctionnel)
+ * @author Rabotage de code : Gaïa (Vigilante de la virgule)
+ * @author Reliques Git->Origin : L'Ancien Régime & Co (Artisans du temps imparti)
+ */
+export class ProviderId extends IdCodeFixe {
+  /** 🔌 Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants dictionnaire */
+  declare private readonly __brandProviderId: undefined;
+
+  /**
+   * Encapsule le quadrigramme du fournisseur sous l'armure nominale du domaine.
+   *
+   * @constructor
+   * @param {string} p_sCodeProvider - Le code textuel du fournisseur d'accès
+   */
+  public constructor(p_sCodeProvider: string) {
+    super(p_sCodeProvider, TailleCodeEnum.DIM_4);
+  }
+}
+
+/**
+ * 📦 Identifiant unique et fortement typé pour la table "ContentTypes" (Formats de pépites).
+ *
+ * @class ContentTypeId
+ * @extends {IdCodeFixe}
+ * @author Conception : Joël (Purement infonctionnel)
+ * @author Rabotage de code : Gaïa (Vigilante de la virgule)
+ * @author Reliques Git->Origin : L'Ancien Régime & Co (Artisans du temps imparti)
+ */
+export class ContentTypeId extends IdCodeFixe {
+  /** 📥 Marque nominale exclusive interdisant l'inversion accidentelle d'identifiants dictionnaire */
+  declare private readonly __brandContentTypeId: undefined;
+
+  /**
+   * Encapsule le quadrigramme du format de contenu d'une pépite.
+   *
+   * @constructor
+   * @param {string} p_sCodeContentType - Le code textuel du format de pépite
+   */
+  public constructor(p_sCodeContentType: string) {
+    super(p_sCodeContentType, TailleCodeEnum.DIM_4);
+  }
+}

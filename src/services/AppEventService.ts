@@ -1,11 +1,11 @@
 // ——— fichier : src/services/AppEventService.ts
 
-import { AppEventCategory } from '@/constants/AppEventCategory';
-import { AppEventSeverity } from '@/constants/AppEventSeverity';
-import { AppEventType } from '@/constants/AppEventType';
+import { AppEventCategory        } from '@/constants/AppEventCategory';
+import { AppEventSeverity        } from '@/constants/AppEventSeverity';
+import { AppEventType            } from '@/constants/AppEventType';
 import { UserId, ItemId, ShareId } from '@/domain/value-objects/IdMetier';
-import { DatabaseConnection } from '@/config/DatabaseConnection';
-import { AppEventRepository } from '@/infrastructure/repositories/AppEventRepository';
+import { DatabaseConnection      } from '@/config/DatabaseConnection';
+import { AppEventRepository      } from '@/infrastructure/repositories/AppEventRepository';
 
 /**
  * 🏛️ Classe AppEventService
@@ -57,7 +57,9 @@ export class AppEventService {
       eventType     : data.eventType,
       severity      : data.severity || AppEventSeverity.INFO,
       message       : data.message,
-      metadata      : data.metadata || {}
+      metadata      : data.metadata || {},
+      createdAt     : new Date()
+
     });
   }
 

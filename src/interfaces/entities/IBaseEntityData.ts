@@ -1,28 +1,31 @@
 // ——— fichier : src/interfaces/entities/IBaseEntityData.ts
 
-import type { IdBinaire } from '@/domain/base/IdBinaire';
+import      { Buffer           } from 'node:buffer';
+import type { IdInfrastructure } from '@/domain/base/IdInfrastructure';
+import type { IdBinaire        } from '@/domain/base/IdBinaire';
+import type { IdCodeFixe       } from '@/domain/base/IdCodeFixe';
 
 /**
- * 📋 Type AllowedIdTypes
- * ----------------------
+ * 📋 Type AllowedIdTypes (Version Jojo Alignement Binaire Pur 🔬)
+ * ----------------------------------------------------------------------------
  * Liste exhaustive des types physiques et d'objets autorisés pour les clés primaires.
- * Sert de balise absolue à travers tout le système (ex: IEntity, BaseEntity).
- *
- * @type AllowedIdTypes
- * @author Joël, Gaïa & Co
  */
 export type AllowedIdTypes =
 
-  | string
-  | number
-  | object
-  | IdBinaire; // Accepte implicitement UserId, ItemId, ShareId, TagId par héritage !
+  | string                // Pour nos codes fixes (Char(4)) et le transit Web
+  | number                // Rétrocompatibilité des index de dictionnaire numériques
+  | Buffer                // ALIGNEMENT BYTEA : Le flux binaire pur de PostgreSQL !
+
+  | IdInfrastructure<any> // L'Ancêtre Suprême de la Forge
+  | IdBinaire             // Accepte implicitement UserId, ItemId, ShareId, TagId...
+  | IdCodeFixe;           // Accepte implicitement RoleId, SeverityId, EventCategoryId...
 
 /**
- * 📊 Interface IBaseEntityData (Version Jojo Générique Absolue)
- * -------------------------------------------------------------
+ * 📊 Interface IBaseEntityData (Version Jojo Équilibre de l'Audit 🛡️)
+ * ----------------------------------------------------------------------------
  * Contrat de base générant dynamiquement la clé primaire typée selon l'entité.
- * Injecte également les métadonnées universelles de traçabilité d'audit.
+ * Garantit la présence universelle de l'horodatage de création, tout en laissant
+ * la date de modification optionnelle pour respecter les flux Append-Only (Logs).
  *
  * @type IBaseEntityData
  * @template TEntityName - Le nom sémantique de l'entité (ex: 'user', 'tag')
@@ -36,15 +39,14 @@ export type IBaseEntityData<
 
   /**
    * 🪓 Mappage dynamique calculé et chirurgical de la clé primaire.
-   * Exemple : Le littéral 'tag' engendre automatiquement la propriété d'infra 'idTag'.
    */
   [K in `id${Capitalize<TEntityName>}`]: TId;
 
 } & {
 
-  /** 📅 Horodatage précis de la création de l'enregistrement en base (Audit). */
-  createdAt? : Date;
+  /** 📅 Horodatage précis, OBLIGATOIRE et immuable de la création de l'enregistrement (Présent partout). */
+  createdAt : Date; // Verrouillé : Strictement obligatoire !
 
-  /** 📅 Horodatage précis de la dernière modification de l'enregistrement (Audit). */
-  updatedAt? : Date;
+  /** 📅 Horodatage de la dernière modification (Optionnel pour tolérer l'Append-Only des tables d'audit). */
+  updatedAt? : Date; // Remis en optionnel pour respecter la table Events de Joël !
 };

@@ -40,6 +40,11 @@ export class AuthProvider extends SmartEnum<string> {
     return this.m_bEstUnSso;
   }
 
+  /** 🗄️ Convertisseur d infrastructure historique branché sur le décodeur central [Mémoria] */
+  public static fromSql(p_sCodeSql: string): AuthProvider {
+    return this.DeCode<AuthProvider>(p_sCodeSql);
+  }
+
   // ----------------------------------------------------------------------------
   // 🏺 ENSEMENCEMENT DE LA RAM (Les protocoles d'accès de Phase 1 - Format 4 lettres)
   // ----------------------------------------------------------------------------

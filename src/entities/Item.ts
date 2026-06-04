@@ -1,11 +1,11 @@
 // ——— fichier : src/entities/Item.ts
 
-import { BaseEntity  } from '@/entities/BaseEntity';
-import { ItemId, UserId } from '@/domain/value-objects/IdMetier';
-import type { ContentType } from '@/constants/ContentType';
-import type { IItem  } from '@/interfaces/entities/item/IItem';
-import type { IItemData } from '@/interfaces/entities/item/IItemData';
-
+import      { BaseEntity     } from '@/entities/BaseEntity';
+import type { ItemId, UserId } from '@/domain/value-objects/IdMetier'
+import      { ContentType    } from '@/constants/ContentType';
+import type { IItem          } from '@/interfaces/entities/item/IItem';
+import type { IItemData      } from '@/interfaces/entities/item/IItemData';
+import      { ContentTypeId  } from '@/domain/value-objects/IdMetier';
 /**
  * 🏛️ Classe Item (Pépites)
  * ------------------------
@@ -56,7 +56,7 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> implements IItem
     super(data);
     this.m_idItem        = data.idItem;
     this.m_idUser        = data.idUser;
-    this.m_eContentType  = data.contentType;
+    this.m_eContentType  = ContentType.fromSql(data.contentTypeId.valeur);
     this.m_sTitle        = data.title;
     this.m_sSlug         = data.slug;
     this.m_sContent      = data.content;
@@ -176,7 +176,7 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> implements IItem
     return {
       idItem       : this.getItemId(),
       idUser       : this.getUserId(),
-      contentType  : this.getContentType(),
+     contentTypeId : new ContentTypeId(this.m_eContentType.code.toString()),
       title        : this.getTitle(),
       slug         : this.getSlug(),
       content      : this.getContent(),

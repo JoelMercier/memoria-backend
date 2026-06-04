@@ -139,7 +139,8 @@ export class ShareService implements IShareService {
       shItemId        : dto.idItem,
       shCourrielDest  : dto.recipientEmail,
       shJeton         : token,
-      shConfiguration : dto.accessConfig
+      shConfiguration : dto.accessConfig,
+      createdAt       : new Date()
     };
 
     return await this.shareRepository.create(data);

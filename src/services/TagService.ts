@@ -55,9 +55,10 @@ export class TagService implements ITagService {
   public async create(userId: UserId, dto: CreateTagDto): Promise<ITag> {
     // 🪓 ALIGNEMENT INDUSTRIEL : Forgeage propre de l'ID avec l'outil crypto natif
     const data : ITagData = {
-      idTag   : new TagId(randomUUID()),
-      userId  : userId,
-      tagName : dto.tagName
+      idTag     : new TagId(randomUUID()),
+      userId    : userId,
+      tagName   : dto.tagName,
+      createdAt : new Date()
     };
 
     return await this.tagRepository.create(data);
