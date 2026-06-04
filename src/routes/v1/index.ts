@@ -43,7 +43,7 @@ export function createV1Router(): Router {
   const userRepository    = new UserRepository(db);
   const itemRepository    = new ItemRepository(db);
   const tagRepository     = new TagRepository(db);
-  const itemTagRepository = new ItemTagRepository(db.getPool());
+  const itemTagRepository = new ItemTagRepository(db);
   const shareRepository   = new ShareRepository(db);
 
   // Services
