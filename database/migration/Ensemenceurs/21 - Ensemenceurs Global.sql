@@ -93,11 +93,11 @@ INSERT INTO "ItemTags" ("tiItemId", "tiTagId", "tiCreatedAt") VALUES
 ("Bin-UUID"(decode('018d5c8e80017001b009000000000001', 'hex')), "Bin-UUID"(decode('018d5c8e70017001a009000000000001', 'hex')), '2024-01-15 13:41:00')
 ON CONFLICT DO NOTHING;
 
--- 🔗 STEP 5 : LES PASSERELLES DE PARTAGE (Table: Shares)
-INSERT INTO "Shares" ("shCreatedAt", "shUpdatedAt", "shIdShare", "shItemId", "shCourrielDest", "shJeton", "shConfiguration") VALUES
-('2024-01-15 10:50:00', NULL, "Bin-UUID"(decode('018d5c8e90017001c001000000000001', 'hex')), "Bin-UUID"(decode('018d5c8e80017001b001000000000001', 'hex')), 'marc.dubois@entreprise.fr', 'tok_share_sophie_marc_001', '{"level":"read"}'::jsonb),
-('2024-01-15 10:55:00', NULL, "Bin-UUID"(decode('018d5c8e90017001c002000000000001', 'hex')), "Bin-UUID"(decode('018d5c8e80017001b002000000000001', 'hex')), 'sophie.laurent@tech.io'   , 'tok_share_marc_sophie_001', '{"level":"read"}'::jsonb)
-ON CONFLICT DO NOTHING;
+-- 🔗 STEP 5 : LES PASSERELLES DE PARTAGE (Table: Shares) (Rule 1 & 2)
+Insert Into "Shares" ( "shIdShare", "shItemId", "shItemOwnerId", "shCreatedAt", "shUpdatedAt", "shCourrielDest", "shJeton", "shConfiguration" ) Values
+('2024-01-15 10:50:00', Null, "Bin-UUID"(decode('018d5c8e90017001c001000000000001', 'hex')), "Bin-UUID"(decode('018d5c8e80017001b001000000000001', 'hex')), "Bin-UUID"(decode('018d5c8e567870019001000000000001', 'hex')), 'marc.dubois@entreprise.fr', 'tok_share_sophie_marc_001', '{"level": "read", "allow_download": false, "expiration": null}'::Jsonb),
+('2024-01-15 10:55:00', Null, "Bin-UUID"(decode('018d5c8e90017001c002000000000001', 'hex')), "Bin-UUID"(decode('018d5c8e80017001b002000000000001', 'hex')), "Bin-UUID"(decode('018d5c8e567870019001000000000002', 'hex')), 'sophie.laurent@tech.io'   , 'tok_share_marc_sophie_001', '{"level": "read", "allow_download": true, "expiration": null}'::Jsonb)
+on Conflict Do Nothing;
 
 -- 🚨 STEP 6 : JOURNAL D'AUDIT IMMEUBLE APPEND-ONLY (Table: Events)
 Insert Into "Events" ("aeIdEvent", "aeUserId", "aeCreatedAt", "aeCategoryId", "aeSeverityId", "aeContextId", "aeActionId", "aeMessage", "aeMetadata") Values

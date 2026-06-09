@@ -98,7 +98,7 @@ export class ShareService implements IShareService {
   private async generateUniqueToken(): Promise<string> {
     for (let l_nIdx : number = 0; l_nIdx < MAX_TOKEN_GEN_ATTEMPTS; l_nIdx++) {
       const l_sToken : string       = ShareTokenGenerator.generate();
-      const l_oExisting : Share | null = await this.m_oShareRepository.findByToken(l_sToken);
+      const l_oExisting : Share | null = await this.shareRepository.findByToken(l_sToken);
       if (!l_oExisting) {
         return l_sToken;
       }
@@ -118,14 +118,14 @@ export class ShareService implements IShareService {
    * @returns {Promise<Share>} L'entité Share vivante et sécurisée
    */
   private async ensureOwnership(p_axUserId: UserId, p_axShareId: ShareId): Promise<Share> {
-    const l_oShare : Share | null = await this.m_oShareRepository.findById(p_axShareId);
+    const l_oShare : Share | null = await this.shareRepository.findById(p_axShareId);
     if (!l_oShare) {
       throw ShareErrorFactory.notFound(p_axShareId.valeur);
     }
-    const l_oItem : Item | null = await this.m_oItemRepository.findById(l_oShare.getItemId());
+    const l_oItem : Item | null = await this.itemRepository.findById(l_oShare.idItem);
 
     // 🪓 Utilisation du getter getUserId() de l'Ancien Régime sur Item
-    if (!l_oItem || l_oItem.getUserId().valeur !== p_axUserId.valeur) {
+    if (!l_oItem || l_oItem.idUser.valeur !== p_axUserId.valeur) {
       throw ShareErrorFactory.accessDenied(p_axShareId, p_axUserId);
     }
     return l_oShare;
@@ -142,30 +142,28 @@ export class ShareService implements IShareService {
    * @returns {Promise<IShare>} L'entité de partage configurée et persistante
    */
   public async create(p_axUserId: UserId, p_oDto: CreateShareDto): Promise<IShare> {
-    const l_oItem : Item | null = await this.m_oItemRepository.findById(p_oDto.idItem);
+    const l_oItem : Item | null = await this.itemRepository.findById(p_oDto.idItem);
     if (!l_oItem) {
       throw ItemErrorFactory.notFound(p_oDto.idItem);
     }
 
-    // 🪓 Utilisation du getter getUserId() de l'Ancien Régime sur Item
-    if (l_oItem.getUserId().valeur !== p_axUserId.valeur) {
+    if (l_oItem.idUser.valeur !== p_axUserId.valeur) {
       throw ItemErrorFactory.accessDenied(p_oDto.idItem, p_axUserId);
     }
 
     const l_sToken : string = await this.generateUniqueToken();
 
-    // 🪓 [REARMÉ V4] Utilisation de IdForge pour injecter un vrai UUID v7 chronologique
     const l_oData : IShareData = {
-      idShare         : new ShareId(IdForge.genererUuidV7()), // Fin de la passoire v4 bête 🐦 💨
-      shItemOwnerId   : p_oDto.idUser,
-      shItemId        : p_oDto.idItem,
-      shCourrielDest  : p_oDto.recipientEmail,
-      shJeton         : l_sToken,
-      shConfiguration : p_oDto.accessConfig,
-      createdAt       : new Date()
+      idShare       : new ShareId(IdForge.genererUuidV7()), // Fin de la v4 bête 🐦 💨
+      itemOwnerId   : p_oDto.idUser,
+      itemId        : p_oDto.idItem,
+      courrielDest  : p_oDto.recipientEmail,
+      jeton         : l_sToken,
+      configuration : p_oDto.accessConfig,
+      createdAt     : new Date()
     };
 
-    return await this.m_oShareRepository.create(l_oData);
+    return await this.shareRepository.create(l_oData);
   }
 
   /**
@@ -190,7 +188,7 @@ export class ShareService implements IShareService {
    * @returns {Promise<IShare[]>} La collection des contrats de partage actifs
    */
   public async listByUser(p_axUserId: UserId): Promise<IShare[]> {
-    return await this.m_oShareRepository.findByUserId(p_axUserId);
+    return await this.shareRepository.findByUserId(p_axUserId);
   }
 
   /**
@@ -209,13 +207,13 @@ export class ShareService implements IShareService {
 
     const l_oUpdates : Partial<IShareData> = {};
     if (p_oDto.recipientEmail !== undefined) {
-      l_oUpdates.shCourrielDest = p_oDto.recipientEmail;
+      l_oUpdates.courrielDest = p_oDto.recipientEmail;
     }
     if (p_oDto.accessConfig !== undefined) {
-      l_oUpdates.shConfiguration = p_oDto.accessConfig;
+      l_oUpdates.configuration = p_oDto.accessConfig;
     }
 
-    const l_oUpdated : Share | null = await this.m_oShareRepository.update(p_axShareId, l_oUpdates);
+    const l_oUpdated : Share | null = await this.shareRepository.update(p_axShareId, l_oUpdates);
     if (!l_oUpdated) {
       throw ShareErrorFactory.notFound(p_axShareId.valeur);
     }
@@ -235,7 +233,7 @@ export class ShareService implements IShareService {
   public async delete(p_axUserId: UserId, p_axShareId: ShareId): Promise<void> {
     await this.ensureOwnership(p_axUserId, p_axShareId);
 
-    const l_bDeleted : boolean = await this.m_oShareRepository.delete(p_axShareId);
+    const l_bDeleted : boolean = await this.shareRepository.delete(p_axShareId);
     if (!l_bDeleted) {
       throw ShareErrorFactory.notFound(p_axShareId.valeur);
     }
@@ -252,7 +250,7 @@ export class ShareService implements IShareService {
    * @returns {Promise<IItem>} L'entité de la pépite rattachée pour affichage anonyme
    */
   public async findItemByToken(p_sToken: string): Promise<IItem> {
-    const l_oShare : Share | null = await this.m_oShareRepository.findByToken(p_sToken);
+    const l_oShare : Share | null = await this.shareRepository.findByToken(p_sToken);
     if (!l_oShare) {
       throw ShareErrorFactory.notFound(p_sToken);
     }
@@ -260,7 +258,7 @@ export class ShareService implements IShareService {
       throw ShareErrorFactory.expired(p_sToken);
     }
 
-    const l_oItem : Item | null = await this.m_oItemRepository.findById(l_oShare.getItemId());
+    const l_oItem : Item | null = await this.itemRepository.findById(l_oShare.idItem);
 
     // Cas pathologique : le share existe mais son item a disparu (FK CASCADE normalement = ne devrait pas arriver)
     if (!l_oItem) {

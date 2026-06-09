@@ -82,7 +82,7 @@ export abstract class IdBinaire {
    * @returns {boolean} Vrai si les segments binaires sous-jacents coïncident à 100% 🚀
    */
   public estEgalA(autreId: IdBinaire): boolean {
-    return this.m_rBuffer.equals(autreId.binaire); // Utilisation de l accesseur binaire sécurisé
+    return this.m_rBuffer.equals(autreId.binaire); // Utilisation de l'accesseur binaire sécurisé
   }
 
   /**

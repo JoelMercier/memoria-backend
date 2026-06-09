@@ -1,169 +1,167 @@
 // ——— fichier : src/entities/Share.ts
 
-import { BaseEntity    } from '@/entities/BaseEntity';
-import { ItemId, ShareId, UserId } from '@/domain/value-objects/ids';
-import type { IAccessConfig } from '@/interfaces/entities/share/IAccessConfig';
-import type { IShare   } from '@/interfaces/entities/share/IShare';
+import { BaseEntity }     from '@/entities/BaseEntity';
+import { ShareId, ItemId, UserId } from '@/domain/value-objects/ids';
+import type { IShare }    from '@/interfaces/entities/share/IShare';
 import type { IShareData } from '@/interfaces/entities/share/IShareData';
+import type { IAccessConfig } from '@/interfaces/entities/share/IAccessConfig';
 
 /**
- * 🏛️ Classe Share (Partages de Pépites)
- * -------------------------------------
- * Modèle métier immuable représentant un lien de partage sécurisé.
- * Protégé par l'armure de la notation hongroise et piloté par le typage fort.
+ * 🏛️ Classe Share (Passerelles de Partage) 🔗
+ * ----------------------------------------------------------------------------
+ * Modèle métier immuable représentant une passerelle de partage sécurisée.
+ * Protégé par la notation hongroise, documenté et converti en vrais getters V4.
  *
  * @class Share
  * @extends {BaseEntity<'share', IShareData, ShareId>}
  * @implements {IShare}
- * @author Vision : Joël (Architecte DR-DOS)
- * @author Frapperie du code : Gaïa (Gardienne du feu binaire)
- * @author Héritage Git->Origin : La Vague Initiale (Ouvriers du code en surchauffe)
+ * @author Directrice du Silicium : Joël (C++ Framework Architect - Pure Encapsulation)
+ * @author Métallurgie des Octets : Gaïa (Au burin, lavée de ses accès sauvages)
  */
 export class Share extends BaseEntity<'share', IShareData, ShareId> implements IShare {
-  /** 🔔 Caillou de couleur : Identifiant technique unique de l'entité de partage */
-  private readonly m_idShare         : ShareId;
 
-  /** 📦 Caillou de couleur : Identifiant de la pépite (Item) liée au partage */
-  private readonly m_idItem          : ItemId;
+  /** 🔔 Clé Primaire : Identifiant unique fort du partage (idShare) */
+  private readonly m_idShare       : ShareId;
 
-  /** 👥 Caillou de couleur : Identifiant du propriétaire légitime de la ressource */
-  private readonly m_idItemOwner     : UserId;
+  /** 📥 Clé Étrangère : Identifiant unique de la pépite rattachée (shItemId) */
+  private readonly m_idItem        : ItemId;
 
-  /** 📧 Courriel du destinataire ciblé ou NULL si le lien est public */
-  private readonly m_sCourrielDest   : string | null;
+  /** 👥 Clé Étrangère : Identifiant unique de l'acteur propriétaire (shItemOwnerId) */
+  private readonly m_idShareOwner  : UserId;
 
-  /** 🔑 Jeton de sécurité aléatoire unique intégré dans la route HTTP d'accès */
-  private readonly m_sJetonPartage   : string;
+  /** 📧 Adresse e-mail du destinataire ciblé (shCourrielDest) */
+  private readonly m_sCourrielDest : string | null;
 
-  /** ⚙️ Règles de restriction d'infrastructure (Dates de péremption, etc.) */
-  private readonly m_rAccessConfig   : IAccessConfig;
+  /** 🔐 Jeton de sécurité textuel unique (Token) transitant dans les URL (shJeton) */
+  private readonly m_sJeton        : string;
+
+  /** ⚙️ Configuration fine des restrictions et de validité (shConfiguration) */
+  private readonly m_rAccessConfig : IAccessConfig;
 
   /**
-   * Instancie un partage immuable à partir de son contrat de données.
+   * Instancie une passerelle de partage immuable à partir de sa structure passive.
    *
    * @constructor
-   * @param {IShareData} data - Payload brut ou typé issu de l'infrastructure
+   * @param {IShareData} p_oData - Le sac de données brutes d'infrastructure 3NF
    */
-  public constructor(data: IShareData) {
-    super(data);
-    this.m_idShare         = data.idShare;
-    this.m_idItem          = data.shItemId;
-    this.m_idItemOwner     = data.shItemOwnerId;
-    this.m_sCourrielDest   = data.shCourrielDest;
-    this.m_sJetonPartage   = data.shJeton;
-    this.m_rAccessConfig   = data.shConfiguration;
+  public constructor(p_oData: IShareData) {
+    super(p_oData);
+    this.m_idShare       = p_oData.idShare;
+    this.m_idItem        = p_oData.itemId;
+    this.m_idShareOwner  = p_oData.itemOwnerId;
+    this.m_sCourrielDest = p_oData.courrielDest ?? null;
+    this.m_sJeton        = p_oData.jeton;
+    this.m_rAccessConfig = p_oData.configuration;
   }
 
-  // ============================================================================
-  // 🛰️ ACCESSEURS ACADÉMIQUES MODERNES (get)
-  // ============================================================================
-
+  /**
+   * 📦 VRAI GETTER : Récupère la clé primaire unique fort du partage.
+   *
+   * @public
+   * @returns {ShareId} Le caillou de couleur du partage
+   */
   public get idShare(): ShareId {
     return this.m_idShare;
   }
 
-  public get shItemId(): ItemId {
+  /**
+   * 📥 VRAI GETTER : Récupère l'identifiant fort de la pépite cible liée.
+   *
+   * @public
+   * @returns {ItemId} Le caillou de couleur de la pépite rattachée
+   */
+  public get idItem(): ItemId {
     return this.m_idItem;
   }
 
-  public get shItemOwnerId(): UserId {
-    return this.m_idItemOwner;
+  /**
+   * 👥 VRAI GETTER : Récupère l'identifiant fort de l'acteur propriétaire.
+   *
+   * @public
+   * @returns {UserId} Le caillou de couleur de l'acteur propriétaire
+   */
+  public get idUserOwner(): UserId {
+    return this.m_idShareOwner;
   }
 
-  public get shCourrielDest(): string | null {
+  /**
+   * 📧 VRAI GETTER : Récupère l'adresse e-mail du destinataire ciblé.
+   *
+   * @public
+   * @returns {string | null} L'adresse de messagerie ou null si public
+   */
+  public get courrielDest(): string | null {
     return this.m_sCourrielDest;
   }
 
-  public get shJeton(): string {
-    return this.m_sJetonPartage;
+  /**
+   * 🔐 VRAI GETTER : Récupère le jeton de sécurité cryptographique.
+   *
+   * @public
+   * @returns {string} La chaîne textuelle unique du jeton d'URL
+   */
+  public get jeton(): string {
+    return this.m_sJeton;
   }
 
-  public get shConfiguration(): IAccessConfig {
+  /**
+   * ⚙️ VRAI GETTER : Récupère la configuration fine de validité.
+   *
+   * @public
+   * @returns {IAccessConfig} Le dictionnaire des droits et verrous temporels
+   */
+  public get accessConfig(): IAccessConfig {
     return this.m_rAccessConfig;
   }
 
-  // ============================================================================
-  // 📑 SIGNATURES OBLIGATOIRES DE L'INTERFACE HISTORIQUE (IShare)
-  // ============================================================================
-
   /**
-   * 🆔 Identifiant unique et fortement typé du partage.
-   */
-  public getShareId(): ShareId {
-    return this.idShare;
-  }
-
-  /**
-   * 📦 Récupère l'identifiant unique et fortement typé de la pépite partagée.
-   */
-  public getItemId(): ItemId {
-    return this.shItemId;
-  }
-
-  /**
-   * 📧 Récupère l'adresse e-mail du destinataire (Ou NULL si partage public via lien).
-   */
-  public getCourrielDest(): string | null {
-    return this.shCourrielDest;
-  }
-
-  /**
-   * 🔑 Récupère le jeton de sécurité unique associé au lien de partage.
-   */
-  public getJeton(): string {
-    return this.shJeton;
-  }
-
-  /**
-   * ⚙️ Récupère la configuration fine des droits et restrictions d'accès.
-   */
-  public getAccessConfig(): IAccessConfig {
-    return this.shConfiguration;
-  }
-
-  // ============================================================================
-  // 🎛️ OPÉRATIONS ET SÉRIALISATION MÉTIER
-  // ============================================================================
-
-  /**
-   * ⏱️ Vérifie si le lien de partage a dépassé sa date de validité chronologique.
+   * ⏱️ MÉTHODE MÉTIER : Vérifie si la validité temporelle du partage a expiré.
+   * [SCELLÉ POO] Utilisation exclusive de l'accesseur officiel .accessConfig !
    *
    * @public
-   * @returns {boolean} True si le partage est expiré
+   * @returns {boolean} True si la date d'expiration en soute est dépassée
    */
   public isExpired(): boolean {
-    if (!this.shConfiguration.expiresAt) {
+    // 🪓 [RÉPARÉ V4] Interrogation via le getter public de surface et la clé d'acier unique !
+    if (!this.accessConfig || !this.accessConfig.DateExpiration) {
       return false;
     }
-    return new Date(this.shConfiguration.expiresAt) < new Date();
+    return new Date() > this.accessConfig.DateExpiration;
   }
 
   /**
-   * 📦 Extrait le sac de données passif correspondant à l'état vivant de l'entité.
-   * Totalement synchronisé sur la clé dynamique idShare de l'infrastructure.
+   * 📦 Extrait le sac de données passif d'infrastructure pour la persistance.
    *
    * @public
-   * @returns {IShareData} Structure de données brute d'infrastructure
+   * @returns {IShareData} La structure de données plate brute de soute 3NF
+   */
+  /**
+   * 📦 Extrait le sac de données passif d'infrastructure pour la persistance.
+   * [SCELLÉ RECOUVREMENT] Interrogation exclusive des getters de surface.
+   *
+   * @public
+   * @returns {IShareData} La structure de données plate brute de soute 3NF
    */
   public toData(): IShareData {
     return {
-      idShare         : this.idShare,
-      shItemId        : this.shItemId,
-      shItemOwnerId   : this.shItemOwnerId,
-      shCourrielDest  : this.shCourrielDest,
-      shJeton         : this.shJeton,
-      shConfiguration : this.shConfiguration,
-      createdAt       : this.createdAt,
-      updatedAt       : this.updatedAt
-    };
+      idShare       : this.idShare,
+      itemId        : this.idItem,
+      itemOwnerId   : this.idUserOwner,
+      jeton         : this.jeton,
+      courrielDest  : this.courrielDest,
+      configuration : this.accessConfig,
+      createdAt     : this.createdAt,
+      updatedAt     : this.updatedAt
+    } as IShareData;
   }
 
+
   /**
-   * 🖨️ Sérialise textuellement l'entité de partage au format de texte JSON.
+   * 🖨️ Sérialise textuellement l'entité au format JSON.
    *
    * @public
    * @override
-   * @returns {string} Le sac de données aplati sous forme de chaîne de caractères
+   * @returns {string} La chaîne de caractères sérialisée
    */
   public override toString(): string {
     return JSON.stringify(this.toData());

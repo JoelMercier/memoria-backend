@@ -1,25 +1,24 @@
 // ——— fichier : src/infrastructure/repositories/mocks/MockItemRepository.ts
 
-import      { Item            } from '@/entities/Item';
-import      { ItemId, UserId  } from '@/domain/value-objects/ids';
-import type { IItemData       } from '@/interfaces/entities/item/IItemData';
-import type { IItemListOptions,
-              IItemListResult,
-              IItemRepository } from '@/interfaces/repositories/IItemRepository';
+import { Item }                       from '@/entities/Item';
+import { ItemId, UserId }             from '@/domain/value-objects/ids';
+import type { IItemData }             from '@/interfaces/entities/item/IItemData';
+import type { IMockItemRepository }   from '@/interfaces/repositories/IItemRepository';
+import type { IItemRepositoryListOptions } from '@/interfaces/repositories/IItemRepositoryListOptions';
+import type { IListResult }           from '@/interfaces/shared/IListResult';
 
 /**
  * 🗄️ Classe MockItemRepository 🧮 (Le Simulateur de Pépites en RAM 🤖)
  * ----------------------------------------------------------------------------
- * Usine de simulation émulant à 100% le cycle de vie de la table "Items".
- * Permet de faire tourner le Donjon applicatif en isolation sans toucher au disque.
+ * Usine de simulation émulant à 100% le cycle de vie de la table "Items" en RAM.
+ * Délivrée de la propriété physique .db grâce à l'héritage légitime de IMemoryRW.
  *
  * @class MockItemRepository
- * @implements {IItemRepository}
- * @author Vision : Joël (Architecte DR-DOS)
- * @author Frapperie du code : Gaïa (Gardienne du feu binaire)
- * @author Héritage Git->Origin : La Vague Initiale (Ouvriers du code en surchauffe)
+ * @implements {IMockItemRepository}
+ * @author Vision : Joël (Architecte DR-DOS - Nettoyeur de parenthèses)
+ * @author Frapperie du code : Gaïa (Au burin, raccordée sur la Choupy Doctrine V4)
  */
-export class MockItemRepository implements IItemRepository {
+export class MockItemRepository implements IMockItemRepository {
   /** 🧠 La collection virtuelle des pépites stockée en mémoire vive active */
   private m_aoItems: Item[] = [];
 
@@ -42,7 +41,7 @@ export class MockItemRepository implements IItemRepository {
    * @returns {Promise<Item | null>} L'instance de pépite réarmée ou null
    */
   public async findById(p_oIdItem: ItemId): Promise<Item | null> {
-    return this.getItems().find((l_oItem: Item): boolean => l_oItem.getItemId().estEgalA(p_oIdItem)) ?? null;
+    return this.getItems().find((l_oItem: Item): boolean => l_oItem.idItem.estEgalA(p_oIdItem)) ?? null;
   }
 
   /**
@@ -51,14 +50,14 @@ export class MockItemRepository implements IItemRepository {
    * @public
    * @async
    * @param {UserId} p_oUserId - L'identifiant de l'acteur propriétaire
-   * @param {string} p_sSlug - Le slug exact recherché
+   * @param {string} p_sSlug - Le permalien exact recherché
    * @returns {Promise<Item | null>} La pépite correspondante ou null
    */
   public async findBySlug(p_oUserId: UserId, p_sSlug: string): Promise<Item | null> {
     const l_sRecherche: string = p_sSlug.trim();
     return (
       this.getItems().find((l_oItem: Item): boolean =>
-        l_oItem.getUserId().estEgalA(p_oUserId) && l_oItem.getSlug() === l_sRecherche
+        l_oItem.idUser.estEgalA(p_oUserId) && l_oItem.slug === l_sRecherche
       ) ?? null
     );
   }
@@ -76,39 +75,55 @@ export class MockItemRepository implements IItemRepository {
     const l_sRecherche: string = p_sTitle.toLowerCase().trim();
     return (
       this.getItems().find((l_oItem: Item): boolean =>
-        l_oItem.getUserId().estEgalA(p_oUserId) && l_oItem.getTitle().toLowerCase().trim() === l_sRecherche
+        l_oItem.idUser.estEgalA(p_oUserId) && l_oItem.title.toLowerCase().trim() === l_sRecherche
       ) ?? null
     );
   }
 
   /**
    * 🚀 Extraction contractuelle filtrée Jojo-Style simulant l'indexation SQL 🌐.
+   * Raccordement strict sur IListResult et les variables sacrées de contrôle.
    *
    * @public
    * @async
    * @param {UserId} p_oUserId - L'identifiant de l'acteur propriétaire connecté
-   * @param {IItemListOptions} [p_oOptions] - Filtres optionnels (Recherche, Média)
-   * @returns {Promise<IItemListResult>} Le dictionnaire paginé contenant le total
+   * @param {IItemRepositoryListOptions} p_oOptions - Le dictionnaire de tri et pagination obligatoires
+   * @returns {Promise<IListResult<Item>>} Le lot de résultats paginé et structuré en français d'élite
    */
-  public async listByUser(p_oUserId: UserId, p_oOptions?: IItemListOptions): Promise<IItemListResult> {
-    let l_aoFiltres: Item[] = this.getItems().filter((l_oItem: Item): boolean => l_oItem.getUserId().estEgalA(p_oUserId));
+  public async listByUser(p_oUserId: UserId, p_oOptions: IItemRepositoryListOptions): Promise<IListResult<Item>> {
+    let l_aoFiltres: Item[] = this.getItems().filter((l_oItem: Item): boolean => l_oItem.idUser.estEgalA(p_oUserId));
 
-    if (p_oOptions?.contentType) {
-      l_aoFiltres = l_aoFiltres.filter((l_oItem: Item): boolean => l_oItem.getContentType() === p_oOptions.contentType);
+    if (p_oOptions.contentTypeId) {
+      l_aoFiltres = l_aoFiltres.filter((l_oItem: Item): boolean => l_oItem.contentType.code === p_oOptions.contentTypeId?.valeur);
     }
 
-    if (p_oOptions?.search) {
-      const l_sMotCle: string = p_oOptions.search.toLowerCase().trim();
-      l_aoFiltres = l_aoFiltres.filter((l_oItem: Item): boolean => l_oItem.getTitle().toLowerCase().includes(l_sMotCle));
+    if (p_oOptions.MotsCles) {
+      const l_sMotCle: string = p_oOptions.MotsCles.toLowerCase().trim();
+      l_aoFiltres = l_aoFiltres.filter((l_oItem: Item): boolean => l_oItem.title.toLowerCase().includes(l_sMotCle));
     }
 
-    const l_iTotal  : number = l_aoFiltres.length;
-    const l_iOffset : number = p_oOptions?.offset ?? 0;
-    const l_iLimit  : number = p_oOptions?.limit  ?? 20;
+    // Algorithme de tri déterministe obligatoire émulant le moteur SQL
+    const l_sCleTri = p_oOptions.ColonneTri === 'itCreatedAt' ? 'createdAt' : 'title';
+    l_aoFiltres.sort((l_oA: any, l_oB: any): number => {
+      const l_vA = l_oA[l_sCleTri];
+      const l_vB = l_oB[l_sCleTri];
+      return p_oOptions.OrdreAff?.toString() === 'DESC'
+        ? (l_vA > l_vB ? -1 : 1)
+        : (l_vA < l_vB ? -1 : 1);
+    });
+
+    const l_nTotal: number       = l_aoFiltres.length;
+    const l_nLigneDebut: number  = p_oOptions.LigneDebut;
+    const l_nNbLignesDem: number = p_oOptions.NbLignes;
+
+    const l_aoLignesPage = l_aoFiltres.slice(l_nLigneDebut, l_nLigneDebut + l_nNbLignesDem);
 
     return {
-      items : l_aoFiltres.slice(l_iOffset, l_iOffset + l_iLimit),
-      total : l_iTotal
+      LigneDebut:    l_nLigneDebut,
+      NbLignesDem:   l_nNbLignesDem,
+      NbLignesRenv:  l_aoLignesPage.length,
+      NbLignesTotal: l_nTotal,
+      Lignes:        l_aoLignesPage
     };
   }
 
@@ -123,8 +138,8 @@ export class MockItemRepository implements IItemRepository {
   public async create(p_oData: IItemData): Promise<Item> {
     const l_oItem = new Item({
       ...p_oData,
-      createdAt : new Date(),
-      updatedAt : new Date()
+      createdAt : p_oData.createdAt || new Date(),
+      updatedAt : p_oData.updatedAt
     });
     this.getItems().push(l_oItem);
     return l_oItem;
@@ -140,7 +155,7 @@ export class MockItemRepository implements IItemRepository {
    * @returns {Promise<Item>} L'entité Domaine modifiée au bit près
    */
   public async update(p_oIdItem: ItemId, p_oData: Partial<IItemData>): Promise<Item> {
-    const l_iIdx: number = this.getItems().findIndex((l_oItem: Item): boolean => l_oItem.getItemId().estEgalA(p_oIdItem));
+    const l_iIdx: number = this.getItems().findIndex((l_oItem: Item): boolean => l_oItem.idItem.estEgalA(p_oIdItem));
 
     if (l_iIdx === -1) {
       throw new Error(`[Mock 🚨] Item unique ID ${p_oIdItem.toString()} introuvable pour l'update.`);
@@ -150,9 +165,8 @@ export class MockItemRepository implements IItemRepository {
     const l_oMute    = new Item({
       ...l_oCourant,
       ...p_oData,
-      idItem    : p_oIdItem,
       updatedAt : new Date()
-    });
+    } as any);
 
     this.getItems()[l_iIdx] = l_oMute;
     return l_oMute;
@@ -179,9 +193,8 @@ export class MockItemRepository implements IItemRepository {
    */
   public async delete(p_oIdItem: ItemId): Promise<boolean> {
     const l_iTailleInitiale: number = this.getItems().length;
-    const l_aoNettoye = this.getItems().filter((l_oItem: Item): boolean => !l_oItem.getItemId().estEgalA(p_oIdItem));
+    const l_aoNettoye = this.getItems().filter((l_oItem: Item): boolean => !l_oItem.idItem.estEgalA(p_oIdItem));
 
-    // Réassignation propre du conteneur privé
     this.m_aoItems = l_aoNettoye;
     return this.m_aoItems.length < l_iTailleInitiale;
   }

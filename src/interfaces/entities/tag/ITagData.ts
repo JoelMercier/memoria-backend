@@ -21,7 +21,7 @@ import type { IBaseEntityData } from '@/interfaces/entities/IBaseEntityData';
 export interface ITagData extends IBaseEntityData<'tag', TagId> {
 
   /** 👥 Identifiant unique et fortement typé de l utilisateur propriétaire. */
-  userId : UserId;
+  idUser : UserId;
 
   /** 📝 Nom textuel explicite et qualifié du mot-clé (Tag). */
   tagName : string;

@@ -7,6 +7,7 @@ import { UserId, AppEventId,
          EventActionId      } from '@/domain/value-objects/ids';
 import { AppEvent           } from '@/entities/AppEvent';
 import { IListOptions       } from '@/interfaces/shared/IListOptions';
+import { IBaseRepository    } from '@/interfaces/repositories/IBaseRepository';
 
 /**
  * 📋 Interface exclusive pour le sac de données brutes de l'événement d'audit.
@@ -20,31 +21,31 @@ import { IListOptions       } from '@/interfaces/shared/IListOptions';
  */
 export interface IAppEventData {
   /** 🤖 L'identifiant binaire fort obligatoire pour l'entité [Mémoria] */
-  idAppEvent     : AppEventId;
+  idAppEvent   : AppEventId;
 
   /** 👥 L'identifiant unique de l'acteur (Peut être null pour le système ou le RGPD) */
-  userId         : UserId | null;
+  userId       : UserId | null;
 
   /** 📅 La date d'enregistrement immuable calculée par la RAM du Domaine */
-  createdAt      : Date;
+  createdAt    : Date;
 
   /** 📥 [RÉPARÉ V4] Le Secteur fonctionnel typé (Char(4) - ex: 'AUTH', 'PEPI') */
-  aeSecteurId    : EventSecteurId;
+  SecteurId    : EventSecteurId;
 
   /** ⚙️ [RÉPARÉ V4] L'action technique typée (Char(4) - ex: 'CONN', 'CREA') */
-  aeActionId     : EventActionId;
+  ActionId     : EventActionId;
 
   /** 📂 La catégorie fonctionnelle parente au format quadrigramme */
-  aeCategoryId   : AppEventCategory;
+  CategoryId   : AppEventCategory;
 
   /** ⚠️ L'objet sévérité riche contenant le poids numérique machine */
-  aeSeverityId   : AppEventSeverity;
+  SeverityId   : AppEventSeverity;
 
   /** 📦 Libellé textuel ou message intelligible de l'événement pour l'écran */
-  aeMessage      : string;
+  Message      : string;
 
   /** 🗄️ Le dictionnaire Jsonb de contexte technique (IP, user-agent) [Mémoria] */
-  aeMetadata     : Record<string, unknown>;
+  Metadata     : Record<string, unknown>;
 }
 
 /**
@@ -58,13 +59,13 @@ export interface IAppEventListOptions extends IListOptions {
   /** 👥 Filtre optionnel ciblant les traces d'un acteur spécifique */
   userId?        : UserId;
   /** 📥 [ALIGNÉ V4] Filtre optionnel sur le Secteur fonctionnel de soute */
-  aeSecteurId?   : EventSecteurId;
+  secteurId?   : EventSecteurId;
   /** ⚙️ Filtre optionnel sur l'action technique unitaire */
-  aeActionId?    : EventActionId;
+  actionId?    : EventActionId;
   /** 📂 Filtre optionnel sur la catégorie fonctionnelle parente */
-  aeCategoryId?  : AppEventCategory;
+  categoryId?  : AppEventCategory;
   /** ⚠️ Filtre optionnel sur le palier de sévérité critique minimal (Filtre incrémental) */
-  aeSeverityId?  : AppEventSeverity;
+  severityId?  : AppEventSeverity;
 }
 
 /**
@@ -85,10 +86,12 @@ export interface IAppEventListResult {
  * ----------------------------------------------------------------------------
  * Contrat d'infrastructure gérant les flux d'écriture et de lecture de l'audit.
  * Verrouillé contre les extractions massives anarchiques destructrices de RAM.
+ * Connected explicitly to the universal maman IBaseRepository framework V4.
  *
  * @interface IAppEventRepository
+ * @extends {IBaseRepository<AppEvent, IAppEventData, AppEventId>}
  */
-export interface IAppEventRepository {
+export interface IAppEventRepository extends IBaseRepository<AppEvent, IAppEventData, AppEventId> {
   /**
    * 🔎 Extrait un événement d'audit unique par son identifiant de soute.
    *

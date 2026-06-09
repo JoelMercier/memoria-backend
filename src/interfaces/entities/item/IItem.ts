@@ -19,29 +19,29 @@ import type { IItemData      } from '@/interfaces/entities/item/IItemData';
 export interface IItem extends IEntity<IItemData> {
 
   /** 🔔 Accesseur vers l'identifiant unique fort de la pépite */
-  getItemId(): ItemId;
+  get idItem(): ItemId;
 
   /** 👥 Accesseur vers l'identifiant unique fort du propriétaire */
-  getUserId(): UserId;
+  get idUser(): UserId;
 
   /** 🏷️ Accesseur vers le type de contenu sémantique du Smart Enum */
-  getContentType(): ContentType;
+  get contentType(): ContentType;
 
   /** 📝 Accesseur vers le titre principal */
-  getTitle(): string;
+  get title(): string;
 
   /** 🛤️ Accesseur vers le permalien normalisé (Slug) */
-  getSlug(): string;
+  get slug(): string;
 
   /** 📄 Accesseur vers le corps ou payload textuel */
-  getContent(): string;
+  get content(): string;
 
   /** ✍️ Accesseur vers l'auteur original ou la provenance */
-  getSourceAuthor(): string;
+  get sourceAuthor(): string;
 
   /** 🖼️ Accesseur vers l'URL optionnelle de la miniature d'illustration */
-  getThumbnailUrl(): string | null | undefined;
+  get thumbnailUrl(): string | null | undefined;
 
   /** 🎛️ Accesseur vers les métadonnées d'infrastructure dynamiques */
-  getMetadata(): Record<string, unknown>;
+  get metadata(): Record<string, unknown>;
 }

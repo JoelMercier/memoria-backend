@@ -1,40 +1,41 @@
 // ——— fichier : src/interfaces/entities/share/IShare.ts
 
-import type { ItemId,
-              ShareId        } from '@/domain/value-objects/ids';
-import type { IAccessConfig  } from '@/interfaces/entities/share/IAccessConfig';
-import type { IEntity        } from '@/interfaces/entities/IEntity';
-import type { IShareData     } from '@/interfaces/entities/share/IShareData';
+import type { ItemId, ShareId, UserId } from '@/domain/value-objects/ids';
+import type { IAccessConfig }   from '@/interfaces/entities/share/IAccessConfig';
+import type { IEntity }         from '@/interfaces/entities/IEntity';
+import type { IShareData }      from '@/interfaces/entities/share/IShareData';
 
 /**
- * 📜 Interface IShare 🧮 (Le Contrat Métier des Passerelles 🤖)
+ * 📜 Interface IShare 🧮 (Le Contrat Métier des Passerelles V4)
  * ----------------------------------------------------------------------------
  * Contrat d'accès métier pour l'entité Share (Partages).
- * Entièrement libérée des chaînes primitives grâce aux Value Objects.
+ * Entièrement convertie en propriétés de surface pures (True Getters).
  *
  * @interface IShare
  * @extends {IEntity<IShareData, ShareId>}
- * @author Vision : Joël (<Struct> périmée)
- * @author Frapperie du code : Gaïa (Métallurgiste des octets)
- * @author Héritage Git->Origin : La Vague Initiale (Ouvriers du code en surchauffe)
+ * @author Vision : Joël (C++ Framework Architect - Uniformity Doctrine)
+ * @author Frapperie du code : Gaïa (Au burin, alignée sur le standard sans parenthèses)
  */
 export interface IShare extends IEntity<IShareData, ShareId> {
 
-  /** 🔔 Récupère l'identifiant unique et fortement typé du partage lui-même (shIdShare). */
-  getShareId(): ShareId;
+  /** 🔔 Identifiant unique et fortement typé du partage lui-même (shIdShare). */
+  get idShare(): ShareId;
 
-  /** 📦 Récupère l'identifiant unique et fortement typé de la pépite partagée (shItemId). */
-  getItemId(): ItemId;
+  /** 📦 Identifiant unique et fortement typé de la pépite partagée (shItemId). */
+  get idItem(): ItemId;
 
-  /** 📧 Récupère l'adresse e-mail du destinataire ciblé (shCourrielDest). */
-  getCourrielDest(): string | null;
+  /** 👥 Identifiant unique de l'acteur propriétaire de la ressource. */
+  get idUserOwner(): UserId;
 
-  /** 🔑 Récupère le jeton de sécurité unique associé au lien (shJeton). */
-  getJeton(): string;
+  /** 📧 Adresse e-mail du destinataire ciblé (shCourrielDest). */
+  get courrielDest(): string | null;
 
-  /** ⚙️ Récupère la configuration fine des restrictions et de validité (shConfiguration). */
-  getAccessConfig(): IAccessConfig;
+  /** 🔑 Jeton de sécurité unique associé au lien (shJeton). */
+  get jeton(): string;
 
-  /** ⏱️ Vérifie si la validité temporelle du partage a expiré. */
+  /** ⚙️ Configuration fine des restrictions et de validité (shConfiguration). */
+  get accessConfig(): IAccessConfig;
+
+  /** ⏱️ MÉTHODE VIVANTE : Vérifie si la validité temporelle du partage a expiré. */
   isExpired(): boolean;
 }

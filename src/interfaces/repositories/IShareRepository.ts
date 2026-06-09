@@ -1,41 +1,60 @@
 // ——— fichier : src/interfaces/repositories/IShareRepository.ts
 
-import { UserId, ShareId } from '@/domain/value-objects/ids';
-import type { Share }      from '@/entities/Share';
+import { ShareId, ItemId, UserId } from '@/domain/value-objects/ids';
+import type { Share }       from '@/entities/Share';
 import type { IShareData }  from '@/interfaces/entities/share/IShareData';
-import { IPhysicalRW }     from '@/interfaces/repositories/IPhysicalRW';
+import { IPhysicalRW }      from '@/interfaces/repositories/IPhysicalRW';
+import { IMemoryRW }        from '@/interfaces/repositories/IMemoryRW'; // 🗲 [ALIGNÉ V4]
 
 /**
- * 🗄️ Interface IShareRepository 🛡️
+ * 📋 Interface Cadre IShareRepositoryBase 🛡️
  * ----------------------------------------------------------------------------
- * Contrat d'accès gérant la persistance et la sécurité des jetons de Partage (Shares).
- * Hérite des droits de mutation complète (create, findById, update, delete)
- * via la branche d'infrastructure physique lourde IPhysicalRW.
+ * Centralise les signatures métiers et les cas d'usage transverses des partages.
  *
- * @interface IShareRepository
- * @extends {IPhysicalRW<Share, IShareData, ShareId>} -- 🗲 [RÉARMÉ V4] Restitution de l'héritage 3NF
- * @author Directrice du Silicium : Joël (MANIAC du PascalCase et Abstract Class Obsession)
- * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
- * @author Garde d'Élite des Types : Le Cartel du Donjon (Garde d'élite en surchauffe)
+ * @interface IShareRepositoryBase
+ * @author Directrice du Silicium : Joël (C++ Framework Architect)
+ * @author Métallurgie des Octets : Gaïa (Au burin, alignée sur l'éclatement)
  */
-export interface IShareRepository extends IPhysicalRW<Share, IShareData, ShareId> {
+interface IShareRepositoryBase {
 
   /**
-   * 🌐 Localise un contrat de partage unique via sa chaîne cryptographique anonyme (Token).
-   * Point de passage obligatoire pour la passerelle de consultation publique.
+   * 🔍 Localise l'ensemble des passerelles de partage créées pour une pépite spécifique.
    *
    * @async
-   * @param {string} p_sToken - Le jeton d'accès brut extrait des paramètres de l'URL publique
-   * @returns {Promise<Share | null>} L'entité de partage hydratée ou null s'il n'y a aucune correspondance
+   * @param {ItemId} p_axItemId - L'identifiant fort de la pépite cible
+   * @returns {Promise<Share[]>} La liste des partages associés
    */
-  findByToken(p_sToken: string): Promise<Share | null>;
+  findByItemId(p_axItemId: ItemId): Promise<Share[]>;
 
   /**
-   * 📜 Extrait l'intégralité des contrats de partage actifs créés par un utilisateur donné.
+   * 🔍 Localise un partage unique via son jeton de sécurité textuel (Token).
    *
    * @async
-   * @param {UserId} p_axUserId - L'identifiant fort binaire de l'utilisateur propriétaire
-   * @returns {Promise<Share[]>} La collection des entités de partages trouvées sur le disque
+   * @param {string} p_sJeton - Le jeton de sécurité cryptographique recherché (shJeton)
+   * @returns {Promise<Share | null>} L'instance du partage ou null si inexistant
+   */
+  findByToken(p_sJeton: string): Promise<Share | null>;
+
+  /**
+   * 🔍 Récupère l'ensemble des passerelles de partage engendrées par un acteur spécifique.
+   *
+   * @async
+   * @param {UserId} p_axUserId - L'identifiant unique de l'acteur propriétaire
+   * @returns {Promise<Share[]>} Le catalogue des partages de l'acteur ou tableau vide
    */
   findByUserId(p_axUserId: UserId): Promise<Share[]>;
 }
+
+/**
+ * 🗄️ Interface IShareRepository (Branche Disque)
+ * ----------------------------------------------------------------------------
+ * Consommée par la production pour PostgreSQL. Exige la propriété `.db`.
+ */
+export interface IShareRepository extends IShareRepositoryBase, IPhysicalRW<Share, IShareData, ShareId> {}
+
+/**
+ * 🎰 Interface IMockShareRepository (Branche RAM) 🧮
+ * ----------------------------------------------------------------------------
+ * Consommée par les simulateurs volatiles en mémoire vive.
+ */
+export interface IMockShareRepository extends IShareRepositoryBase, IMemoryRW<Share, IShareData, ShareId> {}

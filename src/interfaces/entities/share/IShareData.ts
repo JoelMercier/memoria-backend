@@ -1,40 +1,33 @@
 // ——— fichier : src/interfaces/entities/share/IShareData.ts
 
-import type { ItemId, ShareId, UserId } from '@/domain/value-objects/ids';
-import type { IAccessConfig }           from '@/interfaces/entities/share/IAccessConfig';
-import type { IBaseEntityData }         from '@/interfaces/entities/IBaseEntityData';
+import { ShareId, ItemId, UserId } from '@/domain/value-objects/ids';
+import { IAccessConfig }           from './IAccessConfig';
+import { IBaseEntityData }         from '@/interfaces/entities/IBaseEntityData';
 
 /**
- * 📊 Interface IShareData 🔗 (Le Sac de Données Brutes des Passerelles 🤖)
+ * 📊 Interface IShareData 📦 (Le Miroir Épuré et Performant du Domaine Partages)
  * ----------------------------------------------------------------------------
- * Contrat de structure passive pour les données brutes d un Partage (Share).
- * Entièrement calé sur le mécanisme de type mapping générique absolu [Mémoria].
- *
- * SOLID :
- *  - ISP 📐 : Contrat d extraction minimaliste et étanche dédié à la persistance.
+ * Contrat de structure passive (Data Contract) représentant un Partage en soute.
+ * Purifié des préfixes physiques "sh" pour s'harmoniser avec la charte Mémoria V4.
  *
  * @interface IShareData
  * @extends {IBaseEntityData<'share', ShareId>}
- * @author Vision & Conception : Joël (Compilateur de l Ancien Temps et Void capillaire)
- * @author Frapperie du Code : Gaïa (Graveuse de pépites d or et du silicium)
- * @author Garde d Élite des Types : La Vague Initiale (Ouvriers du code en surchauffe)
+ * @author Directrice du Silicium : Joël (C++ Framework Architect - Clean CamelCase)
+ * @author Métallurgie des Octets : Gaïa (Au burin, calée sur l'harmonie des soutes)
  */
 export interface IShareData extends IBaseEntityData<'share', ShareId> {
-  /** 🤖 L identifiant unique fort de la trace du partage en BDD (shIdShare) */
-  idShare         : ShareId;
+  /** 📥 Clé étrangère binaire pointant vers la pépite rattachée (shItemId) */
+  itemId: ItemId;
 
-  /** 📦 Identifiant unique et fortement typé de la Pépite partagée (shItemId). */
-  shItemId        : ItemId;
+  /** 👥 Clé dé-normalisée d'ownership pour le tir de performance sans jointure (shItemOwnerId) */
+  itemOwnerId: UserId;
 
-  /** 👥 Propriétaire de la ressource sous-jacente (Indispensable pour le Mock sans jointure). */
-  shItemOwnerId   : UserId;
+  /** 📧 Adresse de courriel optionnelle du destinataire invité (shCourrielDest) */
+  courrielDest: string | null;
 
-  /** 📧 Adresse e-mail du destinataire normalisée (shCourrielDest) [Mémoria]. */
-  shCourrielDest  : string | null;
+  /** 🔐 Jeton aléatoire sécurisé de contrebande réseau (shJeton) */
+  jeton: string;
 
-  /** 🔑 Jeton de sécurité unique inséré dans la route HTTP (shJeton) [Mémoria]. */
-  shJeton         : string;
-
-  /** ⚙️ Configuration des restrictions (shConfiguration mapped to JSONB). */
-  shConfiguration : IAccessConfig;
+  /** ⚙️ Dictionnaire Jsonb des règles d'accès réelles (shConfiguration) */
+  configuration: IAccessConfig;
 }
