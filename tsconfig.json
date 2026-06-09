@@ -27,6 +27,6 @@
   "scripts": {
    "start": "cross-env NODE_OPTIONS=--trace-deprecation react-scripts start",
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/interfaces/repositories/IBlacklistRepository.ts"],
   "exclude": ["node_modules", "dist"]
 }

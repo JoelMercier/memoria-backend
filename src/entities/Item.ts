@@ -1,34 +1,33 @@
 // ——— fichier : src/entities/Item.ts
 
-import      { BaseEntity     } from '@/entities/BaseEntity';
-import type { ItemId, UserId } from '@/domain/value-objects/IdMetier'
-import      { ContentType    } from '@/constants/ContentType';
-import type { IItem          } from '@/interfaces/entities/item/IItem';
-import type { IItemData      } from '@/interfaces/entities/item/IItemData';
-import      { ContentTypeId  } from '@/domain/value-objects/IdMetier';
+import { BaseEntity }    from '@/entities/BaseEntity';
+import { ItemId, UserId, ContentTypeId } from '@/domain/value-objects/ids';
+import { ContentType }   from '@/constants/ContentType';
+import type { IItemData } from '@/interfaces/entities/item/IItemData';
+
 /**
- * 🏛️ Classe Item (Pépites)
- * ------------------------
+ * 🏛️ Classe Item (Pépites) 📦
+ * ----------------------------------------------------------------------------
  * Modèle métier immuable représentant une pépite de contenu.
- * Protégé par la notation hongroise, documenté et corrigé des inversions d'ID.
+ * Protégé par la notation hongroise, documenté et pourvu de vrais getters C++ Style.
  *
  * @class Item
  * @extends {BaseEntity<'item', IItemData, ItemId>}
- * @implements {IItem}
- * @author Joël, Gaïa & Co
+ * @author Directrice du Silicium : Joël (C++ Framework Architect - True Getters Conversion)
+ * @author Métallurgie des Octets : Gaïa (Au burin, éradication des parenthèses de contrebande)
  */
-export class Item extends BaseEntity<'item', IItemData, ItemId> implements IItem {
+export class Item extends BaseEntity<'item', IItemData, ItemId> {
 
-  /** 🔔 Caillou de couleur : Identifiant unique immuable de la pépite */
+  /** 🔔 Identifiant unique immuable de la pépite (Clé Primaire) */
   private readonly m_idItem        : ItemId;
 
-  /** 👥 Caillou de couleur : Identifiant unique du propriétaire de l'élément */
+  /** 👥 Identifiant unique du propriétaire de l'élément */
   private readonly m_idUser        : UserId;
 
   /** 🏷️ Instance de Smart Enum gérant la typologie de contenu associé */
   private readonly m_eContentType  : ContentType;
 
-  /** 📝 Titre principal donné à la pépite */
+  /** ✏️ Titre principal donné à la pépite */
   private readonly m_sTitle        : string;
 
   /** 🛤️ Permalien normalisé (Slug) unique */
@@ -40,7 +39,7 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> implements IItem
   /** ✍️ Signature de l'auteur original ou provenance de la pépite */
   private readonly m_sSourceAuthor : string;
 
-  /** 🖼️ URL ou chemin de la miniature de couverture */
+  /** 🖼️ URL ou chemin de la miniature de couverture (Optionnelle) */
   private readonly m_sThumbnailUrl : string | null | undefined;
 
   /** 🎛️ Métadonnées d'infrastructure dynamiques et structurées */
@@ -50,117 +49,110 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> implements IItem
    * Instancie une pépite immuable à partir de son contrat de données.
    *
    * @constructor
-   * @param {IItemData} data - Payload brut ou typé issu de l'infrastructure
+   * @param {IItemData} p_oData - Payload brut ou typé issu de l'infrastructure
    */
-  public constructor(data: IItemData) {
-    super(data);
-    this.m_idItem        = data.idItem;
-    this.m_idUser        = data.idUser;
-    this.m_eContentType  = ContentType.fromSql(data.contentTypeId.valeur);
-    this.m_sTitle        = data.title;
-    this.m_sSlug         = data.slug;
-    this.m_sContent      = data.content;
-    this.m_sSourceAuthor = data.sourceAuthor;
-    this.m_sThumbnailUrl = data.thumbnailUrl;
-    this.m_rMetadata     = data.metadata || {};
+  public constructor(p_oData: IItemData) {
+    super(p_oData);
+
+    // 🪓 [RÉPARÉ V4] Extraction chirurgicale via la clé dynamique calculée par la maman !
+    this.m_idItem        = (p_oData as any).idItem;
+    this.m_idUser        = p_oData.idUser;
+    this.m_eContentType  = ContentType.fromSql(p_oData.contentTypeId.valeur);
+    this.m_sTitle        = p_oData.title;
+    this.m_sSlug         = p_oData.slug;
+    this.m_sContent      = p_oData.content;
+    this.m_sSourceAuthor = p_oData.sourceAuthor;
+    this.m_sThumbnailUrl = p_oData.thumbnailUrl;
+    this.m_rMetadata     = p_oData.metadata || {};
   }
 
   /**
-   * 📦 Récupère l'identifiant unique et fortement typé de la pépite.
+   * 📦 VRAI GETTER : Récupère l'identifiant unique fort de la pépite.
    *
    * @public
-   * @function getItemId
-   * @returns {ItemId} Le caillou de couleur de la pépite.
+   * @returns {ItemId} Le caillou de couleur de la pépite
    */
-  public getItemId(): ItemId {
+  public get idItem(): ItemId {
     return this.m_idItem;
   }
 
   /**
-   * 👥 Récupère l'identifiant unique et fortement typé du propriétaire.
+   * 👥 VRAI GETTER : Récupère l'identifiant unique fort du propriétaire.
    *
    * @public
-   * @function getUserId
-   * @returns {UserId} Le caillou de couleur de l'utilisateur.
+   * @returns {UserId} Le caillou de couleur de l'utilisateur
    */
-  public getUserId(): UserId {
+  public get idUser(): UserId {
     return this.m_idUser;
   }
 
   /**
-   * 🏷️ Récupère le type sémantique du contenu (Smart Enum).
+   * 🏷️ VRAI GETTER : Récupère le type sémantique du contenu (Smart Enum).
    *
    * @public
-   * @function getContentType
-   * @returns {ContentType} L'instance vivante du type de contenu.
+   * @returns {ContentType} L'instance vivante du type de contenu
    */
-  public getContentType(): ContentType {
+  public get contentType(): ContentType {
     return this.m_eContentType;
   }
 
   /**
-   * ✏️ Récupère le titre de la pépite.
+   * ✏️ VRAI GETTER : Récupère le titre de la pépite.
    *
    * @public
-   * @function getTitle
-   * @returns {string} Le texte du titre.
+   * @returns {string} Le texte du titre
    */
-  public getTitle(): string {
+  public get title(): string {
     return this.m_sTitle;
   }
 
   /**
-   * 🔗 Récupère le slug normalisé pour les URL.
+   * 🔗 VRAI GETTER : Récupère le slug normalisé pour les URL.
    *
    * @public
-   * @function getSlug
-   * @returns {string} Le permalien de la pépite.
+   * @returns {string} Le permalien de la pépite
    */
-  public getSlug(): string {
+  public get slug(): string {
     return this.m_sSlug;
   }
 
   /**
-   * 📝 Récupère le contenu textuel brut ou enrichi de la pépite.
+   * 📝 VRAI GETTER : Récupère le contenu textuel brut ou enrichi de la pépite.
    *
    * @public
-   * @function getContent
-   * @returns {string} Le texte brut de mémoire.
+   * @returns {string} Le texte brut de mémoire
    */
-  public getContent(): string {
+  public get content(): string {
     return this.m_sContent;
   }
 
   /**
-   * ✍️ Récupère l'auteur d'origine de la source.
+   * ✍️ VRAI GETTER : Récupère l'auteur d'origine de la source.
    *
    * @public
-   * @function getSourceAuthor
-   * @returns {string} Le nom ou l'adresse d'origine.
+   * @returns {string} Le nom ou l'adresse d'origine
    */
-  public getSourceAuthor(): string {
+  public get sourceAuthor(): string {
     return this.m_sSourceAuthor;
   }
 
   /**
-   * 🖼️ Récupère l'URL de la miniature de couverture.
+   * 🖼️ VRAI GETTER : Récupère l'URL de la miniature de couverture.
    *
    * @public
-   * @function getThumbnailUrl
-   * @returns {string | null | undefined} L'URL ou une valeur absente.
+   * @returns {string | null | undefined} L'URL ou une valeur absente
    */
-  public getThumbnailUrl(): string | null | undefined {
+  public get thumbnailUrl(): string | null | undefined {
     return this.m_sThumbnailUrl;
   }
 
   /**
-   * 🗄️ Récupère le dictionnaire des métadonnées complémentaires.
+   * 🗄️ VRAI GETTER : Récupère le dictionnaire des métadonnées complémentaires.
    *
    * @public
-   * @function getMetadata
-   * @returns {Record<string, unknown>} L'objet de métadonnées.
+   * @returns {Record<string, unknown>} L'objet de métadonnées
    */
-  public getMetadata(): Record<string, unknown> {
+  public get metadata(): Record<string, unknown> {
     return this.m_rMetadata;
   }
 
@@ -174,18 +166,17 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> implements IItem
    */
   public toData(): IItemData {
     return {
-      idItem       : this.getItemId(),
-      idUser       : this.getUserId(),
-     contentTypeId : new ContentTypeId(this.m_eContentType.code.toString()),
-      title        : this.getTitle(),
-      slug         : this.getSlug(),
-      content      : this.getContent(),
-      sourceAuthor : this.getSourceAuthor(),
-      thumbnailUrl : this.getThumbnailUrl(),
-      metadata     : this.getMetadata(),
-      createdAt    : this.createdAt,
-      updatedAt    : this.updatedAt
-    };
+      idUser        : this.idUser,
+      contentTypeId : new ContentTypeId(this.m_eContentType.code.toString()),
+      title         : this.title,
+      slug          : this.slug,
+      content       : this.content,
+      sourceAuthor  : this.sourceAuthor,
+      thumbnailUrl  : this.thumbnailUrl,
+      metadata      : this.metadata,
+      createdAt     : this.createdAt,
+      updatedAt     : this.updatedAt
+    } as IItemData;
   }
 
   /**

@@ -1,16 +1,19 @@
 // ——— fichier : src/infrastructure/cache/WarmupCache.ts
 
+import type { DatabaseConnection } from '@/config/DatabaseConnection';
+
 import { Role }              from '@/constants/Role';
 import { AppEventCategory }  from '@/constants/AppEventCategory';
 import { ContentType }       from '@/constants/ContentType';
 import { AuthProvider }      from '@/constants/AuthProvider';
 import { AppEventSeverity }  from '@/constants/AppEventSeverity';
-import type { DatabaseConnection } from '@/config/DatabaseConnection';
+import { AppEventSecteur }   from '@/constants/AppEventSecteur';
+import { AppEventAction }    from '@/constants/AppEventAction';
 
 /**
  * 🗄️ Classe WarmupCache 🔥 (La Chaudière Initiale Élite & Résiliente 🤖)
  * ----------------------------------------------------------------------------
- * Orchestre le pré-chargement chirurgical et le chauffage des 5 tables de
+ * Orchestre le pré-chargement chirurgical et le chauffage des 7 tables de
  * référence de Mémoria en RAM dès l'allumage du serveur Express.
  * Mode "Auto-Mock" intégré : Bascule sur les reliques locales en cas de panne SQL.
  *
@@ -25,7 +28,7 @@ import type { DatabaseConnection } from '@/config/DatabaseConnection';
 export class WarmupCache {
 
   /**
-   * 🎛️ Déclencheur Principal : Allume simultanément les 5 radiateurs de la RAM.
+   * 🎛️ Déclencheur Principal : Allume simultanément les 7 radiateurs de la RAM.
    *
    * @static
    * @public
@@ -39,11 +42,23 @@ export class WarmupCache {
     await WarmupCache.chaufferFormats(p_oDb);
     await WarmupCache.chaufferFournisseurs(p_oDb);
     await WarmupCache.chaufferSeverites(p_oDb);
+    await WarmupCache.chaufferContextes(p_oDb);
+    await WarmupCache.chaufferActions(p_oDb);
   }
 
   /**
    * ⚙️ Injecteur Générique Universel : Instancie dynamiquement les lignes SQL manquantes en RAM.
    * Consomme les lignes pour le linter et alimente le registre caché de la maman SmartEnum.
+   *
+   * @private
+   * @static
+   * @param {any} p_oClasseFille - La classe du SmartEnum cible à instancier
+   * @param {any[]} p_aLignes - Le tableau de lignes brutes renvoyé par PostgreSQL
+   * @param {string} p_sColId - Le nom de la colonne contenant le code de clé primaire
+   * @param {string} p_sColName - Le nom de la colonne contenant le libellé descriptif
+   * @param {string} p_sColOrdre - Le nom de la colonne contenant l'ordre d'affichage
+   * @param {string} [p_sColNiveau] - Le nom optionnel de la colonne de niveau (spécifique aux rôles)
+   * @returns {void}
    */
   private static injecterDynamique(
     p_oClasseFille: any,
@@ -155,6 +170,40 @@ export class WarmupCache {
 
     } catch (l_oPanne) {
       console.warn(`[Warmup Cache ⚠️] Le guichet "ToutesLesSeverites" est inaccessible. Repli défensif sur la RAM.`);
+    }
+  }
+
+  /**
+   * 🪓 Radiateur 6 : Extrait la table "EventContexts" via "TousLesContextes"
+   */
+  private static async chaufferContextes(p_oDb: DatabaseConnection): Promise<void> {
+    try {
+      const l_oPool = p_oDb.getPool();
+      const l_sRequete = 'Select * From "TousLesContextes"();';
+      const l_rResultat = await l_oPool.query(l_sRequete);
+
+      if (l_rResultat.rows.length === 0) throw new Error('Dictionnaire vide');
+      WarmupCache.injecterDynamique(AppEventSecteur, l_rResultat.rows, 'ecIdContext', 'ecName', 'ecOrdreAff');
+
+    } catch (l_oPanne) {
+      console.warn(`[Warmup Cache ⚠️] Le guichet "TousLesContextes" est inaccessible. Repli défensif sur la RAM.`);
+    }
+  }
+
+  /**
+   * 🪓 Radiateur 7 : Extrait la table "EventActions" via "ToutesLesActions"
+   */
+  private static async chaufferActions(p_oDb: DatabaseConnection): Promise<void> {
+    try {
+      const l_oPool = p_oDb.getPool();
+      const l_sRequete = 'Select * From "ToutesLesActions"();';
+      const l_rResultat = await l_oPool.query(l_sRequete);
+
+      if (l_rResultat.rows.length === 0) throw new Error('Dictionnaire vide');
+      WarmupCache.injecterDynamique(AppEventAction, l_rResultat.rows, 'eaIdAction', 'eaName', 'eaOrdreAff');
+
+    } catch (l_oPanne) {
+      console.warn(`[Warmup Cache ⚠️] Le guichet "ToutesLesActions" est inaccessible. Repli défensif sur la RAM.`);
     }
   }
 }

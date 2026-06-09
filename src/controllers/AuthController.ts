@@ -14,7 +14,7 @@ import type { IUserRepository    } from '@/interfaces/repositories/IUserReposito
 import type { IAuthService       } from '@/interfaces/services/IAuthService';
 import      { ApiResponseFactory } from '@/utils/ApiResponseFactory';
 import      { RequestIdGenerator } from '@/utils/RequestIdGenerator';
-import      { UserId             } from '@/domain/value-objects/IdMetier';
+import      { UserId             } from '@/domain/value-objects/ids';
 
 /**
  * 🏛️ Classe AuthController

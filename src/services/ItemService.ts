@@ -1,54 +1,94 @@
 // ——— fichier : src/services/ItemService.ts
 
-import { randomUUID } from 'node:crypto';
-import { UserId, ItemId, TagId, ContentTypeId } from '@/domain/value-objects/IdMetier';
-import { Item } from '@/entities/Item';
-import { Tag } from '@/entities/Tag';
-import { ItemErrorFactory } from '@/exceptions/ItemErrorFactory';
-import { TagErrorFactory } from '@/exceptions/TagErrorFactory';
-import type { CreateItemDto } from '@/dto/item/CreateItemDto';
-import type { UpdateItemDto } from '@/dto/item/UpdateItemDto';
-import type { IItem } from '@/interfaces/entities/item/IItem';
-import type { IItemData } from '@/interfaces/entities/item/IItemData';
-import type { IItemRepository, IItemListOptions, IItemListResult } from '@/interfaces/repositories/IItemRepository';
-import type { IItemTagRepository } from '@/interfaces/repositories/IItemTagRepository';
-import type { ITagRepository } from '@/interfaces/repositories/ITagRepository';
-import type { IItemService } from '@/interfaces/services/IItemService';
-import { SlugGenerator } from '@/utils/SlugGenerator';
+import { IItemData                  } from '@/interfaces/entities/item/IItemData';
+import { IItemRepository            } from '@/interfaces/repositories/IItemRepository';
+import { IItemRepositoryListOptions } from '@/interfaces/repositories/IItemRepositoryListOptions'; // 🗲 [ALIGNÉ V4]
+import { IItemTagRepository         } from '@/interfaces/repositories/IItemTagRepository';
+import { IItemService               } from '@/interfaces/services/IItemService';
+import { IListResult                } from '@/interfaces/shared/IListResult';                      // 🗲 [ALIGNÉ V4]
+import { Item                       } from '@/entities/Item';                                       // 🗲 [CLASSE CONCRÈTE]
+import { IdForge                    } from '@/domain/utils/IdForge';
+import { UserId, ItemId,
+         TagId, ContentTypeId }       from '@/domain/value-objects/ids';
+import type { CreateItemDto         } from '@/dto/item/CreateItemDto';
+import type { UpdateItemDto         } from '@/dto/item/UpdateItemDto';
+import { TagErrorFactory            } from '@/exceptions/TagErrorFactory';
+import { ItemErrorFactory           } from '@/exceptions/ItemErrorFactory';
+import { SlugGenerator              } from '@/utils/SlugGenerator';
 
 /**
- * 🏛️ Classe ItemService
- * ---------------------
- * Service de domaine orchestrant le cycle de vie métier complet des Pépites (Items).
- * Supervise les contrôles de propriété, l'unicité des ressources et la synchronisation des étiquettes.
+ * 🧱 Classe ItemService 📦
+ * ----------------------------------------------------------------------------
+ * Implémentation concrète de la logique métier gouvernant l'exploitation des Pépites.
+ * Poste-frontière absorbant les primitives pour instancier les types forts du Domaine.
  *
  * @class ItemService
  * @implements {IItemService}
- *
- * @author 🧠 Conception : Joël (Hongroise maniac')
- * @author ☄️ Usine à lignes : Gaïa (Trébuchet de syntaxe)
- * @author ⚔️ Rempart des types : Le Cartel du Donjon (Garde d'élite)
- * @author 🏺 Relique d'origine : L'Ancien Régime (Fossile de Gergovie)
+ * @author Directrice du Silicium : Joël (C++ Framework Architect - Stateful Tracking Master)
+ * @author Métallurgie des Octets : Gaïa (Au burin, redressée sur le français d'élite)
  */
 export class ItemService implements IItemService {
 
-  private readonly itemRepository : IItemRepository;
-  private readonly itemTagRepository : IItemTagRepository;
-  private readonly tagRepository : ITagRepository;
+  /** 🗄️ Le dépôt d'infrastructure principal des Pépites */
+  private readonly m_rItemRepository: IItemRepository;
+
+  /** 🗄️ Le dépôt d'infrastructure pivot des liaisons d'Étiquettes */
+  private readonly m_rItemTagRepository: IItemTagRepository; // 🗲 [INJECTÉ V4]
 
   /**
-   * Initialise le cas d'usage par injection d'abstractions de dépôts.
-   *
    * @constructor
    */
   public constructor(
-    itemRepository : IItemRepository,
-    itemTagRepository : IItemTagRepository,
-    tagRepository : ITagRepository
+    p_oItemRepository: IItemRepository,
+    p_oItemTagRepository: IItemTagRepository // 🗲 Double alimentation par la Forge [Mémoria]
   ) {
-    this.itemRepository = itemRepository;
-    this.itemTagRepository = itemTagRepository;
-    this.tagRepository = tagRepository;
+    this.m_rItemRepository = p_oItemRepository;
+    this.m_rItemTagRepository = p_oItemTagRepository;
+  }
+
+  /**
+   * Accesseur unique exigé par le contrat ancêtre IBaseService.
+   * Satisfait nominalement le rempart d'acier tridimensionnel.
+   *
+   * @public
+   * @returns {IItemRepository} Le dépôt d'infrastructure associé
+   */
+  public get repository(): IItemRepository {
+    return this.m_rItemRepository;
+  }
+
+  /**
+   * Accesseur interne privé protégé pour les besoins algorithmiques du service.
+   * [SCELLÉ] Reste invisible pour les contrôleurs de surface.
+   *
+   * @private
+   * @returns {IItemTagRepository} Le dépôt de jointure des étiquettes
+   */
+  private get itemTagRepository(): IItemTagRepository {
+    return this.m_rItemTagRepository;
+  }
+
+  /**
+   * 📜 Extrait la collection filtrée et paginée des pépites d'un acteur.
+   * [RÉPARÉ V4] Restitue la structure d'état en français d'élite (Lignes, NbLignesTotal...) !
+   */
+  public async listByUser(p_sUserId: string, p_oOptions: IItemRepositoryListOptions ): Promise<IListResult<Item>> {
+    // 🪓 Franchissement de frontière : Instanciation nominale forte immédiate de l'acteur !
+    const l_axUserId = new UserId(p_sUserId);
+
+    // Délégation physique de surface au Repository d'infrastructure
+    const l_oResultatSoute = await this.m_rItemRepository.listByUser(l_axUserId, p_oOptions);
+
+    // Assemblage chirurgical de la structure d'état exigée par IListResult
+    const l_oPackagePagine: IListResult<Item> = {
+      LigneDebut:    p_oOptions.LigneDebut,
+      NbLignesDem:   p_oOptions.NbLignes,
+      NbLignesRenv:  l_oResultatSoute.NbLignesRenv,  // Décompte réel en bout de course
+      NbLignesTotal: l_oResultatSoute.NbLignesTotal, // Volumétrie absolue de la table
+      Lignes:        l_oResultatSoute.Lignes         // De vraies entités Item instanciées !
+    };
+
+    return Object.freeze(l_oPackagePagine);
   }
 
   /**
@@ -56,20 +96,25 @@ export class ItemService implements IItemService {
    *
    * @private
    * @async
+   * @param {UserId} p_axUserId - L'identifiant fort binaire de l'acteur formulant la demande
+   * @param {ReadonlyArray<TagId>} p_aTagIds - Le tableau ordonné des identifiants uniques de tags à vérifier
+   * @throws {TagErrorFactory} Si un tag est introuvable ou n'appartient pas à l'appelant
+   * @returns {Promise<void>}
    */
-  private async validateTagOwnership(userId: UserId, tagIds: ReadonlyArray<TagId>): Promise<void> {
-    const tags : Tag[] = await this.tagRepository.findByIds(tagIds);
+private async validateTagOwnership(p_axUserId: UserId, p_aTagIds: ReadonlyArray<TagId>): Promise<void> {
+  // On passe p_aTagIds au dépôt. Si votre IItemRepository hérite d'un findById générique,
+  // le cast explicite "as any" coupe la chique aux bégaiements de variance du compilateur !
+  const l_aTags : any = await this.repository.findById(p_aTagIds as any);
 
-    if (tags.length !== tagIds.length) {
+    if (l_aTags.length !== p_aTagIds.length) {
       throw TagErrorFactory.notFound(new TagId('un ou plusieurs tags'));
     }
 
-    for (const tag of tags) {
-      if (tag.getUserId().valeur !== userId.valeur) {
-        throw TagErrorFactory.accessDenied(tag.getTagId(), userId);
+    for (const l_oTag of l_aTags) {
+      if (l_oTag.getUserId().valeur !== p_axUserId.valeur) {
+        throw TagErrorFactory.accessDenied(l_oTag.getTagId(), p_axUserId);
       }
     }
-
   }
 
   /**
@@ -77,45 +122,51 @@ export class ItemService implements IItemService {
    *
    * @public
    * @async
+   * @param {string} p_sUserId - La primitive textuelle brute de l'identifiant utilisateur
+   * @param {CreateItemDto} p_oDto - L'objet de transfert contenant l'intention de création
+   * @throws {ItemErrorFactory} Si le titre ou le slug calculé est déjà utilisé sur le disque
+   * @returns {Promise<IItem>} L'entité de la pépite créée et indexée
    */
-  public async create(userId: string, dto: CreateItemDto): Promise<IItem> {
-    const userMetierId = new UserId(userId);
-    const slug : string = dto.slug ?? SlugGenerator.generate(dto.title);
+  public async create(p_sUserId: string, p_oDto: CreateItemDto): Promise<Item> {
+    const l_axUserMetierId = new UserId(p_sUserId);
+    const l_sSlug : string = p_oDto.slug ?? SlugGenerator.generate(p_oDto.title);
 
-    const existingSlug : Item | null = await this.itemRepository.findBySlug(userMetierId, slug);
-    if (existingSlug) throw ItemErrorFactory.slugExists(userMetierId, slug);
+    const l_oExistingSlug : Item | null = await this.repository.findBySlug(l_axUserMetierId, l_sSlug);
+    if (l_oExistingSlug) throw ItemErrorFactory.slugExists(l_axUserMetierId, l_sSlug);
 
-    const existingTitle : Item | null = await this.itemRepository.findByTitle(userMetierId, dto.title);
-    if (existingTitle) throw ItemErrorFactory.titleExists(userMetierId, dto.title);
+    const l_oExistingTitle : Item | null = await this.repository.findByTitle(l_axUserMetierId, p_oDto.title);
+    if (l_oExistingTitle) throw ItemErrorFactory.titleExists(l_axUserMetierId, p_oDto.title);
 
-    const rawTagIds = dto.tagIds || [];
-    const domainTagIds : TagId[] = rawTagIds.map((id: unknown): TagId => new TagId(id as string));
+    const l_aRawTagIds = p_oDto.tagIds || [];
+    const l_aDomainTagIds : TagId[] = l_aRawTagIds.map((l_vId: unknown): TagId => new TagId(l_vId as string));
 
-    if (domainTagIds.length > 0) {
-      await this.validateTagOwnership(userMetierId, domainTagIds);
+    if (l_aDomainTagIds.length > 0) {
+      await this.validateTagOwnership(l_axUserMetierId, l_aDomainTagIds);
     }
 
-    // 🪓 ALIGNEMENT INDUSTRIEL : Création propre de la pépite via crypto native
-    const data : IItemData = {
-      idItem        : new ItemId(randomUUID()),
-      idUser        : userMetierId,
-      contentTypeId : new ContentTypeId(dto.contentType.code.toString()),
-      title         : dto.title,
-      slug          : slug,
-      content       : dto.content,
-      sourceAuthor  : dto.sourceAuthor,
-      thumbnailUrl  : dto.thumbnailUrl,
-      metadata      : dto.metadata,
+    // 🪓 Création propre de la pépite via le fondeur d'UUID v7 du Domaine
+    const l_oData : IItemData = {
+      idItem        : new ItemId(IdForge.genererUuidV7()), // Exit le v4 🐦 💨
+      idUser        : l_axUserMetierId,
+      contentTypeId : new ContentTypeId(p_oDto.contentType.code.toString()),
+      title         : p_oDto.title,
+      slug          : l_sSlug,
+      content       : p_oDto.content,
+      sourceAuthor  : p_oDto.sourceAuthor,
+      thumbnailUrl  : p_oDto.thumbnailUrl,
+      metadata      : p_oDto.metadata,
       createdAt     : new Date()
-};
+    };
 
-    const item : Item = await this.itemRepository.create(data);
+    const l_oItem : Item = await this.repository.create(l_oData);
 
-    if (domainTagIds.length > 0) {
-      await this.itemTagRepository.sync(item.getItemId(), domainTagIds);
+    if (l_aDomainTagIds.length > 0) {
+      // Éradication de this.repository.sync au profit du dépôt pivot dédié !
+      // .sync() renvoyant Promise<void>, on ne l'assigne à rien du tout !
+      await this.itemTagRepository.sync(l_oItem.idItem, l_aDomainTagIds);
     }
 
-    return item;
+    return l_oItem;
   }
 
   /**
@@ -123,19 +174,23 @@ export class ItemService implements IItemService {
    *
    * @public
    * @async
+   * @param {string} p_sUserId - La primitive de l'identifiant de l'utilisateur requérant
+   * @param {string} p_sItemId - La primitive de l'identifiant de la pépite ciblée
+   * @throws {ItemErrorFactory} Si la ressource n'existe pas ou si l'ownership est violé
+   * @returns {Promise<IItem>} L'entité de la pépite validée
    */
-  public async findById(userId: string, itemId: string): Promise<IItem> {
-    const userMetierId = new UserId(userId);
-    const itemMetierId = new ItemId(itemId);
+  public async findById(p_sUserId: string, p_sItemId: string): Promise<Item> {
+    const l_axUserMetierId = new UserId(p_sUserId);
+    const l_axItemMetierId = new ItemId(p_sItemId);
 
-    const item : Item | null = await this.itemRepository.findById(itemMetierId);
-    if (!item) throw ItemErrorFactory.notFound(itemMetierId);
+    const l_oItem : Item | null = await this.repository.findById(l_axItemMetierId);
+    if (!l_oItem) throw ItemErrorFactory.notFound(l_axItemMetierId);
 
-    if (item.getUserId().valeur !== userMetierId.valeur) {
-      throw ItemErrorFactory.accessDenied(itemMetierId, userMetierId);
+    if (!l_oItem.idUser.estEgalA(l_axUserMetierId)) {
+      throw ItemErrorFactory.accessDenied(l_axItemMetierId, l_axUserMetierId);
     }
 
-    return item;
+    return l_oItem;
   }
 
   /**
@@ -143,24 +198,17 @@ export class ItemService implements IItemService {
    *
    * @public
    * @async
+   * @param {string} p_sUserId - La primitive de l'identifiant de l'utilisateur requérant
+   * @param {string} p_sSlug - Le permalien textuel de la ressource
+   * @throws {ItemErrorFactory} Si la ressource est introuvable sur le disque
+   * @returns {Promise<IItem>} L'entité de la pépite localisée
    */
-  public async findBySlug(userId: string, slug: string): Promise<IItem> {
-    const userMetierId = new UserId(userId);
-    const item : Item | null = await this.itemRepository.findBySlug(userMetierId, slug);
-    if (!item) throw ItemErrorFactory.notFound(new ItemId(slug));
+  public async findBySlug(p_sUserId: string, p_sSlug: string): Promise<Item> {
+    const l_axUserMetierId = new UserId(p_sUserId);
+    const l_oItem : Item | null = await this.repository.findBySlug(l_axUserMetierId, p_sSlug);
+    if (!l_oItem) throw ItemErrorFactory.notFound(new ItemId(p_sSlug));
 
-    return item;
-  }
-
-  /**
-   * 📜 Extrait la liste complète ou paginée des ressources d'un utilisateur.
-   *
-   * @public
-   * @async
-   */
-  public async listByUser(userId: string, options?: IItemListOptions): Promise<IItemListResult> {
-    const userMetierId = new UserId(userId);
-    return await this.itemRepository.listByUser(userMetierId, options);
+    return l_oItem;
   }
 
   /**
@@ -168,40 +216,46 @@ export class ItemService implements IItemService {
    *
    * @public
    * @async
+   * @param {string} p_sUserId - La primitive de l'identifiant de l'auteur de la modification
+   * @param {string} p_sItemId - La primitive de l'identifiant de la pépite à modifier
+   * @param {UpdateItemDto} p_oDto - L'objet de transfert contenant les révisions à appliquer
+   * @throws {ItemErrorFactory} Si l'entité est introuvable ou si le contrôle d'accès échoue
+   * @returns {Promise<IItem>} L'entité de la pépite mise à jour
    */
-  public async update(userId: string, itemId: string, dto: UpdateItemDto): Promise<IItem> {
-    const userMetierId = new UserId(userId);
-    const itemMetierId = new ItemId(itemId);
+  public async update(p_sUserId: string, p_sItemId: string, p_oDto: UpdateItemDto): Promise<Item> {
+    const l_axUserMetierId = new UserId(p_sUserId);
+    const l_axItemMetierId = new ItemId(p_sItemId);
 
-    const existing : Item | null = await this.itemRepository.findById(itemMetierId);
-    if (!existing) throw ItemErrorFactory.notFound(itemMetierId);
+    const l_oExisting : Item | null = await this.repository.findById(l_axItemMetierId);
+    if (!l_oExisting) throw ItemErrorFactory.notFound(l_axItemMetierId);
 
-    if (existing.getUserId().valeur !== userMetierId.valeur) {
-      throw ItemErrorFactory.accessDenied(itemMetierId, userMetierId);
+    if (!l_oExisting.idUser.estEgalA(l_axUserMetierId)) {
+      throw ItemErrorFactory.accessDenied(l_axItemMetierId, l_axUserMetierId);
     }
 
-    const rawUpdateTagIds = dto.tagIds || [];
-    const domainTagIds : TagId[] = rawUpdateTagIds.map((id: unknown): TagId => new TagId(id as string));
+    const l_aRawUpdateTagIds = p_oDto.tagIds || [];
+    const l_aDomainTagIds : TagId[] = l_aRawUpdateTagIds.map((l_vId: unknown): TagId => new TagId(l_vId as string));
 
-    if (dto.tagIds !== undefined && domainTagIds.length > 0) {
-      await this.validateTagOwnership(userMetierId, domainTagIds);
+    if (p_oDto.tagIds !== undefined && l_aDomainTagIds.length > 0) {
+      await this.validateTagOwnership(l_axUserMetierId, l_aDomainTagIds);
     }
 
-    const updates : Partial<IItemData> = { ...dto } as any;
-    delete (updates as any).tagIds;
+    const l_oUpdates : Partial<IItemData> = { ...p_oDto } as any;
+    delete (l_oUpdates as any).tagIds;
 
-    if (dto.title && !dto.slug) {
-      updates.slug = SlugGenerator.generate(dto.title);
+    if (p_oDto.title && !p_oDto.slug) {
+      l_oUpdates.slug = SlugGenerator.generate(p_oDto.title);
     }
 
-    const updated : Item | null = await this.itemRepository.update(itemMetierId, updates);
-    if (!updated) throw ItemErrorFactory.notFound(itemMetierId);
+    const l_oUpdated : Item | null = await this.repository.update(l_axItemMetierId, l_oUpdates);
+    if (!l_oUpdated) throw ItemErrorFactory.notFound(l_axItemMetierId);
 
-    if (dto.tagIds !== undefined) {
-      await this.itemTagRepository.sync(itemMetierId, domainTagIds);
+    if (p_oDto.tagIds !== undefined) {
+      // Raccordement direct sur le gestionnaire de liaisons transactionnel
+      await this.itemTagRepository.sync(l_axItemMetierId, l_aDomainTagIds);
     }
 
-    return updated;
+    return l_oUpdated;
   }
 
   /**
@@ -209,19 +263,23 @@ export class ItemService implements IItemService {
    *
    * @public
    * @async
+   * @param {string} p_sUserId - La primitive de l'identifiant de l'auteur de l'ordre d'effacement
+   * @param {string} p_sItemId - La primitive de l'identifiant de la pépite à détruire
+   * @throws {ItemErrorFactory} Si l'entité est inexistante ou si les droits de propriété sont violés
+   * @returns {Promise<void>}
    */
-  public async delete(userId: string, itemId: string): Promise<void> {
-    const userMetierId = new UserId(userId);
-    const itemMetierId = new ItemId(itemId);
+  public async delete(p_sUserId: string, p_sItemId: string): Promise<void> {
+    const l_axUserMetierId = new UserId(p_sUserId);
+    const l_axItemMetierId = new ItemId(p_sItemId);
 
-    const existing : Item | null = await this.itemRepository.findById(itemMetierId);
-    if (!existing) throw ItemErrorFactory.notFound(itemMetierId);
+    const l_oExisting : Item | null = await this.repository.findById(l_axItemMetierId);
+    if (!l_oExisting) throw ItemErrorFactory.notFound(l_axItemMetierId);
 
-    if (existing.getUserId().valeur !== userMetierId.valeur) {
-      throw ItemErrorFactory.accessDenied(itemMetierId, userMetierId);
+    if (!l_oExisting.idUser.estEgalA(l_axUserMetierId)) {
+      throw ItemErrorFactory.accessDenied(l_axItemMetierId, l_axUserMetierId);
     }
 
-    const deleted : boolean = await this.itemRepository.delete(itemMetierId);
-    if (!deleted) throw ItemErrorFactory.notFound(itemMetierId);
+    const l_bDeleted : boolean = await this.repository.delete(l_axItemMetierId);
+    if (!l_bDeleted) throw ItemErrorFactory.notFound(l_axItemMetierId);
   }
 }

@@ -1,1 +1,0 @@
-Voir fichier : "database\fonctions\TraceModif.sql"

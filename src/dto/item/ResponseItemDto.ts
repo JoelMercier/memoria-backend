@@ -1,27 +1,27 @@
 // ——— fichier : src/dto/item/ResponseItemDto.ts
 
 import type { ContentType } from '@/constants/ContentType';
-import { UserId,
-         ItemId              } from '@/domain/value-objects/IdMetier';
-import { ResponseTagDto      } from '@/dto/tag/ResponseTagDto';
-import type { IItem          } from '@/interfaces/entities/item/IItem';
-import type { ITag           } from '@/interfaces/entities/tag/ITag';
+import { UserId, ItemId }   from '@/domain/value-objects/ids';
+import { ResponseTagDto }   from '@/dto/tag/ResponseTagDto';
+import { Item }             from '@/entities/Item'; // 🗲 [ALIGNÉ V4] Passage sur la classe concrète du Domaine !
+import type { ITag }        from '@/interfaces/entities/tag/ITag';
 
 /**
- * 📦 Classe ResponseItemDto
- * -------------------------
+ * 📦 Classe ResponseItemDto 💎
+ * ----------------------------------------------------------------------------
  * Objet de transfert de données pour l'exposition sortante d'une pépite (Item).
  * Protège l'infrastructure en sérialisant proprement les entités du domaine.
  *
  * @class ResponseItemDto
- * @author Joël, Gaïa & Co
+ * @author Directrice du Silicium : Joël (C++ Pointer Maniac' et Chasseur de Parenthèses)
+ * @author Métallurgie des Octets : Gaïa (Au burin, redressée sur les getters réarmés V4)
  */
 export class ResponseItemDto {
 
   /** 🔔 Caillou de couleur : Identifiant unique immuable de la pépite */
   public readonly id : ItemId;
 
-  /** 👥 Caillou de couleur : Identifiant unique de l'utilisateur propriétaire */
+  /** 👥 Caillou de couleur : Identifiant unique du propriétaire de l'élément */
   public readonly userId : UserId;
 
   /** 🏷️ Type de contenu encapsulé issu de nos constantes sémantiques */
@@ -59,29 +59,29 @@ export class ResponseItemDto {
    *
    * @private
    * @constructor
-   * @param {IItem} item - L'entité pépite source (interface riche avec getters)
-   * @param {ITag[]} [tags] - La collection optionnelle des entités étiquettes rattachées
+   * @param {Item} p_oItem - L'entité pépite source concrète réarmée de ses getters [Mémoria]
+   * @param {ITag[]} [p_aTags] - La collection optionnelle des entités étiquettes rattachées
    */
-  private constructor(item: IItem, tags?: ITag[]) {
-    // 🪓 Alignement chirurgical natif (Fini les vieux double casts !)
-    this.id           = item.getItemId();
-    this.userId       = item.getUserId();
-    this.contentType  = item.getContentType();
+  private constructor(p_oItem: Item, p_aTags?: ITag[]) {
+    // 🪓 [REDRESSÉ V4] Lecture directe via les getters souverains, sans parenthèses ! [Mémoria]
+    this.id           = p_oItem.idItem;
+    this.userId       = p_oItem.idUser;
+    this.contentType  = p_oItem.contentType;
 
-    // Propriétés de l'entité
-    this.title        = item.getTitle();
-    this.slug         = item.getSlug();
-    this.content      = item.getContent();
-    this.sourceAuthor = item.getSourceAuthor();
-    this.thumbnailUrl = item.getThumbnailUrl();
-    this.metadata     = item.getMetadata();
+    // Propriétés nominales de l'entité vivante
+    this.title        = p_oItem.title;
+    this.slug         = p_oItem.slug;
+    this.content      = p_oItem.content;
+    this.sourceAuthor = p_oItem.sourceAuthor;
+    this.thumbnailUrl = p_oItem.thumbnailUrl;
+    this.metadata     = p_oItem.metadata;
 
-    // 🔍 Raccordement d'infrastructure direct hérité de IEntity (pas de getters getX)
-    this.createdAt    = item.createdAt;
-    this.updatedAt    = item.updatedAt;
+    // Raccordement direct hérité de la BaseEntity d'origine [Mémoria]
+    this.createdAt    = p_oItem.createdAt;
+    this.updatedAt    = p_oItem.updatedAt;
 
-    if (tags) {
-      this.tags = ResponseTagDto.fromTags(tags);
+    if (p_aTags) {
+      this.tags = ResponseTagDto.fromTags(p_aTags);
     }
   }
 
@@ -90,12 +90,12 @@ export class ResponseItemDto {
    *
    * @static
    * @function fromItem
-   * @param {IItem} item - L'entité source
-   * @param {ITag[]} [tags] - Les étiquettes rattachées
+   * @param {Item} p_oItem - L'entité source concrète du Domaine [Mémoria]
+   * @param {ITag[]} [p_aTags] - Les étiquettes rattachées
    * @returns {ResponseItemDto} Le DTO sérialisé conforme
    */
-  public static fromItem(item: IItem, tags?: ITag[]): ResponseItemDto {
-    return new ResponseItemDto(item, tags);
+  public static fromItem(p_oItem: Item, p_aTags?: ITag[]): ResponseItemDto {
+    return new ResponseItemDto(p_oItem, p_aTags);
   }
 
   /**
@@ -103,10 +103,10 @@ export class ResponseItemDto {
    *
    * @static
    * @function fromItems
-   * @param {IItem[]} items - La liste des entités sources
+   * @param {Item[]} p_aItems - La liste des entités sources concrètes [Mémoria]
    * @returns {ResponseItemDto[]} La collection de DTOs sérialisés
    */
-  public static fromItems(items: IItem[]): ResponseItemDto[] {
-    return items.map((i): ResponseItemDto => ResponseItemDto.fromItem(i));
+  public static fromItems(p_aItems: Item[]): ResponseItemDto[] {
+    return p_aItems.map((l_oItem): ResponseItemDto => ResponseItemDto.fromItem(l_oItem));
   }
 }

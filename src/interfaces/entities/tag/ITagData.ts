@@ -1,6 +1,6 @@
 // ——— fichier : src/interfaces/entities/tag/ITagData.ts
 
-import type { UserId, TagId }   from '@/domain/value-objects/IdMetier';
+import type { UserId, TagId }   from '@/domain/value-objects/ids';
 import type { IBaseEntityData } from '@/interfaces/entities/IBaseEntityData';
 
 /**

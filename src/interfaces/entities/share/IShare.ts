@@ -1,7 +1,7 @@
 // ——— fichier : src/interfaces/entities/share/IShare.ts
 
 import type { ItemId,
-              ShareId        } from '@/domain/value-objects/IdMetier';
+              ShareId        } from '@/domain/value-objects/ids';
 import type { IAccessConfig  } from '@/interfaces/entities/share/IAccessConfig';
 import type { IEntity        } from '@/interfaces/entities/IEntity';
 import type { IShareData     } from '@/interfaces/entities/share/IShareData';

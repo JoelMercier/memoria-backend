@@ -1,6 +1,6 @@
 // ——— fichier : src/interfaces/repositories/IItemTagRepository.ts
 
-import { ItemId, TagId } from '@/domain/value-objects/IdMetier';
+import { ItemId, TagId } from '@/domain/value-objects/ids';
 import type { Tag } from '@/entities/Tag';
 
 /**
@@ -24,7 +24,7 @@ export interface IItemTagRepository {
   /** 🪓 Retire l'association entre une pépite et une étiquette. Renvoie true si effectif. */
   remove(itemId: ItemId, tagId: TagId): Promise<boolean>;
 
-  /** 🔄 Remplace tous les tags rattachés à une pépite par la collection fournie (Transactionnel). */
+  /** 🔄 Ajoute / Remplace / Supprime / Mets à jours les tags rattachés à une pépite par la collection fournie (Transactionnel). */
   sync(itemId: ItemId, tagIds: ReadonlyArray<TagId>): Promise<void>;
 
   /** 🔎 Récupère la collection exhaustive de toutes les instances de tags associées à une pépite. */

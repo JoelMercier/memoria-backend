@@ -1,6 +1,6 @@
 // ——— fichier : src/exceptions/ShareErrorFactory.ts
 
-import { ShareId, UserId } from '@/domain/value-objects/IdMetier';
+import { ShareId, UserId } from '@/domain/value-objects/ids';
 import { ApiError }         from '@/exceptions/ApiError';
 
 /**

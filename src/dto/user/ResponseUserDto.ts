@@ -1,6 +1,6 @@
 // ——— fichier : src/dto/user/ResponseUserDto.ts
 
-import { UserId } from '@/domain/value-objects/IdMetier';
+import { UserId } from '@/domain/value-objects/ids';
 import type { IUser  } from '@/interfaces/entities/user/IUser';
 
 /**

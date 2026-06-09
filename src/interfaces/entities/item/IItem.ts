@@ -2,7 +2,7 @@
 
 import type { ContentType } from '@/constants/ContentType';
 import { UserId,
-         ItemId              } from '@/domain/value-objects/IdMetier';
+         ItemId              } from '@/domain/value-objects/ids';
 import type { IEntity        } from '@/interfaces/entities/IEntity';
 import type { IItemData      } from '@/interfaces/entities/item/IItemData';
 

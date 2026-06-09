@@ -2,7 +2,7 @@
 
 import { ApiError } from '@/exceptions/ApiError';
 import { UserId,
-         ItemId   } from '@/domain/value-objects/IdMetier';
+         ItemId   } from '@/domain/value-objects/ids';
 
 /**
  * 🏛️ Classe ItemErrorFactory

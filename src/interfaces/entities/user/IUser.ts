@@ -2,7 +2,7 @@
 
 import type { AuthProvider } from '@/constants/AuthProvider';
 import type { Role         } from '@/constants/Role';
-import type { UserId       } from '@/domain/value-objects/IdMetier';
+import type { UserId       } from '@/domain/value-objects/ids';
 import type { IEntity      } from '@/interfaces/entities/IEntity';
 import type { IUserData    } from '@/interfaces/entities/user/IUserData';
 

@@ -2,7 +2,7 @@
 
 import { ApiError } from '@/exceptions/ApiError';
 import { UserId,
-         TagId    } from '@/domain/value-objects/IdMetier';
+         TagId    } from '@/domain/value-objects/ids';
 
 /**
  * 🏛️ Classe TagErrorFactory

@@ -5,7 +5,7 @@ import { MockTagRepository }     from '@/infrastructure/repositories/mocks/MockT
 import { MockItemRepository }    from '@/infrastructure/repositories/mocks/MockItemRepository';
 import { MockItemTagRepository } from '@/infrastructure/repositories/mocks/MockItemTagRepository';
 import { MockShareRepository }   from '@/infrastructure/repositories/mocks/MockShareRepository';
-import { UserId, ItemId, TagId, ShareId } from '@/domain/value-objects/IdMetier';
+import { UserId, ItemId, TagId, ShareId } from '@/domain/value-objects/ids';
 import { ContentType }           from '@/constants/ContentType';
 import { Role }                  from '@/constants/Role';
 import { AuthProvider }          from '@/constants/AuthProvider';
@@ -169,4 +169,3 @@ export class MockDataSeeder {
     await p_oShareRepo.create({ idShare: l_oIdShareMarc  , shIdShare: l_oIdShareMarc  , shItemId: l_oIdItemScrum, shCourrielDest: 'sophie.laurent@tech.io', shJeton: 'tok_share_marc_sophie_001', shConfiguration: { level: 'read', allow_download: true } } as any);
   }
 }
-

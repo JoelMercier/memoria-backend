@@ -19,11 +19,7 @@ import type { AllowedIdTypes } from '@/interfaces/entities/IBaseEntityData';
  * @author ⚔️ Rempart des types : Le Cartel du Donjon (Garde d'élite)
  * @author 🏺 Relique d'origine : L'Ancien Régime (Fossile de Gergovie)
  */
-export interface IBaseRepository<
-  TEntity,
-  TData,
-  TId extends AllowedIdTypes = string
-> {
+export interface IBaseRepository< TEntity, TData, TId extends AllowedIdTypes = string > {
 
   /** 🔎 Recherche une entité unique via son identifiant fortement typé. */
   findById(id: TId): Promise<TEntity | null>;

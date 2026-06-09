@@ -3,10 +3,10 @@
 import      { BaseEntity         } from '@/entities/BaseEntity';
 import      { Role               } from '@/constants/Role';
 import      { AuthProvider       } from '@/constants/AuthProvider';
-import      { RoleId, ProviderId } from '@/domain/value-objects/IdMetier';
+import      { RoleId, ProviderId } from '@/domain/value-objects/ids';
 import type { IUser              } from '@/interfaces/entities/user/IUser';
 import type { IUserData          } from '@/interfaces/entities/user/IUserData';
-import type { UserId             } from '@/domain/value-objects/IdMetier';
+import type { UserId             } from '@/domain/value-objects/ids';
 
 /**
  * 🏛️ Classe User 👥 (Le Modèle Métier Immuable de l'Acteur)

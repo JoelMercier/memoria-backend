@@ -6,7 +6,7 @@ import { z } from 'zod';
  * 🔑 Schéma de validation Zod pour la connexion (Login).
  */
 const loginSchema = z.object({
-  email    : z.string().trim().toLowerCase().email('Email invalide'),
+  email    : z.string().trim().toLowerCase().email('Email invalide'), // @deprecated — Use z.email() instead.
   password : z.string().min(1, 'Mot de passe requis')
 });
 

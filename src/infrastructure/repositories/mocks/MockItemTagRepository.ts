@@ -1,7 +1,7 @@
 // ——— fichier : src/infrastructure/repositories/mocks/MockItemTagRepository.ts
 
 import { Tag                  } from '@/entities/Tag';
-import { ItemId, TagId        } from '@/domain/value-objects/IdMetier';
+import { ItemId, TagId        } from '@/domain/value-objects/ids';
 import { MockTagRepository    } from '@/infrastructure/repositories/mocks/MockTagRepository';
 import type { IItemTagRepository } from '@/interfaces/repositories/IItemTagRepository';
 

@@ -2,7 +2,7 @@
 
 import { BaseRepository       } from '@/infrastructure/repositories/BaseRepositories';
 import { ProviderId, RoleId,
-         UserId               } from '@/domain/value-objects/IdMetier';
+         UserId               } from '@/domain/value-objects/ids';
 import { User                 } from '@/entities/User';
 import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
 import { UserErrorFactory     } from '@/exceptions/UserErrorFactory';

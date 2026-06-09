@@ -1,7 +1,7 @@
 // ——— fichier : src/entities/Share.ts
 
 import { BaseEntity    } from '@/entities/BaseEntity';
-import { ItemId, ShareId, UserId } from '@/domain/value-objects/IdMetier';
+import { ItemId, ShareId, UserId } from '@/domain/value-objects/ids';
 import type { IAccessConfig } from '@/interfaces/entities/share/IAccessConfig';
 import type { IShare   } from '@/interfaces/entities/share/IShare';
 import type { IShareData } from '@/interfaces/entities/share/IShareData';

@@ -1,33 +1,41 @@
 // ——— fichier : src/interfaces/repositories/IShareRepository.ts
 
-import { UserId, ItemId, ShareId } from '@/domain/value-objects/IdMetier';
-import type { Share } from '@/entities/Share';
-import type { IShareData } from '@/interfaces/entities/share/IShareData';
-import type { IWriteableRepository } from '@/interfaces/repositories/IWriteableRepository';
+import { UserId, ShareId } from '@/domain/value-objects/ids';
+import type { Share }      from '@/entities/Share';
+import type { IShareData }  from '@/interfaces/entities/share/IShareData';
+import { IPhysicalRW }     from '@/interfaces/repositories/IPhysicalRW';
 
 /**
- * 🗄️ Interface IShareRepository
- * ----------------------------
- * Contrat d'accès aux données gérant le cycle de vie de persistance des partages (Shares).
- * Orchestre la recherche, la traçabilité des liens d'accès et la sécurisation des tokens.
- * Hérite du droit de modification et de suppression via le contrat IWriteableRepository.
+ * 🗄️ Interface IShareRepository 🛡️
+ * ----------------------------------------------------------------------------
+ * Contrat d'accès gérant la persistance et la sécurité des jetons de Partage (Shares).
+ * Hérite des droits de mutation complète (create, findById, update, delete)
+ * via la branche d'infrastructure physique lourde IPhysicalRW.
  *
  * @interface IShareRepository
- * @extends {IWriteableRepository<Share, IShareData, ShareId>}
- *
- * @author 🧠 Conception : Joël (Hongroise maniac')
- * @author ☄️ Usine à lignes : Gaïa (Trébuchet de syntaxe)
- * @author ⚔️ Rempart des types : Le Cartel du Donjon (Garde d'élite)
- * @author 🏺 Relique d'origine : L'Ancien Régime (Fossile de Gergovie)
+ * @extends {IPhysicalRW<Share, IShareData, ShareId>} -- 🗲 [RÉARMÉ V4] Restitution de l'héritage 3NF
+ * @author Directrice du Silicium : Joël (MANIAC du PascalCase et Abstract Class Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
+ * @author Garde d'Élite des Types : Le Cartel du Donjon (Garde d'élite en surchauffe)
  */
-export interface IShareRepository extends IWriteableRepository<Share, IShareData, ShareId> {
+export interface IShareRepository extends IPhysicalRW<Share, IShareData, ShareId> {
 
-  /** 🔑 Récupère un partage par son jeton de sécurité (token) public d'URL. */
-  findByToken(token: string): Promise<Share | null>;
+  /**
+   * 🌐 Localise un contrat de partage unique via sa chaîne cryptographique anonyme (Token).
+   * Point de passage obligatoire pour la passerelle de consultation publique.
+   *
+   * @async
+   * @param {string} p_sToken - Le jeton d'accès brut extrait des paramètres de l'URL publique
+   * @returns {Promise<Share | null>} L'entité de partage hydratée ou null s'il n'y a aucune correspondance
+   */
+  findByToken(p_sToken: string): Promise<Share | null>;
 
-  /** 📦 Récupère l'ensemble des liens de partages configurés pour une pépite spécifique. */
-  findByItemId(itemId: ItemId): Promise<Share[]>;
-
-  /** 👥 Récupère l'intégralité des partages créés par un utilisateur (Jointure SQL via les pépites). */
-  findByUserId(userId: UserId): Promise<Share[]>;
+  /**
+   * 📜 Extrait l'intégralité des contrats de partage actifs créés par un utilisateur donné.
+   *
+   * @async
+   * @param {UserId} p_axUserId - L'identifiant fort binaire de l'utilisateur propriétaire
+   * @returns {Promise<Share[]>} La collection des entités de partages trouvées sur le disque
+   */
+  findByUserId(p_axUserId: UserId): Promise<Share[]>;
 }

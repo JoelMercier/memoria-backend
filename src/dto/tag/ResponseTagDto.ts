@@ -1,7 +1,7 @@
 // ——— fichier : src/dto/tag/ResponseTagDto.ts
 
 import { UserId,
-         TagId          } from '@/domain/value-objects/IdMetier';
+         TagId          } from '@/domain/value-objects/ids';
 import type { ITag      } from '@/interfaces/entities/tag/ITag';
 
 /**

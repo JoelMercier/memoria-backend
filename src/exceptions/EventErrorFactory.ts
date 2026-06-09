@@ -1,7 +1,7 @@
 // ——— fichier : src/exceptions/EventErrorFactory.ts
 
 import { ApiError     } from '@/exceptions/ApiError';
-import { AppEventId   } from '@/domain/value-objects/IdMetier';
+import { AppEventId   } from '@/domain/value-objects/ids';
 
 /**
  * 🏛️ Classe EventErrorFactory

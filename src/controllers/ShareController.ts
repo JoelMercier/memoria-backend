@@ -12,7 +12,7 @@ import type { IShareService      } from '@/interfaces/services/IShareService';
 import      { ApiResponseFactory } from '@/utils/ApiResponseFactory';
 import      { RequestIdGenerator } from '@/utils/RequestIdGenerator';
 import      { UserId,
-              ShareId            } from '@/domain/value-objects/IdMetier';
+              ShareId            } from '@/domain/value-objects/ids';
 import      { ShareValidation    } from '@/validation/zod';
 
 /**

@@ -1,12 +1,11 @@
 // ——— fichier : src/dto/event/CreateEventDto.ts
 
-import { AppEventCategory         } from '@/constants/AppEventCategory';
-import { AppEventSeverity         } from '@/constants/AppEventSeverity';
-import { AppEventType             } from '@/constants/AppEventType';
-import { UserId,
-         AppEventId               } from '@/domain/value-objects/IdMetier';
-import { type CreateAppEventSchemaType,
-         AppEventValidation       } from '@/validation/zod/AppEventValidation';
+import { AppEventAction     } from '@/constants/AppEventAction';
+import { AppEventCategory   } from '@/constants/AppEventCategory';
+import { AppEventSecteur    } from '@/constants/AppEventSecteur';
+import { AppEventSeverity   } from '@/constants/AppEventSeverity';
+import { UserId, AppEventId } from '@/domain/value-objects/ids';
+import { type CreateAppEventSchemaType, AppEventValidation } from '@/validation/zod/AppEventValidation';
 
 /**
  * 📦 Classe CreateEventDto (Version Pure Hexagonale)
@@ -16,7 +15,9 @@ import { type CreateAppEventSchemaType,
  * Armé avec les cailloux de couleur (Value Objects) pour la sécurité nominale.
  *
  * @class CreateEventDto
- * @author Joël, Gaïa & Co
+ * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
+ * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 export class CreateEventDto {
 
@@ -29,8 +30,11 @@ export class CreateEventDto {
   /** 👥 Caillou de couleur : Propriétaire rattaché à l'action d'audit */
   public readonly userId        : UserId | null;
 
-  /** 🏷️ Caillou de couleur : Type d'action métier tracé */
-  public readonly eventType     : AppEventType;
+  /** 💻 Caillou de couleur : Contexte fonctionnel de l'opération (Char(4)) */
+  public readonly eventSecteur  : AppEventSecteur;
+
+  /** ⚙️ Caillou de couleur : Action technique précise exécutée (Char(4)) */
+  public readonly eventAction   : AppEventAction;
 
   /** ⚠️ Caillou de couleur : Niveau de criticité opérationnelle typé */
   public readonly severity      : AppEventSeverity;
@@ -55,7 +59,11 @@ export class CreateEventDto {
     this.eventCategory = validated.eventCategory as unknown as AppEventCategory;
     this.idEvent       = new AppEventId(validated.idAppEvent);
     this.userId        = validated.userId ? new UserId(validated.userId) : null;
-    this.eventType     = validated.eventType as unknown as AppEventType;
+
+    // 🗲 Raccordement V4 : Hydratation étanche depuis les deux propriétés éclatées de Zod
+    this.eventSecteur  = validated.eventContext as unknown as AppEventSecteur;
+    this.eventAction   = validated.eventAction as unknown as AppEventAction;
+
     this.severity      = (validated.severity ?? 'INFO') as unknown as AppEventSeverity;
     this.message       = validated.message;
     this.metadata      = validated.metadata as Record<string, any>;

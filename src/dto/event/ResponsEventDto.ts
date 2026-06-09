@@ -1,90 +1,116 @@
 // ——— fichier : src/dto/event/ResponseEventDto.ts
 
-import type { AppEventCategory } from '@/constants/AppEventCategory';
-import type { AppEventSeverity } from '@/constants/AppEventSeverity';
-import type { AppEventType     } from '@/constants/AppEventType';
-import { UserId,
-         AppEventId            } from '@/domain/value-objects/IdMetier';
-import type { IAppEvent        } from '@/interfaces/entities/event/IAppEvent';
+/**
+ * 📦 Type décrivant une ligne brute enrichie issue de notre fonction stockée SQL.
+ * Capture les identifiants d'entités transmutés en ByteA ainsi que les désignations textuelles de soute.
+ */
+export interface IAppEventEnrichedRow {
+  aeIdEvent: Buffer | string;
+  aeUserId: Buffer | string | null;
+  aeCreatedAt: Date;
+  aeMessage: string;
+  aeMetadata: Record<string, unknown>;
+  aeSecteurId: string;
+  aeActionId: string;
+  aeCategoryId: string;
+  aeSeverityId: string;
+  secteurLibelle: string;
+  actionLibelle: string;
+  categoryLibelle: string;
+  severityLibelle: string;
+}
 
 /**
- * 📦 Classe ResponseEventDto
- * --------------------------
- * Objet de transfert de données pour l'exposition sortante d'un événement d'audit.
- * Totalement purifié des scories de la table des pépites (Items).
+ * 📦 Structure JSON finale expédiée à travers le réseau vers le Front-End.
+ */
+export interface IAppEventResponseJson {
+  id: string;
+  userId: string | null;
+  createdAt: string;
+  message: string;
+  metadata: Record<string, unknown>;
+  secteur: { id: string; libelle: string };
+  action: { id: string; libelle: string };
+  category: { id: string; libelle: string };
+  severity: { id: string; libelle: string };
+}
+
+/**
+ * 📦 Classe ResponseEventDto 🛡️
+ * ----------------------------------------------------------------------------
+ * Convertisseur et sérialiseur officiel pour l'exportation des logs d'audit.
+ * Hydrate les structures d'IHM en combinant les types forts et les libellés SQL.
  *
  * @class ResponseEventDto
- * @author Joël, Gaïa & Co
+ * @author Directrice du Silicium : Joël (C++ Framework Architect - Zéro Bâclage)
+ * @author Métallurgie des Octets : Gaïa (Au burin, redressée sur le standard V4)
  */
 export class ResponseEventDto {
 
-  /** 🔔 Caillou de couleur : Identifiant unique immuable de l'événement */
-  public readonly idEvent : AppEventId;
-
-  /** 👥 Caillou de couleur : Identifiant unique de l'utilisateur rattaché */
-  public readonly userId : UserId | null;
-
-  /** 📂 Caillou de couleur : Catégorie logique de l'événement */
-  public readonly eventCategory : AppEventCategory;
-
-  /** 🏷️ Caillou de couleur : Action chirurgicale tracée */
-  public readonly eventType : AppEventType;
-
-  /** ⚠️ Caillou de couleur : Niveau de gravité opérationnel */
-  public readonly severity : AppEventSeverity;
-
-  /** 💬 Message textuel descriptif de l'événement */
-  public readonly message : string | null;
-
-  /** 🎛️ Métadonnées d'infrastructure contextuelles */
-  public readonly metadata : Record<string, unknown>;
-
-  /** 📅 Horodatage de création dans le système de persistance */
-  public readonly createdAt? : Date;
-
-  /** 📅 Horodatage de la dernière révision d'infrastructure */
-  public readonly updatedAt? : Date;
-
   /**
-   * Construit le DTO de réponse en extrayant les données réelles de l'audit.
+   * 🏭 Transforme une ligne brute enrichie de la base de données en JSON d'IHM purifié.
    *
-   * @private
-   * @constructor
-   * @param {IAppEvent} event - Le contrat de données brut de l'événement d'audit
+   * @static
+   * @public
+   * @param {IAppEventEnrichedRow} p_oRow - La ligne brute enrichie extraite par la fonction stockée
+   * @returns {IAppEventResponseJson} Le payload JSON normalisé pour le réseau
    */
-  private constructor(event: IAppEvent) {
-    // 🪓 ALIGNEMENT INDUSTRIEL : Respect strict de l'armure nominale et des Smart Enums
-    this.idEvent       = event.getAppEventId();
-    this.userId        = event.getUserId();
-    this.eventCategory = event.getEventCategory();
-    this.eventType     = event.getEventType();
-    this.severity      = event.getSeverity();
-    this.message       = event.getMessage();
-    this.metadata      = event.getMetadata();
-    this.createdAt     = event.createdAt; // Propriété directe héritée d'IEntity
+  public static extraireLigne(p_oRow: IAppEventEnrichedRow): IAppEventResponseJson {
+    // 🗲 [RÉALIGNÉ V4] Conservation impérative de la lecture du format ByteA issu du convertisseur SQL
+    const l_sIdEvent = Buffer.isBuffer(p_oRow.aeIdEvent) ? p_oRow.aeIdEvent.toString('hex') : p_oRow.aeIdEvent;
+    const l_sUserId  = Buffer.isBuffer(p_oRow.aeUserId) ? p_oRow.aeUserId.toString('hex') : p_oRow.aeUserId;
+
+    const l_oResultat: IAppEventResponseJson = {
+      id: l_sIdEvent,
+      userId: l_sUserId || null,
+      createdAt: p_oRow.aeCreatedAt.toISOString(),
+      message: p_oRow.aeMessage,
+      metadata: p_oRow.aeMetadata,
+      secteur: {
+        id: p_oRow.aeSecteurId.trim(),
+        libelle: p_oRow.secteurLibelle ? p_oRow.secteurLibelle.trim() : 'Inconnu'
+      },
+      action: {
+        id: p_oRow.aeActionId.trim(),
+        libelle: p_oRow.actionLibelle ? p_oRow.actionLibelle.trim() : 'Inconnu'
+      },
+      category: {
+        id: p_oRow.aeCategoryId.trim(),
+        libelle: p_oRow.categoryLibelle ? p_oRow.categoryLibelle.trim() : 'Inconnu'
+      },
+      severity: {
+        id: p_oRow.aeSeverityId.trim(),
+        libelle: p_oRow.severityLibelle ? p_oRow.severityLibelle.trim() : 'Inconnu'
+      }
+    };
+
+    return Object.freeze(l_oResultat);
   }
 
   /**
-   * 🏭 Fabrique statique : Transforme un contrat de données d'audit en DTO de sortie.
+   * 🏭 Formate le pack de résultats paginés complet pour le guichet de sortie Express.
    *
    * @static
-   * @function fromEvent
-   * @param {IAppEvent} event - L'entité source d'infrastructure
-   * @returns {ResponseEventDto} Le DTO d'audit sérialisé conforme
+   * @public
+   * @param {IAppEventEnrichedRow[]} p_aRows - La collection de lignes enrichies de la page active
+   * @param {number} p_nTotal - Le volume global absolu capté par le totalCount SQL
+   * @param {number} p_nNbLignes - Le nombre maximum de lignes exigé par le client (limit)
+   * @param {number} p_nLigneDebut - L'index de départ du curseur (offset)
    */
-  public static fromEvent(event: IAppEvent): ResponseEventDto {
-    return new ResponseEventDto(event);
-  }
+  public static formaterPackagePagine(
+    p_aRows: IAppEventEnrichedRow[],
+    p_nTotal: number,
+    p_nNbLignes: number,
+    p_nLigneDebut: number
+  ) {
+    const l_oPackage = {
+      NbLignes: p_nNbLignes,
+      LigneDebut: p_nLigneDebut,
+      total: p_nTotal,
+      count: p_aRows.length,
+      items: p_aRows.map((l_oRow) => ResponseEventDto.extraireLigne(l_oRow))
+    };
 
-  /**
-   * 🏭 Fabrique statique : Transforme une collection de contrats en liste de DTOs d'audit.
-   *
-   * @static
-   * @function fromEvents
-   * @param {IAppEvent[]} events - La liste des structures sources d'audit
-   * @returns {ResponseEventDto[]} La collection de DTOs d'audit purifiés
-   */
-  public static fromEvents(events: IAppEvent[]): ResponseEventDto[] {
-    return events.map((i): ResponseEventDto => ResponseEventDto.fromEvent(i));
+    return Object.freeze(l_oPackage);
   }
 }

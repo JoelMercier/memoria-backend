@@ -1,11 +1,11 @@
 // ——— fichier : src/services/UserService.ts
 
-import { UserId          } from '@/domain/value-objects/IdMetier';
+import { UserId          } from '@/domain/value-objects/ids';
 import { User            } from '@/entities/User';
 import { UserErrorFactory } from '@/exceptions/UserErrorFactory';
 import type { ChangePasswordDto } from '@/dto/user/ChangePasswordDto';
-import type { DeleteAccountDto } from '@/dto/user/DeleteAccountDto';
-import type { UpdateProfileDto } from '@/dto/user/UpdateProfileDto';
+import type { DeleteAccountDto }  from '@/dto/user/DeleteAccountDto';
+import type { UpdateProfileDto }  from '@/dto/user/UpdateProfileDto';
 import type { IUser           } from '@/interfaces/entities/user/IUser';
 import type { IUserData       } from '@/interfaces/entities/user/IUserData';
 import type { IUserRepository    } from '@/interfaces/repositories/IUserRepository';
@@ -20,103 +20,153 @@ import type { IUserService       } from '@/interfaces/services/IUserService';
  *
  * @class UserService
  * @implements {IUserService}
- * @author Joël, Gaïa & Co
+ * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
+ * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 export class UserService implements IUserService {
 
+  /** 🗄️ Entrepôt de persistance abstrait des utilisateurs (IUserRepository) */
+  private readonly m_oUserRepository : IUserRepository;
+
+  /** 🛡️ Service d'encodage et de vérification cryptographique des secrets */
+  private readonly m_oPasswordHasher : IPasswordHasher;
+
+  /**
+   * Initialise les fondations de gestion d'identité par injection d'abstractions.
+   *
+   * @constructor
+   * @param {IUserRepository} p_oUserRepository - Le dépôt d'infrastructure abstrait des utilisateurs
+   * @param {IPasswordHasher} p_oPasswordHasher - Le hacheur de mots de passe
+   */
   public constructor(
-    private readonly userRepository : IUserRepository,
-    private readonly passwordHasher : IPasswordHasher
-  ) {}
+    p_oUserRepository : IUserRepository,
+    p_oPasswordHasher : IPasswordHasher
+  ) {
+    this.m_oUserRepository = p_oUserRepository;
+    this.m_oPasswordHasher = p_oPasswordHasher;
+  }
+
+  /**
+   * Accesseur public immuable exigé par le contrat ancêtre IBaseService.
+   * Centralise la souveraineté d'accès au dépôt d'infrastructure des utilisateurs.
+   *
+   * @public
+   * @returns {IUserRepository} L'instance du dépôt d'infrastructure abstrait
+   */
+  public get repository(): IUserRepository {
+    return this.m_oUserRepository;
+  }
 
   /**
    * 👤 Met à jour le pseudonyme, le courriel ou les préférences graphiques de l'utilisateur.
+   *
+   * @public
+   * @async
+   * @param {UserId} p_axUserId - L'identifiant fort binaire de l'utilisateur cible
+   * @param {UpdateProfileDto} p_oDto - Les nouveaux attributs de profil à appliquer
+   * @throws {UserErrorFactory} Si la ressource est introuvable ou si le courriel/pseudo est déjà réservé
+   * @returns {Promise<IUser>} L'entité de l'utilisateur mise à jour
    */
-  public async updateProfile(userId: UserId, dto: UpdateProfileDto): Promise<IUser> {
-    const existing : User | null = await this.userRepository.findById(userId);
-    if (!existing) {
-      throw UserErrorFactory.notFound(userId);
+  public async updateProfile(p_axUserId: UserId, p_oDto: UpdateProfileDto): Promise<IUser> {
+    const l_oExisting : User | null = await this.m_oUserRepository.findById(p_axUserId);
+    if (!l_oExisting) {
+      throw UserErrorFactory.notFound(p_axUserId);
     }
 
-    // 🪓 ALIGNEMENT INDUSTRIEL REUSSIT : .getEmail() uniformisé
-    if (dto.email && dto.email.toLowerCase() !== existing.getEmail().toLowerCase()) {
-      const byEmail : User | null = await this.userRepository.findByEmail(dto.email);
-      if (byEmail) {
-        throw UserErrorFactory.profileConflict('email', dto.email);
+    // 🪓 ALIGNEMENT INDUSTRIEL RÉUSSI : .getEmail() uniformisé
+    if (p_oDto.email && p_oDto.email.toLowerCase() !== l_oExisting.getEmail().toLowerCase()) {
+      const l_oByEmail : User | null = await this.m_oUserRepository.findByEmail(p_oDto.email);
+      if (l_oByEmail) {
+        throw UserErrorFactory.profileConflict('email', p_oDto.email);
       }
     }
 
-    // 🪓 ALIGNEMENT INDUSTRIEL REUSSIT : .getPseudo() uniformisé
-    if (dto.pseudo && dto.pseudo !== existing.getPseudo()) {
-      const byPseudo : User | null = await this.userRepository.findByPseudo(dto.pseudo);
-      if (byPseudo) {
-        throw UserErrorFactory.profileConflict('pseudo', dto.pseudo);
+    // 🪓 ALIGNEMENT INDUSTRIEL RÉUSSI : .getPseudo() uniformisé
+    if (p_oDto.pseudo && p_oDto.pseudo !== l_oExisting.getPseudo()) {
+      const l_oByPseudo : User | null = await this.m_oUserRepository.findByPseudo(p_oDto.pseudo);
+      if (l_oByPseudo) {
+        throw UserErrorFactory.profileConflict('pseudo', p_oDto.pseudo);
       }
     }
 
-    const updates : Partial<IUserData> = {};
-    if (dto.email !== undefined) {
-      updates.email = dto.email;
+    const l_oUpdates : Partial<IUserData> = {};
+    if (p_oDto.email !== undefined) {
+      l_oUpdates.email = p_oDto.email;
     }
-    if (dto.pseudo !== undefined) {
-      updates.pseudo = dto.pseudo;
+    if (p_oDto.pseudo !== undefined) {
+      l_oUpdates.pseudo = p_oDto.pseudo;
     }
-    if (dto.settingsUser !== undefined) {
-      updates.settingsUser = dto.settingsUser;
+    if (p_oDto.settingsUser !== undefined) {
+      l_oUpdates.settingsUser = p_oDto.settingsUser;
     }
 
-    const updated : User | null = await this.userRepository.update(userId, updates);
-    if (!updated) {
-      throw UserErrorFactory.notFound(userId);
+    const l_oUpdated : User | null = await this.m_oUserRepository.update(p_axUserId, l_oUpdates);
+    if (!l_oUpdated) {
+      throw UserErrorFactory.notFound(p_axUserId);
     }
-    return updated;
+    return l_oUpdated;
   }
 
   /**
    * 🔐 Remplace les secrets d'accès de l'utilisateur après double contrôle de l'infrastructure.
+   *
+   * @public
+   * @async
+   * @param {UserId} p_axUserId - L'identifiant fort binaire de l'acteur concerné
+   * @param {ChangePasswordDto} p_oDto - Le doublet d'anciens et de nouveaux mots de passe bruts
+   * @throws {UserErrorFactory} Si l'utilisateur est introuvable ou si le mot de passe actuel est erroné
+   * @returns {Promise<void>}
    */
-  public async changePassword(userId: UserId, dto: ChangePasswordDto): Promise<void> {
-    const user : User | null = await this.userRepository.findById(userId);
-    if (!user) {
-      throw UserErrorFactory.notFound(userId);
+  public async changePassword(p_axUserId: UserId, p_oDto: ChangePasswordDto): Promise<void> {
+    const l_oUser : User | null = await this.m_oUserRepository.findById(p_axUserId);
+    if (!l_oUser) {
+      throw UserErrorFactory.notFound(p_axUserId);
     }
 
-    // 🪓 ALIGNEMENT INDUSTRIEL REUSSIT : .getPasswordHash() uniformisé
-    const ok : boolean = await this.passwordHasher.verify(
-      dto.currentPassword,
-      user.getPasswordHash()
+    // 🪓 ALIGNEMENT INDUSTRIEL RÉUSSI : .getPasswordHash() uniformisé
+    const l_bOk : boolean = await this.m_oPasswordHasher.verify(
+      p_oDto.currentPassword,
+      l_oUser.getPasswordHash()
     );
-    if (!ok) {
+    if (!l_bOk) {
       throw UserErrorFactory.wrongPassword();
     }
 
-    const newHash : string = await this.passwordHasher.hash(dto.newPassword);
-    const updated : User | null = await this.userRepository.update(userId, {
-      passwordHash: newHash
+    const l_sNewHash : string = await this.m_oPasswordHasher.hash(p_oDto.newPassword);
+    const l_oUpdated : User | null = await this.m_oUserRepository.update(p_axUserId, {
+      passwordHash: l_sNewHash
     });
-    if (!updated) {
-      throw UserErrorFactory.notFound(userId);
+    if (!l_oUpdated) {
+      throw UserErrorFactory.notFound(p_axUserId);
     }
   }
 
   /**
    * 🗑️ Purge destructive et définitive du compte de l'utilisateur.
+   *
+   * @public
+   * @async
+   * @param {UserId} p_axUserId - L'identifiant fort binaire du compte à éradiquer
+   * @param {DeleteAccountDto} p_oDto - Le payload de confirmation contenant le secret de validation
+   * @throws {UserErrorFactory} Si l'utilisateur est introuvable ou si la validation du secret échoue
+   * @returns {Promise<void>}
    */
-  public async deleteAccount(userId: UserId, dto: DeleteAccountDto): Promise<void> {
-    const user : User | null = await this.userRepository.findById(userId);
-    if (!user) {
-      throw UserErrorFactory.notFound(userId);
+  public async deleteAccount(p_axUserId: UserId, p_oDto: DeleteAccountDto): Promise<void> {
+    const l_oUser : User | null = await this.m_oUserRepository.findById(p_axUserId);
+    if (!l_oUser) {
+      throw UserErrorFactory.notFound(p_axUserId);
     }
 
-    // 🪓 ALIGNEMENT INDUSTRIEL REUSSIT : .getPasswordHash() uniformisé
-    const ok : boolean = await this.passwordHasher.verify(dto.password, user.getPasswordHash());
-    if (!ok) {
+    // 🪓 ALIGNEMENT INDUSTRIEL RÉUSSI : .getPasswordHash() uniformisé
+    const l_bOk : boolean = await this.m_oPasswordHasher.verify(p_oDto.password, l_oUser.getPasswordHash());
+    if (!l_bOk) {
       throw UserErrorFactory.wrongPassword();
     }
 
-    const deleted : boolean = await this.userRepository.delete(userId);
-    if (!deleted) {
-      throw UserErrorFactory.notFound(userId);
+    const l_bDeleted : boolean = await this.m_oUserRepository.delete(p_axUserId);
+    if (!l_bDeleted) {
+      throw UserErrorFactory.notFound(p_axUserId);
     }
   }
 }

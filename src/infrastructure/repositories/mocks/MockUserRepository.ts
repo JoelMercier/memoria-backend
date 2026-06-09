@@ -1,7 +1,7 @@
 // ——— fichier : src/infrastructure/repositories/mocks/MockUserRepository.ts
 
 import { User                 } from '@/entities/User';
-import { UserId               } from '@/domain/value-objects/IdMetier';
+import { UserId               } from '@/domain/value-objects/ids';
 import type { IUserData       } from '@/interfaces/entities/user/IUserData';
 import type { IUserRepository } from '@/interfaces/repositories/IUserRepository';
 

@@ -2,9 +2,10 @@
 
 import { AppEventCategory } from '@/constants/AppEventCategory';
 import { AppEventSeverity } from '@/constants/AppEventSeverity';
-import { AppEventType     } from '@/constants/AppEventType';
+import { AppEventSecteur  } from '@/constants/AppEventSecteur';
+import { AppEventAction   } from '@/constants/AppEventAction';
 import type { UserId,
-              AppEventId  } from '@/domain/value-objects/IdMetier';
+              AppEventId      } from '@/domain/value-objects/ids';
 import type { IBaseEntityData } from '@/interfaces/entities/IBaseEntityData';
 
 /**
@@ -14,26 +15,59 @@ import type { IBaseEntityData } from '@/interfaces/entities/IBaseEntityData';
  * Déclarée sous forme de 'type' pour injecter la signature d'index requise par l'ancêtre.
  *
  * @type IAppEventData
- * @author Joël, Gaïa & Co
+ * @author Directrice du Silicium : Joël (MANIAC du PascalCase et Abstract Class Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
+ * @author Garde d'Élite des Types : Le Cartel du Donjon (Ouvriers de la V4 en surchauffe)
  */
 export type IAppEventData = IBaseEntityData<'appEvent', AppEventId> & {
 
-  /** 👥 ID de l'utilisateur concerné (Peut être NULL pour les événements système) */
+  /**
+   * 👥 ID de l'utilisateur concerné (Peut être NULL pour les événements système).
+   *
+   * @type {UserId | null}
+   */
   userId : UserId | null;
 
-  /** 📂 Catégorie fonctionnelle (Smart Enum lié à l'infrastructure) */
+  /**
+   * 📂 Catégorie fonctionnelle (Smart Enum lié à l'infrastructure).
+   *
+   * @type {AppEventCategory}
+   */
   eventCategory : AppEventCategory;
 
-  /** 🎯 Type d'action précis (Smart Enum qualifié) */
-  eventType : AppEventType;
+  /**
+   * 💻 Contexte fonctionnel (Smart Enum de structure V4 - Char(4)).
+   *
+   * @type {AppEventContext}
+   */
+  eventSecteur : AppEventSecteur;
 
-  /** ⚠️ Niveau de gravité (Smart Enum opérationnel) */
+  /**
+   * ⚙️ Action technique précise (Smart Enum d'opération V4 - Char(4)).
+   *
+   * @type {AppEventAction}
+   */
+  eventAction : AppEventAction;
+
+  /**
+   * ⚠️ Niveau de gravité (Smart Enum opérationnel).
+   *
+   * @type {AppEventSeverity}
+   */
   severity : AppEventSeverity;
 
-  /** 💬 Message textuel explicite du log d'audit */
+  /**
+   * 💬 Message textuel explicite du log d'audit.
+   *
+   * @type {string}
+   */
   message : string;
 
-  /** 🎛️ Métadonnées contextuelles au format dictionnaire JSON */
+  /**
+   * 🎛️ Métadonnées contextuelles au format dictionnaire JSON.
+   *
+   * @type {Record<string, any>}
+   */
   metadata : Record<string, any>;
 
 };

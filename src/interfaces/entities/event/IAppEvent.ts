@@ -1,11 +1,11 @@
 // ——— fichier : src/interfaces/entities/event/IAppEvent.ts
 
+import { AppEventAction } from '@/constants/AppEventAction';
 import { AppEventCategory } from '@/constants/AppEventCategory';
+import { AppEventSecteur } from '@/constants/AppEventSecteur';
 import { AppEventSeverity } from '@/constants/AppEventSeverity';
-import { AppEventType     } from '@/constants/AppEventType';
-// 🪓 ALIGNEMENT INDUSTRIEL : Importation du véritable type nominal fort AppEventId
 import type { UserId,
-              AppEventId  } from '@/domain/value-objects/IdMetier';
+              AppEventId  } from '@/domain/value-objects/ids';
 import type { IEntity      } from '@/interfaces/entities/IEntity';
 import type { IAppEventData } from '@/interfaces/entities/event/IAppEventData';
 
@@ -22,23 +22,26 @@ import type { IAppEventData } from '@/interfaces/entities/event/IAppEventData';
 export interface IAppEvent extends IEntity<IAppEventData> {
 
   /** 🔔 Signature sémantique vers l'identifiant unique et fort de l'événement */
-  getAppEventId(): AppEventId;
+  get AppEventId(): AppEventId;
 
   /** 👥 Signature sémantique vers l'identifiant fort de l'auteur de l'action ou NULL si système */
-  getUserId(): UserId | null;
+  get UserId(): UserId | null;
 
   /** 📂 Signature sémantique vers l'instance de Smart Enum représentant la catégorie */
-  getEventCategory(): AppEventCategory;
+  get EventCategory(): AppEventCategory;
 
-  /** 🏷️ Signature sémantique vers l'instance de Smart Enum qualifiant le type précis */
-  getEventType(): AppEventType;
+  /** 🏷️ Signature sémantique vers l'instance de Smart Enum qualifiant le Secteur */
+  get EventAction(): AppEventAction;
+
+  /** 🏷️ Signature sémantique vers l'instance de Smart Enum qualifiant l'action */
+  get EventSecteur(): AppEventSecteur;
 
   /** ⚠️ Signature sémantique vers l'instance de Smart Enum fixant le niveau de gravité */
-  getSeverity(): AppEventSeverity;
+  get Severity(): AppEventSeverity;
 
   /** 💬 Signature sémantique vers la description textuelle explicite stockée */
-  getMessage(): string;
+  get Message(): string;
 
   /** 🎛️ Signature sémantique vers le sac de métadonnées contextuelles */
-  getMetadata(): Record<string, any>;
+  get Metadata(): Record<string, any>;
 }

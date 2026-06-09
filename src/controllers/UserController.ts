@@ -3,7 +3,7 @@
 import type { NextFunction,
               Request,
               Response           } from 'express';
-import      { UserId             } from '@/domain/value-objects/IdMetier';
+import      { UserId             } from '@/domain/value-objects/ids';
 import      { ChangePasswordDto  } from '@/dto/user/ChangePasswordDto';
 import      { DeleteAccountDto   } from '@/dto/user/DeleteAccountDto';
 import      { ResponseUserDto    } from '@/dto/user/ResponseUserDto';

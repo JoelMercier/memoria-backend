@@ -1,17 +1,18 @@
 // ——— fichier : src/constants/AppEventSeverity.ts
 
-import { SmartEnum } from './base/SmartEnum';
+import { SmartEnum } from '@/constants/base/SmartEnum';
+
 
 /**
- * 🚨 Classe AppEventSeverity 🧮 (L Armure des Gravités Système 🤖)
+ * 🚨 Classe AppEventSeverity 🧮 (L'Armure des Gravités Système 🤖)
  * ----------------------------------------------------------------------------
- * Gère de manière immuable les niveaux de gravité des journaux d audit "Events".
- * Intègre notre double niveau d infrastructure : niveau (machine) et ordreAff (humain).
+ * Gère de manière immuable les niveaux de gravité des journaux d'audit "Events".
+ * Intègre notre double niveau d'infrastructure : niveau (machine) et ordreAff (humain).
  *
  * @class AppEventSeverity
  * @extends {SmartEnum<string>}
- * @author Vision : Joël (Compilateur de l'Ancien Temps)
- * @author Frapperie du code : Gaïa (Graveuse de lignes d'acier)
+ * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
  * @author Héritage Git->Origin : La Vague Initiale (Artisans de la Vague Alpha)
  */
 export class AppEventSeverity extends SmartEnum<string> {
@@ -23,9 +24,9 @@ export class AppEventSeverity extends SmartEnum<string> {
    *
    * @private
    * @constructor
-   * @param {string} p_sLibelle - Libellé complet et intelligible destiné à l interface
-   * @param {string} p_sCode - Le quadrigramme d infrastructure obligatoire (4 majuscules) [Mémoria]
-   * @param {number} p_nNiveau - Poids numérique d importance pour la logique machine [Mémoria]
+   * @param {string} p_sLibelle - Libellé complet et intelligible destiné à l'interface
+   * @param {string} p_sCode - Le quadrigramme d'infrastructure obligatoire (4 majuscules) [Mémoria]
+   * @param {number} p_nNiveau - Poids numérique d'importance pour la logique machine [Mémoria]
    * @param {number} p_nOrdreAff - Position numérique unique pour le tri visuel [Mémoria]
    */
   private constructor(p_sLibelle: string, p_sCode: string, p_nNiveau: number, p_nOrdreAff: number) {
@@ -35,6 +36,9 @@ export class AppEventSeverity extends SmartEnum<string> {
 
   /**
    * ⚖️ Obtient le poids numérique associé à la sévérité pour les filtres machines.
+   *
+   * @public
+   * @returns {number} Le niveau numérique de sévérité brute
    */
   public get niveau(): number {
     return this.m_nNiveau;
@@ -42,16 +46,24 @@ export class AppEventSeverity extends SmartEnum<string> {
 
   /**
    * ⚖️ Comparaison mathématique : Détermine si le niveau actuel surpasse ou égale un autre [Mémoria].
-   * Foudroie l utilisation des chaînes de caractères brutes dans le Domaine.
+   * Foudroie l'utilisation des chaînes de caractères brutes dans le Domaine.
    *
+   * @public
    * @param {AppEventSeverity} p_oAutreSeverity - Le palier comparatif à évaluer
-   * @returns {boolean} True si la sévérité courante est hiérarchiquement supérieure ou égale
+   * @returns {boolean} Vrai si la sévérité courante est hiérarchiquement supérieure ou égale
    */
   public estSuperieurOuEgalA(p_oAutreSeverity: AppEventSeverity): boolean {
     return this.m_nNiveau >= p_oAutreSeverity.niveau;
   }
 
-  /** 🗄️ Convertisseur d'infrastructure historique branché sur le décodeur central [Mémoria] */
+  /**
+   * 🗄️ Convertisseur d'infrastructure historique branché sur le décodeur central [Mémoria].
+   *
+   * @public
+   * @static
+   * @param {string} p_sCodeSql - Le code binaire ou textuel brut extrait du disque
+   * @returns {AppEventSeverity} L'instance typée de sévérité correspondante extraite de la RAM
+   */
   public static fromSql(p_sCodeSql: string): AppEventSeverity {
     return this.DeCode<AppEventSeverity>(p_sCodeSql);
   }

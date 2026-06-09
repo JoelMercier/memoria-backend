@@ -12,7 +12,7 @@ import swaggerUi                    from 'swagger-ui-express';
 import { DatabaseConnection } from '@/config/DatabaseConnection';
 import { LoggerSingleton }    from '@/config/LoggerSingleton';
 import { SwaggerConfig }      from '@/config/SwaggerConfig';
-import { SessionId }          from '@/domain/value-objects/IdMetier';
+import { SessionId }          from '@/domain/value-objects/ids';
 import { createV1Router }     from '@/routes/v1';
 import { HandlerService }     from '@/services/http/HandlerService';
 import { ApiResponseFactory } from '@/utils/ApiResponseFactory';

@@ -1,6 +1,6 @@
 // ——— fichier : src/interfaces/entities/share/IShareData.ts
 
-import type { ItemId, ShareId, UserId } from '@/domain/value-objects/IdMetier';
+import type { ItemId, ShareId, UserId } from '@/domain/value-objects/ids';
 import type { IAccessConfig }           from '@/interfaces/entities/share/IAccessConfig';
 import type { IBaseEntityData }         from '@/interfaces/entities/IBaseEntityData';
 

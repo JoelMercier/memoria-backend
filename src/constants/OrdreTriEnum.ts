@@ -30,7 +30,7 @@ export class OrdreTriEnum extends SmartEnum<string> {
   }
 
   /**
-   * ⚖️ Extrait l opérateur SQL réel destiné à s engouffrer dans la requête PostgreSQL.
+   * ⚖️ Extrait l opérateur SQL réel destiné à s'engouffrer dans la requête PostgreSQL.
    */
   public get clauseSql(): string {
     return this.code === 'NATU' ? '' : this.code;
@@ -49,12 +49,12 @@ export class OrdreTriEnum extends SmartEnum<string> {
   /** 💽 DESC - Tri par ordre arithmétique ou alphabétique décroissant */
   public static readonly oDecroissant = new OrdreTriEnum('Décroissant', 'DESC', 3);
 
-  /** 🚀 Passerelle rétrocompatible pour tes DTOs et ton code existant [Mémoria] */
+  /** 🚀 Passerelle rétrocompatible pour tes DTOs et ton code existant */
   public static values(): OrdreTriEnum[] {
     return this.ObtenirToutes<OrdreTriEnum>();
   }
 
-  /** 🗄️ Convertisseur d infrastructure sécurisé convertissant le texte en instance typée [Mémoria] */
+  /** 🗄️ Convertisseur d infrastructure sécurisé convertissant le texte en instance typée */
   public static fromSql(p_sCodeSql: string): OrdreTriEnum {
     const l_sCodeNettoye = p_sCodeSql ? p_sCodeSql.trim().toUpperCase() : '';
 

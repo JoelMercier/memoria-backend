@@ -1,7 +1,7 @@
 // ——— fichier : src/interfaces/entities/user/IUserData.ts
 
 import type { IBaseEntityData }            from '@/interfaces/entities/IBaseEntityData';
-import type { UserId, RoleId, ProviderId } from '@/domain/value-objects/IdMetier';
+import type { UserId, RoleId, ProviderId } from '@/domain/value-objects/ids';
 
 /**
  * 📊 Interface IUserData 👥 (Le Contrat de Structure de l Acteur de Cour Basse)

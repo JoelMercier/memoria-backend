@@ -1,11 +1,13 @@
 // ——— fichier : src/services/AppEventService.ts
 
-import { AppEventCategory        } from '@/constants/AppEventCategory';
-import { AppEventSeverity        } from '@/constants/AppEventSeverity';
-import { AppEventType            } from '@/constants/AppEventType';
-import { UserId, ItemId, ShareId } from '@/domain/value-objects/IdMetier';
-import { DatabaseConnection      } from '@/config/DatabaseConnection';
-import { AppEventRepository      } from '@/infrastructure/repositories/AppEventRepository';
+import { IAppEventService   } from '@/interfaces/services/IAppEventService';
+import { AppEventCategory   } from '@/constants/AppEventCategory';
+import { AppEventSeverity   } from '@/constants/AppEventSeverity';
+import { AppEventSecteur    } from '@/constants/AppEventSecteur';
+import { AppEventAction     } from '@/constants/AppEventAction';
+import { UserId,
+         ItemId, ShareId    } from '@/domain/value-objects/ids';
+import { AppEventRepository } from '@/infrastructure/repositories/AppEventRepository';
 
 /**
  * 🏛️ Classe AppEventService
@@ -13,53 +15,84 @@ import { AppEventRepository      } from '@/infrastructure/repositories/AppEventR
  * Service transverse automatique de journalisation et d'audit applicatif.
  * Centralise l'émission de toutes les traces de sécurité et d'analytique.
  *
- * @sealed Règle d'or : Append-only (Émission stricte, aucune modification autorisée)
+ * @sealed Règle d'or : Append-only (Émission stricte, éclatée en 3NF)
  * @class AppEventService
+ * @implements {IAppEventService}
  *
- * @author 🧠 Conception : Joël (Hongroise maniac')
- * @author ☄️ Usine à lignes : Gaïa (Trébuchet de syntaxe)
- * @author ⚔️ Rempart des types : Le Cartel du Donjon (Garde d'élite)
- * @author 🏺 Relique d'origine : L'Ancien Régime (Fossile de Gergovie)
+ * @author Directrice du Silicium : Joël (DR-DOS maniac, allergique au void capillaire)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets)
+ * @author Ouvriers du Code : La Vague Initiale (Trébuchet de syntaxe purifié V4)
  */
-export class AppEventService {
+export class AppEventService implements IAppEventService {
+  /** 🗄️ Dépôt d'infrastructure d'audit unique injecté par la Forge */
+  private readonly m_oAppEventRepository: AppEventRepository;
+
+  /**
+   * Initialise le service d'audit avec ses dépendances d'infrastructure unifiées.
+   *
+   * @constructor
+   * @param {AppEventRepository} p_oAppEventRepository - Le dépôt d'infrastructure d'audit
+   */
+  public constructor(p_oAppEventRepository: AppEventRepository) {
+    this.m_oAppEventRepository = p_oAppEventRepository;
+  }
+
+  /**
+   * Accesseur public immuable exigé par le contrat ancêtre IBaseService.
+   * Centralise la souveraineté d'accès au dépôt d'infrastructure d'audit.
+   *
+   * @public
+   * @returns {AppEventRepository} L'instance du dépôt d'infrastructure
+   */
+  public get repository(): AppEventRepository {
+    return this.m_oAppEventRepository;
+  }
+
+  /**
+   * Accesseur public immuable exigé par le contrat historique IBaseEventService.
+   *
+   * @public
+   * @returns {AppEventRepository} Le dépôt d'infrastructure.
+   */
+  public get eventRepository(): AppEventRepository {
+    return this.m_oAppEventRepository;
+  }
 
   /**
    * 🔔 Log générique interne du système.
    * Point de passage obligatoire pour l'insertion sécurisée en base de données.
    *
    * @public
-   * @static
    * @async
-   * @param {Object} data - Les données de l'événement à logguer.
-   * @param {UserId | null} [data.userId] - L'identifiant de l'utilisateur.
-   * @param {AppEventCategory} data.eventCategory - La catégorie du SmartEnum.
-   * @param {AppEventType} data.eventType - Le type d'événement SmartEnum précis.
-   * @param {AppEventSeverity} [data.severity] - Le niveau de sévérité SmartEnum.
-   * @param {string} data.message - Le message textuel de description.
-   * @param {Record<string, any>} [data.metadata] - Les métadonnées additionnelles.
-   * @returns {Promise<any>} Le résultat de la création du log en base.
+   * @param {Object} p_oData - Le dictionnaire de structure de l'événement
+   * @param {UserId | null} [p_oData.userId] - L'identifiant de l'acteur responsable
+   * @param {AppEventCategory} p_oData.eventCategory - La catégorie d'infrastructure
+   * @param {AppEventSecteur} p_oData.eventSecteur - Le Secteur fonctionnel (Char(4))
+   * @param {AppEventAction} p_oData.eventAction - L'opération technique menée (Char(4))
+   * @param {AppEventSeverity} [p_oData.severity] - Le niveau de gravité opérationnel
+   * @param {string} p_oData.message - La description claire pour la supervision
+   * @param {Record<string, any>} [p_oData.metadata] - Le Secteur technique lourd JSONB
+   * @returns {Promise<any>} Le résultat brut de l'écriture en base de données
    */
-  public static async log(data: {
+  public async log(p_oData: {
     userId?        : UserId | null;
     eventCategory  : AppEventCategory;
-    eventType      : AppEventType;
+    eventSecteur   : AppEventSecteur;
+    eventAction    : AppEventAction;
     severity?      : AppEventSeverity;
     message        : string;
     metadata?      : Record<string, any>;
   }): Promise<any> {
-    const db = DatabaseConnection.getInstance();
-    const repo = new AppEventRepository(db);
-
-    return repo.create({
+    return this.m_oAppEventRepository.create({
       idAppEvent    : undefined as any,
-      userId        : data.userId ?? null,
-      eventCategory : data.eventCategory,
-      eventType     : data.eventType,
-      severity      : data.severity || AppEventSeverity.INFO,
-      message       : data.message,
-      metadata      : data.metadata || {},
+      userId        : p_oData.userId ?? null,
+      eventCategory : p_oData.eventCategory,
+      eventSecteur  : p_oData.eventSecteur,
+      eventAction   : p_oData.eventAction,
+      severity      : p_oData.severity || AppEventSeverity.INFO,
+      message       : p_oData.message,
+      metadata      : p_oData.metadata || {},
       createdAt     : new Date()
-
     });
   }
 
@@ -67,16 +100,16 @@ export class AppEventService {
    * 🔐 Traçabilité d'une connexion réussie au sein du module d'authentification.
    *
    * @public
-   * @static
    * @async
-   * @param {UserId} userId - L'identifiant de l'utilisateur connecté.
-   * @returns {Promise<any>} Le log généré.
+   * @param {UserId} p_axUserId - L'identifiant de l'utilisateur connecté
+   * @returns {Promise<any>} Le log d'audit généré après insertion
    */
-  public static async authSuccess(userId: UserId): Promise<any> {
+  public async authSuccess(p_axUserId: UserId): Promise<any> {
     return this.log({
-      userId,
+      userId        : p_axUserId,
       eventCategory : AppEventCategory.AUDI,
-      eventType     : AppEventType.UTILISATEUR_CONNEXION,
+      eventSecteur  : AppEventSecteur.AUTH,
+      eventAction   : AppEventAction.CONN,
       message       : 'Connexion réussie'
     });
   }
@@ -85,18 +118,18 @@ export class AppEventService {
    * ⚠️ Traçabilité d'un échec d'authentification (Tentative de brute-force).
    *
    * @public
-   * @static
    * @async
-   * @param {string} email - L'email ayant échoué à se connecter.
-   * @returns {Promise<any>} Le log généré.
+   * @param {string} p_sEmail - L'adresse courriel ayant échoué à s'authentifier
+   * @returns {Promise<any>} Le log d'audit généré après insertion
    */
-  public static async authFailure(email: string): Promise<any> {
+  public async authFailure(p_sEmail: string): Promise<any> {
     return this.log({
       eventCategory : AppEventCategory.AUDI,
-      eventType     : AppEventType.AUTHENTIFICATION_ECHEC,
+      eventSecteur  : AppEventSecteur.AUTH,
+      eventAction   : AppEventAction.ECHE,
       severity      : AppEventSeverity.WARN,
       message       : 'Échec de connexion',
-      metadata      : { email }
+      metadata      : { email: p_sEmail }
     });
   }
 
@@ -104,19 +137,19 @@ export class AppEventService {
    * 📦 Traçabilité de création d'une nouvelle ressource (Pépite).
    *
    * @public
-   * @static
    * @async
-   * @param {UserId} userId - L'auteur de la création.
-   * @param {ItemId} itemId - L'identifiant de la pépite.
-   * @returns {Promise<any>} Le log généré.
+   * @param {UserId} p_axUserId - L'auteur de la création de la pépite
+   * @param {ItemId} p_axItemId - L'identifiant fort de la pépite générée
+   * @returns {Promise<any>} Le log d'audit généré après insertion
    */
-  public static async itemCreated(userId: UserId, itemId: ItemId): Promise<any> {
+  public async itemCreated(p_axUserId: UserId, p_axItemId: ItemId): Promise<any> {
     return this.log({
-      userId,
+      userId        : p_axUserId,
       eventCategory : AppEventCategory.ANAL,
-      eventType     : AppEventType.PEPITE_CREATION,
+      eventSecteur  : AppEventSecteur.PEPI,
+      eventAction   : AppEventAction.CREA,
       message       : 'Pépite créée',
-      metadata      : { itemId: itemId.valeur }
+      metadata      : { itemId: p_axItemId.valeur }
     });
   }
 
@@ -124,19 +157,19 @@ export class AppEventService {
    * 🔗 Traçabilité de génération d'un lien de partage sécurisé.
    *
    * @public
-   * @static
    * @async
-   * @param {UserId} userId - L'auteur du partage.
-   * @param {ShareId} shareId - L'identifiant du partage généré.
-   * @returns {Promise<any>} Le log généré.
+   * @param {UserId} p_axUserId - L'auteur du partage de la pépite
+   * @param {ShareId} p_axShareId - L'identifiant fort du jeton de partage généré
+   * @returns {Promise<any>} Le log d'audit généré après insertion
    */
-  public static async shareCreated(userId: UserId, shareId: ShareId): Promise<any> {
+  public async shareCreated(p_axUserId: UserId, p_axShareId: ShareId): Promise<any> {
     return this.log({
-      userId,
+      userId        : p_axUserId,
       eventCategory : AppEventCategory.ANAL,
-      eventType     : AppEventType.PEPITE_PARTAGE, // Corrigé avec la toute nouvelle instance !
+      eventSecteur  : AppEventSecteur.PEPI,
+      eventAction   : AppEventAction.PART,
       message       : 'Pépite partagée',
-      metadata      : { shareId: shareId.valeur }
+      metadata      : { shareId: p_axShareId.valeur }
     });
   }
 }

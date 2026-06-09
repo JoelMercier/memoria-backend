@@ -1,7 +1,7 @@
 // ——— fichier : src/infrastructure/repositories/mocks/MockAppEventRepository.ts
 
 import { AppEvent             } from '@/entities/AppEvent';
-import { AppEventId, UserId   } from '@/domain/value-objects/IdMetier';
+import { AppEventId, UserId   } from '@/domain/value-objects/ids';
 import { AppEventCategory     } from '@/constants/AppEventCategory';
 import { AppEventSeverity     } from '@/constants/AppEventSeverity';
 import type {

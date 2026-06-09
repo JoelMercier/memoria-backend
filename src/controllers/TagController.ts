@@ -4,7 +4,7 @@ import type { NextFunction,
               Request,
               Response       } from 'express';
 import { UserId,
-         TagId               } from '@/domain/value-objects/IdMetier';
+         TagId               } from '@/domain/value-objects/ids';
 import { CreateTagDto        } from '@/dto/tag/CreateTagDto';
 import { ResponseTagDto      } from '@/dto/tag/ResponseTagDto';
 import { UpdateTagDto        } from '@/dto/tag/UpdateTagDto';

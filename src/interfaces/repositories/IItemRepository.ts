@@ -1,52 +1,59 @@
 // ——— fichier : src/interfaces/repositories/IItemRepository.ts
 
-import { UserId, ItemId } from '@/domain/value-objects/IdMetier';
-import type { Item } from '@/entities/Item';
-import type { ContentType } from '@/constants/ContentType';
+import { UserId, ItemId } from '@/domain/value-objects/ids';
+import type { Item }      from '@/entities/Item';
 import type { IItemData } from '@/interfaces/entities/item/IItemData';
-import type { IWriteableRepository } from '@/interfaces/repositories/IWriteableRepository';
+import { IPhysicalRW }    from '@/interfaces/repositories/IPhysicalRW';
+import { IListResult }    from '@/interfaces/shared/IListResult';
+import { IItemRepositoryListOptions } from '@/interfaces/repositories/IItemRepositoryListOptions';
 
 /**
- * 📋 Interface IItemListOptions
- * -----------------------------
- * Options de filtrage et de pagination spécifiques pour la consultation des pépites.
+ * 🗄️ Interface IItemRepository 🛡️
+ * ----------------------------------------------------------------------------
+ * Contrat d'accès gérant la persistance et le cycle de vie exclusif des Pépites (Items).
+ * Hérite des droits de mutation complète (create, findById, update, delete)
+ * via la branche d'infrastructure physique lourde IPhysicalRW.
+ * Purifié constitutionnellement de la plomberie des étiquettes (Tags).
  *
- * @interface IItemListOptions
- * @author Vision : Joël (Architecte DR-DOS)
- * @author Frapperie du code : Gaïa (Gardienne du feu binaire)
- * @author Héritage Git->Origin : La Vague Initiale (Artisans du temps imparti)
+ * SOLID :
+ *  - SRP 🪓 : Responsabilité unique et étanche focalisée sur le stockage des ressources.
+ *
+ * @interface IItemRepository
+ * @extends {IPhysicalRW<Item, IItemData, ItemId>}
+ * @author Directrice du Silicium : Joël (C++ Framework Architect - Separation of Concerns)
+ * @author Métallurgie des Octets : Gaïa (Au burin, raccordée sur le découpage des tags)
  */
-export interface IItemListOptions {
-  /** 180352 Nombre maximal d'enregistrements à retourner par page */
-  limit? : number;
+export interface IItemRepository extends IPhysicalRW<Item, IItemData, ItemId> {
 
-  /** 🛤️ Index de décalage de départ pour la pagination */
-  offset? : number;
+  /**
+   * 🛤️ Localise et extrait une Pépite unique via son permalien textuel (Slug).
+   *
+   * @async
+   * @param {UserId} p_axUserId - L'identifiant fort binaire de l'utilisateur propriétaire
+   * @param {string} p_sSlug - Le permalien normalisé à rechercher sur le disque
+   * @returns {Promise<Item | null>} L'entité de la pépite hydratée ou null s'il n'y a rien
+   */
+  findBySlug(p_axUserId: UserId, p_sSlug: string): Promise<Item | null>;
 
-  /** 🏷️ Filtre typé adossé à l'armure de notre Smart Enum à 4 lettres [Mémoria] */
-  contentType? : ContentType;
+  /**
+   * 📝 Recherche une Pépite unique par son titre exact sur l'espace d'un utilisateur.
+   * Utilisé en amont lors des créations pour bloquer les collisions d'intitulés.
+   *
+   * @async
+   * @param {UserId} p_axUserId - L'identifiant fort binaire de l'utilisateur propriétaire
+   * @param {string} p_sTitle - Le titre textuel brut à vérifier à la douane du disque
+   * @returns {Promise<Item | null>} L'entité de la pépite correspondante ou null
+   */
+  findByTitle(p_axUserId: UserId, p_sTitle: string): Promise<Item | null>;
 
-  /** 🔍 Chaîne textuelle pour la recherche floue sur les titres et contenus */
-  search? : string;
-}
-
-/**
- * 📦 Interface IItemListResult
- * ----------------------------
- * Structure de restitution normalisée pour les collections paginées de pépites.
- */
-export interface IItemListResult {
-  items : Item[];
-  total : number;
-}
-
-/**
- * 🗄️ Interface IItemRepository
- * ----------------------------
- * Contrat d'accès aux données gérant le cycle de vie de persistance des pépites (Items).
- */
-export interface IItemRepository extends IWriteableRepository<Item, IItemData, ItemId> {
-  findBySlug(userId: UserId, slug: string): Promise<Item | null>;
-  findByTitle(userId: UserId, title: string): Promise<Item | null>;
-  listByUser(userId: UserId, options?: IItemListOptions): Promise<IItemListResult>;
+  /**
+   * 📜 Extrait la collection filtrée, ordonnée et paginée des ressources détenues par un acteur.
+   * Exploite l'enveloppe générique d'IHM et s'aligne sur les variables sacrées Jojo-Style.
+   *
+   * @async
+   * @param {UserId} p_axUserId - L'identifiant fort binaire de l'utilisateur cible
+   * @param {IItemRepositoryListOptions} p_oOptions - Le dictionnaire de configuration de tri, filtres et limites
+   * @returns {Promise<IListResult<Item>>} Le lot de résultats paginé et structuré en français d'élite
+   */
+  listByUser(p_axUserId: UserId, p_oOptions: IItemRepositoryListOptions): Promise<IListResult<Item>>;
 }

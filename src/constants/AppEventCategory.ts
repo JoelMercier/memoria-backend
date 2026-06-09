@@ -49,5 +49,5 @@ export class AppEventCategory extends SmartEnum<string> {
   public static readonly MONI = new AppEventCategory('Supervision', 'MONI', 30);
 
   /** ⛓️ GDPR - Domaine RGPD : Suivi de la conformité et droits à l oubli [Mémoria] */
-  public static readonly GDPR = new AppEventCategory('Conformité RGPD', 'GDPR', 40);
+  public static readonly GDPR = new AppEventCategory('Conformité RGPD', 'RGPD', 40);
 }

@@ -48,30 +48,32 @@
     "description": "Moule une fabrique d'exceptions standardisée à plat",
     "body": [
       "import { ApiError } from '@/exceptions/ApiError';",
-      "import type { ${1:IdType} } from '@/domain/value-objects/IdMetier';",
+      "import type { ${1:IdType} } from '@/domain/value-objects/ids';",
       "",
       "/**",
-      " * 🚨 Classe ${2:Domaine}ErrorFactory",
-      " * ----------------------------",
+      " * 🚨 Classe ${2:Domaine}ErrorFactory 🛡️",
+      " * ----------------------------------------------------------------------------",
       " * Fabrique spécialisée pour la forge d'anomalies unifiées du domaine ${2:Domaine}.",
       " *",
       " * @class ${2:Domaine}ErrorFactory",
-      " * @author Joël, Gaïa & Co",
+      " * @author Directrice du Silicium : Joël (MANIAC de la JSDoc scellée)",
+      " * @author Graveuse de Pépites : Gaïa (Au burin, alignée sur le standard V4)",
       " */",
       "export class ${2:Domaine}ErrorFactory {",
       "",
       "  /** 🔍 Ressource introuvable via son identifiant nominal fort */",
-      "  public static notFound(id: ${1:IdType}): ApiError {",
+      "  public static notFound(p_axId: ${1:IdType}): ApiError {",
       "    return new ApiError(404, '${3:CODE}_NOT_FOUND', `L'entité ${4:ressource} recherchée n'existe pas ou est introuvable.`);",
       "  }",
       "",
       "  /** 🛡️ Violation des droits de propriété ou d'accès */",
-      "  public static accessDenied(id: ${1:IdType}): ApiError {",
+      "  public static accessDenied(p_axId: ${1:IdType}): ApiError {",
       "    return new ApiError(403, '${3:CODE}_ACCESS_DENIED', `Action interdite : vous ne possédez pas les privilèges requis.`);",
       "  }",
       "}"
     ]
   },
+
 
   "Service Concret de Domaine": {
     "scope": "typescript",

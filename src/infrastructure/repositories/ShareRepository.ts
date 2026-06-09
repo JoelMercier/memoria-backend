@@ -2,7 +2,7 @@
 
 import type { QueryResult, QueryResultRow } from 'pg';
 import { BaseRepository } from '@/infrastructure/repositories/BaseRepositories';
-import { UserId, ItemId, ShareId } from '@/domain/value-objects/IdMetier';
+import { UserId, ItemId, ShareId } from '@/domain/value-objects/ids';
 import { Share } from '@/entities/Share';
 import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
 import { ShareErrorFactory } from '@/exceptions/ShareErrorFactory';

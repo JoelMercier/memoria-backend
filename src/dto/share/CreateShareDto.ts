@@ -1,6 +1,6 @@
 // ——— fichier : src/dto/share/CreateShareDto.ts
 
-import      { ItemId, ShareId, UserId                     } from '@/domain/value-objects/IdMetier';
+import      { ItemId, ShareId, UserId                     } from '@/domain/value-objects/ids';
 import type { IAccessConfig                               } from '@/interfaces/entities/share/IAccessConfig';
 import      { type CreateShareSchemaType, ShareValidation } from '@/validation/zod/ShareValidation';
 

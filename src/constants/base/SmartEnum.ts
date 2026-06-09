@@ -1,4 +1,4 @@
-// ——— fichier : src/constants/base/SmartEnum.ts
+// ——— fichier : src\constants\base\SmartEnum.ts
 
 /**
  * 🤖 Classe Abstraite SmartEnum 🧮 (Le Calibreur de Trigrammes Système 🔌)
@@ -56,7 +56,7 @@ export abstract class SmartEnum<TCode extends string | number> {
     const l_rInstance = l_rSousMap ? l_rSousMap.get(l_vCleNormalisee) : null;
 
     if (!l_rInstance) {
-      throw new Error(`[Erreur Sémantique 🚨] Code d infrastructure inconnu pour ${l_sNomClasse} : ${p_vCode}`);
+      throw new Error(`[Erreur Sémantique 🚨] Code d''infrastructure inconnu pour ${l_sNomClasse} : ${p_vCode}`);
     }
     return l_rInstance as E;
   }
@@ -72,7 +72,7 @@ export abstract class SmartEnum<TCode extends string | number> {
   }
 
   /**
-   * 🚀 Récupère l intégralité des lignes du dictionnaire ordonnées pour l écran 🌐.
+   * 🚀 Récupère l'intégralité des lignes du dictionnaire ordonnées pour l'écran 🌐.
    */
   public static ObtenirToutes<E extends SmartEnum<any>>(this: any): E[] {
     const l_sNomClasse = this.name;

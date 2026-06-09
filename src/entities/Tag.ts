@@ -3,7 +3,7 @@
 import { BaseEntity } from '@/entities/BaseEntity';
 import type { ITag  } from '@/interfaces/entities/tag/ITag';
 import type { ITagData } from '@/interfaces/entities/tag/ITagData';
-import type { UserId, TagId } from '@/domain/value-objects/IdMetier';
+import type { UserId, TagId } from '@/domain/value-objects/ids';
 
 /**
  * 🏛️ Classe Tag

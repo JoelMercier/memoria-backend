@@ -1,7 +1,7 @@
 // ——— fichier : src/exceptions/UserErrorFactory.ts
 
 import { ApiError } from '@/exceptions/ApiError';
-import { UserId   } from '@/domain/value-objects/IdMetier';
+import { UserId   } from '@/domain/value-objects/ids';
 
 /**
  * 🏛️ Classe UserErrorFactory

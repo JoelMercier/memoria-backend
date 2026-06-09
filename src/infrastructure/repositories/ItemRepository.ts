@@ -3,7 +3,7 @@
 import type { QueryResult,
               QueryResultRow       } from 'pg';
 import      { BaseRepository       } from '@/infrastructure/repositories/BaseRepositories';
-import      { UserId, ItemId, ContentTypeId       } from '@/domain/value-objects/IdMetier';
+import      { UserId, ItemId, ContentTypeId       } from '@/domain/value-objects/ids';
 import      { Item                 } from '@/entities/Item';
 import      { ContentType          } from '@/constants/ContentType';
 import      { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';

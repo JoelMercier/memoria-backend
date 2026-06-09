@@ -3,7 +3,8 @@
 import      { Buffer           } from 'node:buffer';
 import type { IdInfrastructure } from '@/domain/base/IdInfrastructure';
 import type { IdBinaire        } from '@/domain/base/IdBinaire';
-import type { IdCodeFixe       } from '@/domain/base/IdCodeFixe';
+import { IdChoupy } from '@/domain/base/idCore/IdChoupy';
+
 
 /**
  * 📋 Type AllowedIdTypes (Version Jojo Alignement Binaire Pur 🔬)
@@ -18,7 +19,21 @@ export type AllowedIdTypes =
 
   | IdInfrastructure<any> // L'Ancêtre Suprême de la Forge
   | IdBinaire             // Accepte implicitement UserId, ItemId, ShareId, TagId...
-  | IdCodeFixe;           // Accepte implicitement RoleId, SeverityId, EventCategoryId...
+  | IdChoupy<any, any>;   // Accepte implicitement RoleId, SeverityId, EventCategoryId...
+
+
+/**
+ * 🏛️ Interface de base pour l'audit temporel de Mémoria
+*/
+interface IBaseAuditData {
+
+    /** 📅 Horodatage précis, OBLIGATOIRE et immuable de la création de l'enregistrement (Présent partout). */
+    createdAt : Date; // Verrouillé : Strictement obligatoire !
+
+    /** 📅 Horodatage de la dernière modification (Optionnel pour tolérer l'Append-Only des tables d'audit). */
+    updatedAt? : Date; // Remis en optionnel pour respecter la table Events de Joël !
+
+};
 
 /**
  * 📊 Interface IBaseEntityData (Version Jojo Équilibre de l'Audit 🛡️)
@@ -32,21 +47,12 @@ export type AllowedIdTypes =
  * @template TId         - Le Value Object ou type physique affecté à la clé primaire
  * @author Joël, Gaïa & Co
  */
-export type IBaseEntityData<
-  TEntityName extends string,
-  TId extends AllowedIdTypes = string
-> = {
+
+export type IBaseEntityData< TEntityName extends string, TId extends AllowedIdTypes = string > = {
 
   /**
    * 🪓 Mappage dynamique calculé et chirurgical de la clé primaire.
    */
   [K in `id${Capitalize<TEntityName>}`]: TId;
 
-} & {
-
-  /** 📅 Horodatage précis, OBLIGATOIRE et immuable de la création de l'enregistrement (Présent partout). */
-  createdAt : Date; // Verrouillé : Strictement obligatoire !
-
-  /** 📅 Horodatage de la dernière modification (Optionnel pour tolérer l'Append-Only des tables d'audit). */
-  updatedAt? : Date; // Remis en optionnel pour respecter la table Events de Joël !
-};
+} & IBaseAuditData;

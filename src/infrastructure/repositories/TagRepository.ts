@@ -1,7 +1,7 @@
 // ——— fichier : src/infrastructure/repositories/TagRepository.ts
 
 import { BaseRepository       } from '@/infrastructure/repositories/BaseRepositories';
-import { UserId, TagId        } from '@/domain/value-objects/IdMetier';
+import { UserId, TagId        } from '@/domain/value-objects/ids';
 import { Tag                  } from '@/entities/Tag';
 import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
 import { TagErrorFactory      } from '@/exceptions/TagErrorFactory';

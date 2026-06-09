@@ -1,7 +1,7 @@
 // ——— fichier : src/infrastructure/repositories/mocks/MockShareRepository.ts
 
 import { Share                   } from '@/entities/Share';
-import { ShareId, ItemId, UserId } from '@/domain/value-objects/IdMetier';
+import { ShareId, ItemId, UserId } from '@/domain/value-objects/ids';
 import type { IShareData         } from '@/interfaces/entities/share/IShareData';
 import type { IShareRepository   } from '@/interfaces/repositories/IShareRepository';
 

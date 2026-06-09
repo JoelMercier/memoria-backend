@@ -3,7 +3,7 @@
 import { ApiError } from '@/exceptions/ApiError';
 // 🪓 ALIGNEMENT INDUSTRIEL : Remplacement du fantomatique EventId par le type nominal officiel AppEventId
 import { UserId,
-         AppEventId } from '@/domain/value-objects/IdMetier';
+         AppEventId } from '@/domain/value-objects/ids';
 
 /**
  * 🏛️ Classe AppEventErrorFactory

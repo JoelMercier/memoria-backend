@@ -1,4 +1,4 @@
-// ——— fichier : src/interfaces/entities/IEntity.ts
+// ——— fichier : src\interfaces\entities\IEntity.ts
 
 import type { AllowedIdTypes } from '@/interfaces/entities/IBaseEntityData';
 
@@ -13,8 +13,7 @@ import type { AllowedIdTypes } from '@/interfaces/entities/IBaseEntityData';
  * @template TId   - Le type fort de la clé primaire (Par défaut string)
  * @author Joël, Gaïa & Co
  */
-export interface IEntity<
-  TData,
+export interface IEntity< TData,
   // @ts-expect-error - TId est déclaré pour l'extensibilité des classes héritières mais non lu directement ici
   TId extends AllowedIdTypes = string
 > {

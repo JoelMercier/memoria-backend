@@ -1,7 +1,7 @@
 // ——— fichier : src/infrastructure/repositories/ItemTagRepository.ts
 
 import      { BaseRepository          } from '@/infrastructure/repositories/BaseRepositories';
-import      { UserId, ItemId, TagId   } from '@/domain/value-objects/IdMetier';
+import      { UserId, ItemId, TagId   } from '@/domain/value-objects/ids';
 import      { Tag                     } from '@/entities/Tag';
 import      { DatabaseErrorFactory    } from '@/exceptions/DatabaseErrorFactory';
 import type { IItemTagRepository      } from '@/interfaces/repositories/IItemTagRepository';
@@ -144,7 +144,7 @@ export class ItemTagRepository extends BaseRepository implements IItemTagReposit
    * @returns {Promise<void>}
    */
   public async sync(p_oItemId: ItemId, p_aoTagIdsCibles: ReadonlyArray<TagId>): Promise<void> {
-    const l_oPoolClient = await this.db.getPool().connect(); // Extraction via l accesseur public
+    const l_oPoolClient = await this.db.getPool().connect(); // Extraction via l'accesseur public
 
     try {
       await l_oPoolClient.query('Begin;');
@@ -205,10 +205,14 @@ export class ItemTagRepository extends BaseRepository implements IItemTagReposit
       await l_oPoolClient.query('Commit;');
 
     } catch (l_oErreur) {
+
       await l_oPoolClient.query('Rollback;'); // Libération défensive immédiate des Shared Buffers
       throw DatabaseErrorFactory.queryFailed('ItemTag.sync', (l_oErreur as Error).message);
+
     } finally {
+
       l_oPoolClient.release();
+
     }
   }
 

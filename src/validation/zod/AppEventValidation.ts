@@ -1,8 +1,10 @@
-// ——— fichier : src\validation\zod\AppEventValidation.ts
+// ——— fichier : src/validation/zod/AppEventValidation.ts
 
 import { z }                from 'zod';
 import { AppEventCategory } from '@/constants/AppEventCategory';
 import { AppEventSeverity } from '@/constants/AppEventSeverity';
+import { AppEventContext }  from '@/constants/AppEventSecteur'; // [NEW V4]
+import { AppEventAction }   from '@/constants/AppEventAction';  // [NEW V4]
 
 /**
  * 🗂️ Schémas de validation Zod pour les codes des Smart Enums d'audit.
@@ -19,6 +21,18 @@ const severitySchema = z.string().trim().nullable().refine(
   { message: 'Niveau de gravité d\'audit invalide' }
 );
 
+/** [NEW V4] Contexte fonctionnel éclaté - Reçoit et valide le quadrigramme fixe (ex: 'SYST') */
+const eventContextSchema = z.string().trim().refine(
+  (val) => AppEventContext.isValidCode(val),
+  { message: 'Contexte fonctionnel d\'audit invalide' }
+);
+
+/** [NEW V4] Action technique éclatée - Reçoit et valide le quadrigramme fixe (ex: 'DEMA') */
+const eventActionSchema = z.string().trim().refine(
+  (val) => AppEventAction.isValidCode(val),
+  { message: 'Opération technique d\'audit invalide' }
+);
+
 /**
  * 🆔 Schémas des identifiants techniques (Value Objects au format de transport).
  */
@@ -28,7 +42,6 @@ const userIdSchema        = z.string().trim().nullable().optional();
 /**
  * 🎯 Schémas pour les champs textuels et contextuels de l'audit.
  */
-const eventTypeSchema     = z.string().trim().min(1, 'Type d\'événement requis').max(50);
 const messageSchema       = z.string().trim().max(1024).nullable();
 const metadataSchema      = z.record(z.string(), z.any()).default({});
 
@@ -39,7 +52,8 @@ const createAppEventSchema = z.object({
   idAppEvent    : idEventSchema,
   userId        : userIdSchema,
   eventCategory : eventCategorySchema,
-  eventType     : eventTypeSchema,
+  eventContext  : eventContextSchema, // [REARMÉ V4]
+  eventAction   : eventActionSchema,  // [REARMÉ V4]
   severity      : severitySchema,
   message       : messageSchema,
   metadata      : metadataSchema
@@ -52,7 +66,8 @@ const updateAppEventSchema = z.object({
   idAppEvent    : idEventSchema,
   userId        : userIdSchema,
   eventCategory : eventCategorySchema,
-  eventType     : eventTypeSchema,
+  eventContext  : eventContextSchema, // [REARMÉ V4]
+  eventAction   : eventActionSchema,  // [REARMÉ V4]
   severity      : severitySchema,
   message       : messageSchema,
   metadata      : metadataSchema

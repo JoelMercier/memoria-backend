@@ -17,7 +17,7 @@ import { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
  * @author Héritage Git->Origin : La Vague Initiale (Ouvriers de la première heure)
  */
 export abstract class BaseRepository {
-  /** 🔌 Le pool de connexions persistant de l infrastructure PostgreSQL 💽 */
+  /** 🔌 Le pool de connexions persistant de l'infrastructure PostgreSQL 💽 */
   private readonly m_rPool: Pool;
 
   /** 🎛️ Connexion physique universelle encapsulée [Mémoria] */
@@ -82,11 +82,15 @@ export abstract class BaseRepository {
       return l_rResultatBrut.rows as T[];
 
     } catch (l_oErrSysteme) {
+
       throw new Error(`[Infrastructure 🚨] Échec SQL : ${(l_oErrSysteme as Error).message}`);
+
     } finally {
+
       if (l_oClient) {
         l_oClient.release();
       }
+      
     }
   }
 }

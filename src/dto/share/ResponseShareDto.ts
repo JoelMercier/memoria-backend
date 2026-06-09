@@ -1,7 +1,7 @@
 // ——— fichier : src/dto/share/ResponseShareDto.ts
 
 import { ItemId,
-         ShareId             } from '@/domain/value-objects/IdMetier';
+         ShareId             } from '@/domain/value-objects/ids';
 import type { IAccessConfig  } from '@/interfaces/entities/share/IAccessConfig';
 import type { IShare         } from '@/interfaces/entities/share/IShare';
 

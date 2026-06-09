@@ -1,7 +1,7 @@
 // ——— fichier : src/infrastructure/repositories/mocks/MockItemRepository.ts
 
 import      { Item            } from '@/entities/Item';
-import      { ItemId, UserId  } from '@/domain/value-objects/IdMetier';
+import      { ItemId, UserId  } from '@/domain/value-objects/ids';
 import type { IItemData       } from '@/interfaces/entities/item/IItemData';
 import type { IItemListOptions,
               IItemListResult,

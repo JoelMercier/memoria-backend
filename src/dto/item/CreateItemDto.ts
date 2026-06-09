@@ -1,7 +1,7 @@
 // ——— fichier : src/dto/item/CreateItemDto.ts
 
 import type { ContentType } from '@/constants/ContentType';
-import { TagId               } from '@/domain/value-objects/IdMetier';
+import { TagId               } from '@/domain/value-objects/ids';
 import { type CreateItemSchemaType,
          ItemValidation       } from '@/validation/zod/ItemValidation';
 
