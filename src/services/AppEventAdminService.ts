@@ -7,7 +7,7 @@ import { AppEventSeverity      } from '@/constants/AppEventSeverity';
 import { AppEventSecteur       } from '@/constants/AppEventSecteur';
 import { AppEventAction        } from '@/constants/AppEventAction';
 import { AppEventId            } from '@/domain/value-objects/ids';
-import { IAppEventRepository   } from '@/interfaces/repositories/IAppEventRepository';
+import { IAppEventRepository   } from '@/interfaces/repositories/PostGres/IAppEventRepository';
 import type { AppEvent }         from '@/entities/AppEvent';
 
 /**

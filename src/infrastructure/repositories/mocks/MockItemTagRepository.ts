@@ -3,7 +3,7 @@
 import { Tag                  } from '@/entities/Tag';
 import { ItemId, TagId        } from '@/domain/value-objects/ids';
 import { MockTagRepository    } from '@/infrastructure/repositories/mocks/MockTagRepository';
-import type { IItemTagRepository } from '@/interfaces/repositories/IItemTagRepository';
+import type { IItemTagRepository } from '@/interfaces/repositories/PostGres/IItemTagRepository';
 
 /**
  * 🗄️ Structure de liaison interne pour la simulation de table pivot en RAM 🧠
@@ -27,8 +27,10 @@ interface IMockItemTagRow {
  * @author Héritage Git->Origin : La Vague Initiale (Artisans du temps imparti)
  */
 export class MockItemTagRepository implements IItemTagRepository {
+
   /** 🧠 La table virtuelle associative Many-to-Many stockée en mémoire vive */
   private m_aoRelations: IMockItemTagRow[] = [];
+
   /** 🔌 Le pointeur vers le dépôt factice des étiquettes pour les jointures */
   private readonly m_oTagRepo: MockTagRepository;
 

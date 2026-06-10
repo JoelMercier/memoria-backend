@@ -14,6 +14,7 @@ import      { RequestIdGenerator } from '@/utils/RequestIdGenerator';
 import      { UserId,
               ShareId            } from '@/domain/value-objects/ids';
 import      { ShareValidation    } from '@/validation/zod';
+import OrdreTriEnum from '@/constants/OrdreTriEnum';
 
 /**
  * 🏛️ Classe ShareController
@@ -96,11 +97,14 @@ export class ShareController implements IShareController {
   }
 
   /**
-   * 📜 Liste l'intégralité des partages détenus par l'utilisateur connecté.
+   * 📜 Liste la collection filtrée, ordonnée et obligatoirement paginée des partages détenus par l'utilisateur connecté.
    * GET /v1/shares
+   * [SCELLÉ EXPOSITION V4] Extraction des critères réseau et déballage du français d'élite.
    *
-   * @param {Request} req - Requête HTTP
-   * @param {Response} res - Réponse HTTP
+   * @public
+   * @async
+   * @param {Request} req - Requête HTTP Express
+   * @param {Response} res - Réponse HTTP Express
    * @param {NextFunction} next - Passerelle d'erreurs Express
    * @returns {Promise<void>}
    */
@@ -110,13 +114,23 @@ export class ShareController implements IShareController {
       const userId    : UserId = this.getUserId(req);
       const baseUrl   : string = this.buildBaseUrl(req);
 
-      // ——— Utilisation de l'accesseur propre au lieu du membre brut
-      const shares = await this.shareService.listByUser(userId);
+      // 🗲 [INJECTÉ V4] Extraction et normalisation des curseurs de bridage depuis la Query String
+      const { OrdreTriEnum } = await import('@/constants/OrdreTriEnum');
+      const l_oOptions = {
+        NbLignes:   req.query.NbLignes   ? Number(req.query.NbLignes)   : 50,
+        LigneDebut:  req.query.LigneDebut ? Number(req.query.LigneDebut) : 0,
+        ColonneTri:  (req.query.ColonneTri as string) || 'shCreatedAt',
+        OrdreAff:    OrdreTriEnum.DeCode<OrdreTriEnum>((req.query.OrdreAff as string) || 'DESC')
+      };
+
+      // 🪓 [RÉPARÉ TS2554] Transmission impérative du bouclier anti-fuite de soute
+      const l_oPackShareResult = await this.shareService.listByUser(userId, l_oOptions);
 
       res.status(200).json(
         ApiResponseFactory.success(
           'Liste des partages',
-          { shares: ResponseShareDto.fromShares(shares, baseUrl) },
+          // 🪓 [RÉPARÉ TS2345] On extrait uniquement le tableau d'entités vivantes de l'enveloppe d'état !
+          { shares: ResponseShareDto.fromShares(l_oPackShareResult.Lignes, baseUrl) },
           requestId
         )
       );

@@ -11,7 +11,7 @@ import { AppEventCategory }     from '@/constants/AppEventCategory';
 import { AppEventSecteur }      from '@/constants/AppEventSecteur';
 import { AppEventAction }       from '@/constants/AppEventAction';
 import type { IDatabaseConnection }  from '@/interfaces/database/IDatabaseConnection';
-import type { IAppEventData, IAppEventRepository, IAppEventListOptions, IAppEventListResult } from '@/interfaces/repositories/IAppEventRepository';
+import type { IAppEventData, IAppEventRepository, IAppEventListOptions, IAppEventListResult } from '@/interfaces/repositories/PostGres/IAppEventRepository';
 import type { IListOptions }         from '@/interfaces/shared/IListOptions';
 import type { IListResult }          from '@/interfaces/shared/IListResult';
 import OrdreTriEnum             from '@/constants/OrdreTriEnum';
@@ -54,14 +54,14 @@ export class AppEventRepository extends BaseRepository implements IAppEventRepos
       const l_oResult = await this.db.query<IAppEventRow>(
         'Select * From public."ConsignerEvenement"($1, $2, $3, $4, $5, $6, $7, $8);',
         [
-          p_oData.idAppEvent,
-          p_oData.userId ?? null,
-          p_oData.CategoryId,
-          p_oData.SeverityId,
-          p_oData.SecteurId,
-          p_oData.ActionId,
-          p_oData.Message,
-          p_oData.Metadata ?? {}
+          p_oData.aeIdAppEvent,
+          p_oData.aeUserId ?? null,
+          p_oData.aeCategoryId,
+          p_oData.aeSeverityId,
+          p_oData.aeSecteurId,
+          p_oData.aeActionId,
+          p_oData.aeMessage,
+          p_oData.aeMetadata ?? {}
         ]
       );
       if (!l_oResult.rows || l_oResult.rows.length === 0) {
@@ -72,7 +72,7 @@ export class AppEventRepository extends BaseRepository implements IAppEventRepos
       if (l_oErr instanceof AppEventErrorFactory) throw l_oErr;
       const l_sMsg = l_oErr instanceof Error ? l_oErr.message : 'unknown';
       if (l_sMsg.includes('Events_aeUserId_Fkey')) {
-        const l_oIdInconnu = p_oData.userId ?? new UserId(Buffer.from('00000000000000000000000000000000', 'hex'));
+        const l_oIdInconnu = p_oData.aeUserId ?? new UserId(Buffer.from('00000000000000000000000000000000', 'hex'));
         throw AppEventErrorFactory.userIdUnknown(l_oIdInconnu);
       }
       throw AppEventErrorFactory.creation(l_sMsg);
@@ -107,7 +107,7 @@ export class AppEventRepository extends BaseRepository implements IAppEventRepos
       const l_sActionText  = p_oOptions.actionId  ? p_oOptions.actionId.valeur  : null;
 
       const l_oResult = await this.db.query<IAppEventRow>(
-        'Select * From public."ToutesLesTraces"($1, $2, $3, $4, $5, $6, $7, $8, $9);',
+        'Select * From "ToutesLesTraces"($1, $2, $3, $4, $5, $6, $7, $8, $9);',
         [
           p_oOptions.userId ?? null,
           l_sSecteurText,

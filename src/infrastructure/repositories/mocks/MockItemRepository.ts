@@ -3,15 +3,17 @@
 import { Item }                       from '@/entities/Item';
 import { ItemId, UserId }             from '@/domain/value-objects/ids';
 import type { IItemData }             from '@/interfaces/entities/item/IItemData';
-import type { IMockItemRepository }   from '@/interfaces/repositories/IItemRepository';
-import type { IItemRepositoryListOptions } from '@/interfaces/repositories/IItemRepositoryListOptions';
 import type { IListResult }           from '@/interfaces/shared/IListResult';
+import { IListOptions }               from '@/interfaces/shared/IListOptions';
+import { IMockItemRepository }        from '@/interfaces/repositories/Mocks/IMockItemRepository';
+import { IItemRepositoryListOptions } from '@/interfaces/repositories/PostGres/IItemRepository';
+import OrdreTriEnum                   from '@/constants/OrdreTriEnum';
 
 /**
  * 🗄️ Classe MockItemRepository 🧮 (Le Simulateur de Pépites en RAM 🤖)
  * ----------------------------------------------------------------------------
  * Usine de simulation émulant à 100% le cycle de vie de la table "Items" en RAM.
- * Délivrée de la propriété physique .db grâce à l'héritage légitime de IMemoryRW.
+ * Délivrée de la propriété physique .db grâce à l'héritage légitime de IMockItemRepository.
  *
  * @class MockItemRepository
  * @implements {IMockItemRepository}
@@ -46,12 +48,6 @@ export class MockItemRepository implements IMockItemRepository {
 
   /**
    * 🔍 Localise une pépite via son jeton textuel unique (slug) pour un acteur.
-   *
-   * @public
-   * @async
-   * @param {UserId} p_oUserId - L'identifiant de l'acteur propriétaire
-   * @param {string} p_sSlug - Le permalien exact recherché
-   * @returns {Promise<Item | null>} La pépite correspondante ou null
    */
   public async findBySlug(p_oUserId: UserId, p_sSlug: string): Promise<Item | null> {
     const l_sRecherche: string = p_sSlug.trim();
@@ -64,31 +60,18 @@ export class MockItemRepository implements IMockItemRepository {
 
   /**
    * 🔍 Localise une pépite via son titre pour un acteur propriétaire.
-   *
-   * @public
-   * @async
-   * @param {UserId} p_oUserId - L'identifiant de l'acteur propriétaire
-   * @param {string} p_sTitle - Le titre textuel recherché
-   * @returns {Promise<Item | null>} La pépite correspondante ou null
    */
   public async findByTitle(p_oUserId: UserId, p_sTitle: string): Promise<Item | null> {
     const l_sRecherche: string = p_sTitle.toLowerCase().trim();
     return (
-      this.getItems().find((l_oItem: Item): boolean =>
-        l_oItem.idUser.estEgalA(p_oUserId) && l_oItem.title.toLowerCase().trim() === l_sRecherche
+      this.getItems().find((l_oUserItem: Item): boolean =>
+        l_oUserItem.idUser.estEgalA(p_oUserId) && l_oUserItem.title.toLowerCase().trim() === l_sRecherche
       ) ?? null
     );
   }
 
   /**
    * 🚀 Extraction contractuelle filtrée Jojo-Style simulant l'indexation SQL 🌐.
-   * Raccordement strict sur IListResult et les variables sacrées de contrôle.
-   *
-   * @public
-   * @async
-   * @param {UserId} p_oUserId - L'identifiant de l'acteur propriétaire connecté
-   * @param {IItemRepositoryListOptions} p_oOptions - Le dictionnaire de tri et pagination obligatoires
-   * @returns {Promise<IListResult<Item>>} Le lot de résultats paginé et structuré en français d'élite
    */
   public async listByUser(p_oUserId: UserId, p_oOptions: IItemRepositoryListOptions): Promise<IListResult<Item>> {
     let l_aoFiltres: Item[] = this.getItems().filter((l_oItem: Item): boolean => l_oItem.idUser.estEgalA(p_oUserId));
@@ -102,38 +85,11 @@ export class MockItemRepository implements IMockItemRepository {
       l_aoFiltres = l_aoFiltres.filter((l_oItem: Item): boolean => l_oItem.title.toLowerCase().includes(l_sMotCle));
     }
 
-    // Algorithme de tri déterministe obligatoire émulant le moteur SQL
-    const l_sCleTri = p_oOptions.ColonneTri === 'itCreatedAt' ? 'createdAt' : 'title';
-    l_aoFiltres.sort((l_oA: any, l_oB: any): number => {
-      const l_vA = l_oA[l_sCleTri];
-      const l_vB = l_oB[l_sCleTri];
-      return p_oOptions.OrdreAff?.toString() === 'DESC'
-        ? (l_vA > l_vB ? -1 : 1)
-        : (l_vA < l_vB ? -1 : 1);
-    });
-
-    const l_nTotal: number       = l_aoFiltres.length;
-    const l_nLigneDebut: number  = p_oOptions.LigneDebut;
-    const l_nNbLignesDem: number = p_oOptions.NbLignes;
-
-    const l_aoLignesPage = l_aoFiltres.slice(l_nLigneDebut, l_nLigneDebut + l_nNbLignesDem);
-
-    return {
-      LigneDebut:    l_nLigneDebut,
-      NbLignesDem:   l_nNbLignesDem,
-      NbLignesRenv:  l_aoLignesPage.length,
-      NbLignesTotal: l_nTotal,
-      Lignes:        l_aoLignesPage
-    };
+    return this.appliquerPaginationRAM(l_aoFiltres, p_oOptions);
   }
 
   /**
    * 🪓 Écriture concrète : Enfourne une nouvelle pépite dans le catalogue de simulation 🪙.
-   *
-   * @public
-   * @async
-   * @param {IItemData} p_oData - Le sac de données brutes issues du Domaine
-   * @returns {Promise<Item>} L'instance de l'entité forgée
    */
   public async create(p_oData: IItemData): Promise<Item> {
     const l_oItem = new Item({
@@ -147,12 +103,6 @@ export class MockItemRepository implements IMockItemRepository {
 
   /**
    * 🪓 Mutation en mémoire vive : Applique les modifications partielles d'une pépite.
-   *
-   * @public
-   * @async
-   * @param {ItemId} p_oIdItem - L'identifiant fort de la pépite à modifier
-   * @param {Partial<IItemData>} p_oData - Les colonnes partielles soumises
-   * @returns {Promise<Item>} L'entité Domaine modifiée au bit près
    */
   public async update(p_oIdItem: ItemId, p_oData: Partial<IItemData>): Promise<Item> {
     const l_iIdx: number = this.getItems().findIndex((l_oItem: Item): boolean => l_oItem.idItem.estEgalA(p_oIdItem));
@@ -174,28 +124,44 @@ export class MockItemRepository implements IMockItemRepository {
 
   /**
    * 🪓 Extraction complète requise par le contrat d'héritage de IBaseRepository [Mémoria].
-   *
-   * @public
-   * @async
-   * @returns {Promise<Item[]>} L'intégralité absolue de la collection simulée
    */
-  public async findAll(): Promise<Item[]> {
-    return [...this.getItems()];
+  public async findAll(p_oOptions: IListOptions): Promise<IListResult<Item>> {
+    return this.appliquerPaginationRAM(this.getItems(), p_oOptions);
   }
 
   /**
    * 🪓 Retrait physique : Supprime une pépite du dictionnaire de simulation.
-   *
-   * @public
-   * @async
-   * @param {ItemId} p_oIdItem - L'identifiant unique fort de la pépite
-   * @returns {Promise<boolean>} True si la suppression en RAM est effective
    */
   public async delete(p_oIdItem: ItemId): Promise<boolean> {
     const l_iTailleInitiale: number = this.getItems().length;
-    const l_aoNettoye = this.getItems().filter((l_oItem: Item): boolean => !l_oItem.idItem.estEgalA(p_oIdItem));
+    this.m_aoItems = this.getItems().filter((l_oItem: Item): boolean => !l_oItem.idItem.estEgalA(p_oIdItem));
+    return this.getItems().length < l_iTailleInitiale;
+  }
 
-    this.m_aoItems = l_aoNettoye;
-    return this.m_aoItems.length < l_iTailleInitiale;
+  /**
+   * 🧮 Utilitaire privé émulant la pagination et le tri universel en RAM.
+   */
+  private appliquerPaginationRAM(p_aoSource: Item[], p_oOptions: IListOptions): IListResult<Item> {
+    const l_nTotal = p_aoSource.length;
+    const l_nLimit = p_oOptions.NbLignes ?? 50;
+    const l_nOffset = p_oOptions.LigneDebut ?? 0;
+
+    const l_sCleTri = p_oOptions.ColonneTri === 'itCreatedAt' ? 'createdAt' : 'title';
+    p_aoSource.sort((l_oA: any, l_oB: any): number => {
+      const l_vA = l_oA[l_sCleTri];
+      const l_vB = l_oB[l_sCleTri];
+      const l_sOrdre = p_oOptions.OrdreAff instanceof OrdreTriEnum ? p_oOptions.OrdreAff.code : 'DESC';
+      return l_sOrdre === 'DESC' ? (l_vA > l_vB ? -1 : 1) : (l_vA < l_vB ? -1 : 1);
+    });
+
+    const l_aoPage = p_aoSource.slice(l_nOffset, l_nOffset + l_nLimit);
+
+    return {
+      LigneDebut:    l_nOffset,
+      NbLignesDem:   l_nLimit,
+      NbLignesRenv:  l_aoPage.length,
+      NbLignesTotal: l_nTotal,
+      Lignes:        l_aoPage
+    };
   }
 }

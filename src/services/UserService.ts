@@ -8,7 +8,7 @@ import type { DeleteAccountDto }  from '@/dto/user/DeleteAccountDto';
 import type { UpdateProfileDto }  from '@/dto/user/UpdateProfileDto';
 import type { IUser           } from '@/interfaces/entities/user/IUser';
 import type { IUserData       } from '@/interfaces/entities/user/IUserData';
-import type { IUserRepository    } from '@/interfaces/repositories/IUserRepository';
+import type { IUserRepository    } from '@/interfaces/repositories/PostGres/IUserRepository';
 import type { IPasswordHasher    } from '@/interfaces/security/IPasswordHasher';
 import type { IUserService       } from '@/interfaces/services/IUserService';
 

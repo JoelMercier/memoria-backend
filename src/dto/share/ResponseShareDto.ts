@@ -17,10 +17,10 @@ import type { IShare         } from '@/interfaces/entities/share/IShare';
 export class ResponseShareDto {
 
   /** 🔔 Caillou de couleur : Identifiant unique immuable du lien de partage */
-  public readonly id : ShareId;
+  public readonly idShare : ShareId;
 
   /** 📦 Caillou de couleur : Identifiant de la pépite (Item) associée */
-  public readonly itemId : ItemId;
+  public readonly idItem : ItemId;
 
   /** 📧 Adresse électronique du destinataire cible du partage */
   public readonly recipientEmail : string | null;
@@ -53,13 +53,13 @@ export class ResponseShareDto {
    */
   private constructor(share: IShare, baseUrl: string) {
     // 🪓 Alignement chirurgical natif (Fini les vieux double casts d'ID !)
-    this.id             = share.getShareId();
-    this.itemId         = share.getItemId();
+    this.idShare        = share.idShare;
+    this.idItem         = share.idItem;
 
-    this.recipientEmail = share.getCourrielDest();
-    this.shareToken     = share.getJeton();
-    this.shareUrl       = `${baseUrl}/v1/public/shared/${share.getJeton()}`;
-    this.accessConfig   = share.getAccessConfig();
+    this.recipientEmail = share.courrielDest;
+    this.shareToken     = share.jeton;
+    this.shareUrl       = `${baseUrl}/v1/public/shared/${share.jeton}`;
+    this.accessConfig   = share.accessConfig;
     this.isExpired      = share.isExpired();
 
     // 🔍 Raccordement d'infrastructure direct hérité de IEntity (pas de getters getX)

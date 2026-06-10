@@ -1,6 +1,5 @@
-// ——— fichier : src/interfaces/security/IBlacklistService.ts
+// ——— fichier : src/interfaces/services/IBlacklistService.ts
 
-import { IBaseService }         from '@/interfaces/services/IBaseService';
 import { IBlacklistRepository } from '@/interfaces/repositories/IBlacklistRepository';
 
 /**
@@ -8,15 +7,14 @@ import { IBlacklistRepository } from '@/interfaces/repositories/IBlacklistReposi
  * ----------------------------------------------------------------------------
  * Contrat d'infrastructure gérant la mise en quarantaine des jetons (Blacklist).
  * Neutralise instantanément les sessions révoquées (Logout, Rotation) avant leur date de péremption.
- * Hérite de la souveraineté d'accès au registre via le contrat générique de base.
+ * [ALIGNÉ PUR V4] Émancipée d'IBaseService pour éliminer l'enflure de types génériques fictifs.
  *
  * @interface IBlacklistService
- * @extends {IBaseService<IBlacklistRepository>}
  * @author Directrice du Silicium : Joël (MANIAC du PascalCase et Abstract Class Obsession)
  * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
  * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
-export interface IBlacklistService extends IBaseService<IBlacklistRepository> {
+export interface IBlacklistService {
 
   /**
    * Accesseur unique et immuable vers le dépôt d'infrastructure principal du service.

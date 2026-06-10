@@ -15,10 +15,10 @@ import type { IUser  } from '@/interfaces/entities/user/IUser';
 export class ResponseUserDto {
 
   /** 🆔 Identifiant unique et fortement typé de l'utilisateur (UserId) */
-  public readonly id : UserId;
+  public readonly idUser : UserId;
 
   /** 📧 Adresse e-mail de correspondance unique */
-  public readonly email : string;
+  public readonly courriel : string;
 
   /** 👤 Pseudonyme public d'affichage */
   public readonly pseudo : string;
@@ -33,7 +33,11 @@ export class ResponseUserDto {
   public readonly settingsUser : Record<string, any>;
 
   /** 🛡️ Statut légal du consentement aux règles de protection des données (RGPD) */
-  public readonly gdprConsent : boolean;
+  public readonly rgpdConsent : boolean;
+
+  /** 🛡️ Statut légal du consentement aux règles de protection des données (RGPD) */
+  public readonly rgpdConsentDate : Date | null;
+
 
   /** ⏱️ Horodatage précis de la création du compte utilisateur */
   public readonly createdAt? : Date;
@@ -50,13 +54,14 @@ export class ResponseUserDto {
    */
   private constructor(user: IUser) {
     // 🪓 ALIGNEMENT INDUSTRIEL : Raccordement via les fonctions nominales unifiées
-    this.id           = user.getUserId();
-    this.email        = user.getEmail();
-    this.pseudo       = user.getPseudo();
-    this.role         = user.getRole().code;
-    this.authProvider = user.getAuthProvider().code;
-    this.settingsUser = user.getSettingsUser();
-    this.gdprConsent  = user.getGdprConsent();
+    this.idUser       = user.idUser;
+    this.courriel     = user.courriel;
+    this.pseudo       = user.pseudo;
+    this.role         = user.role.code;
+    this.authProvider = user.authProvider.code;
+    this.settingsUser = user.settingsUser;
+    this.rgpdConsent  = user.rgpdConsent;
+    this.rgpdConsentDate = user.rgpdConsentDate;
     this.createdAt    = user.createdAt;
     this.updatedAt    = user.updatedAt;
   }

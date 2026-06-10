@@ -1,85 +1,51 @@
 // ——— fichier : src/interfaces/entities/user/IUser.ts
 
+import type { UserId }       from '@/domain/value-objects/ids';
+import type { Role }         from '@/constants/Role';
 import type { AuthProvider } from '@/constants/AuthProvider';
-import type { Role         } from '@/constants/Role';
-import type { UserId       } from '@/domain/value-objects/ids';
-import type { IEntity      } from '@/interfaces/entities/IEntity';
-import type { IUserData    } from '@/interfaces/entities/user/IUserData';
+import type { IEntity }      from '@/interfaces/entities/IEntity';
+import type { IUserData }    from '@/interfaces/entities/user/IUserData';
 
 /**
- * 📜 Interface IUser
- * -----------------
- * Contrat d'accès métier et barrière de sécurité pour l'entité Utilisateur.
- * Entièrement synchronisée sur nos Smart Enums, nos Value Objects et notre grille géométrique.
+ * 📜 Interface IUser 🧮 (Le Contrat Métier des Acteurs V4)
+ * ----------------------------------------------------------------------------
+ * Contrat d'accès métier pour l'entité User (Utilisateurs).
+ * Entièrement convertie en propriétés de surface pures (True Getters).
  *
  * @interface IUser
  * @extends {IEntity<IUserData, UserId>}
- * @author Joël, Gaïa & Co
+ * @author Vision : Joël (C++ Framework Architect - True Getters Alignement)
+ * @author Frapperie du code : Gaïa (Au burin, lavée de toute parenthèse)
  */
 export interface IUser extends IEntity<IUserData, UserId> {
 
-  /**
-   * 🆔 Identifiant unique et fortement typé de l'utilisateur (idUser).
-   * Redirige fidèlement vers le type nominal scellé getUserId().
-   *
-   * @returns {UserId} Le Value Object de l'identifiant.
-   */
-  getUserId(): UserId;
+  /** 🆔 Identifiant unique et fortement typé du profil utilisateur (idUser). */
+  get idUser(): UserId;
 
-  /**
-   * 📧 Adresse email unique servant d'identifiant de connexion principale.
-   *
-   * @returns {string} L'adresse email normalisée.
-   */
-  getEmail(): string;
+  /** 📧 Adresse électronique unique servant d'identifiant de connexion (email). */
+  get courriel(): string;
 
-  /**
-   * 🔑 Empreinte cryptographique (Hachage) du mot de passe utilisateur.
-   *
-   * @returns {string} Le hash sécurisé du mot de passe.
-   */
-  getPasswordHash(): string;
+  /** 🔐 Empreinte cryptographique du mot de passe haché (passwordHash). */
+  get passwordHash(): string;
 
-  /**
-   * 👤 Pseudonyme ou nom d'affichage public sur la plateforme.
-   *
-   * @returns {string} Le nom d'affichage public.
-   */
-  getPseudo(): string;
+  /** 👤 Pseudonyme public d'affichage de l'utilisateur (pseudo). */
+  get pseudo(): string;
 
-  /**
-   * 🗂️ Rôle de privilège hiérarchique (Smart Enum).
-   *
-   * @returns {Role} Le Smart Enum représentant le rôle.
-   */
-  getRole(): Role;
+  /** 🗂️ Instance de Smart Enum gérant les privilèges de sécurité (role). */
+  get role(): Role;
 
-  /**
-   * 🌐 Fournisseur d'authentification d'origine (Smart Enum).
-   *
-   * @returns {AuthProvider} Le type de fournisseur d'identité.
-   */
-  getAuthProvider(): AuthProvider;
+  /** 🌐 Instance de Smart Enum fixant le fournisseur d'identité (authProvider). */
+  get authProvider(): AuthProvider;
 
-  /**
-   * 🗄️ Configurations et preferences de l'interface au format JSON.
-   *
-   * @returns {Record<string, unknown>} Bloc JSON contenant la configuration utilisateur.
-   */
-  getSettingsUser(): Record<string, unknown>;
+  /** 🗄️ Dictionnaire de configuration des préférences de l'interface (settingsUser). */
+  get settingsUser(): Record<string, any>;
 
-  /**
-   * 🛡️ Statut légal du consentement aux règles de protection des données (RGPD).
-   *
-   * @returns {boolean} True si le consentement est accordé.
-   */
-  getGdprConsent(): boolean;
+  /** 🛡️ Indicateur légal d'approbation des conditions d'utilisation (rgpdConsent). */
+  get rgpdConsent(): boolean;
 
-  /**
-   * ⏱️ Horodatage précis de la signature du consentement RGPD (Peut être NULL ou indéfini).
-   *
-   * @returns {Date | null | undefined} Date de signature ou NULL.
-   */
-  getGdprConsentDate(): Date | null | undefined;
+  /** ⏱️ Horodatage précis du scellage du consentement aux règles (rgpdConsentDate). */
+  get rgpdConsentDate(): Date | null;
 
+  /** 🛡️ Sécurité Nominale : Vérifie les privilèges d'accès de l'utilisateur. */
+  aLeDroitAccederA(p_oRoleMinimalRequis: Role): boolean;
 }

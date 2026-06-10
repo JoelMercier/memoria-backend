@@ -39,9 +39,9 @@ export class ResponseTagDto {
    */
   private constructor(tag: ITag) {
     // 🪓 Alignement nominal natif immédiat
-    this.id        = tag.getTagId();
-    this.userId    = tag.getUserId();
-    this.tagName   = tag.getTagName();
+    this.id        = tag.idTag;
+    this.userId    = tag.userId;
+    this.tagName   = tag.tagName;
 
     // 🔍 Raccordement d'infrastructure direct hérité de IEntity (pas de getters getX)
     this.createdAt = tag.createdAt;

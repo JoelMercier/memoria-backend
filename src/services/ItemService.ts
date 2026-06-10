@@ -1,12 +1,12 @@
 // ——— fichier : src/services/ItemService.ts
 
 import { IItemData                  } from '@/interfaces/entities/item/IItemData';
-import { IItemRepository            } from '@/interfaces/repositories/IItemRepository';
-import { IItemRepositoryListOptions } from '@/interfaces/repositories/IItemRepositoryListOptions'; // 🗲 [ALIGNÉ V4]
-import { IItemTagRepository         } from '@/interfaces/repositories/IItemTagRepository';
+import { IItemRepository,
+         IItemRepositoryListOptions } from '@/interfaces/repositories/PostGres/IItemRepository';
+import { IItemTagRepository         } from '@/interfaces/repositories/PostGres/IItemTagRepository';
 import { IItemService               } from '@/interfaces/services/IItemService';
-import { IListResult                } from '@/interfaces/shared/IListResult';                      // 🗲 [ALIGNÉ V4]
-import { Item                       } from '@/entities/Item';                                       // 🗲 [CLASSE CONCRÈTE]
+import { IListResult                } from '@/interfaces/shared/IListResult';
+import { Item                       } from '@/entities/Item';
 import { IdForge                    } from '@/domain/utils/IdForge';
 import { UserId, ItemId,
          TagId, ContentTypeId }       from '@/domain/value-objects/ids';

@@ -3,7 +3,7 @@
 import type { QueryResultRow      } from 'pg';
 import type { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
 import type { IItemData           } from '@/interfaces/entities/item/IItemData';
-import type { IItemRepository     } from '@/interfaces/repositories/IItemRepository';
+import type { IItemRepository, IItemRepositoryListOptions     } from '@/interfaces/repositories/PostGres/IItemRepository';
 
 import { OrdreTriEnum                  } from '@/constants/OrdreTriEnum';
 import { UserId, ItemId, ContentTypeId } from '@/domain/value-objects/ids';
@@ -11,7 +11,6 @@ import { Item                          } from '@/entities/Item';
 import { BaseRepository                } from '@/infrastructure/repositories/BaseRepositories';
 import { DatabaseErrorFactory          } from '@/exceptions/DatabaseErrorFactory';
 import { ItemErrorFactory              } from '@/exceptions/ItemErrorFactory';
-import { IItemRepositoryListOptions    } from '@/interfaces/repositories/IItemRepositoryListOptions';
 import { IListResult                   } from '@/interfaces/shared/IListResult';
 
 /**

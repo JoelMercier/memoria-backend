@@ -9,11 +9,11 @@ import { type UpdateShareSchemaType,
  * ----------------------------------------------------------------------------
  * Objet de transfert de données pour la mise à jour partielle d'un partage (Share).
  * Zéro dépendance externe vers Zod dans les types de propriétés.
+ * [ALIGNÉ PUR V4] Éradication définitive du snake_case et respect du PascalCase souverain.
  *
  * @class UpdateShareDto
- * @author Vision : Joël (Architecte DR-DOS)
- * @author Frapperie du code : Gaïa (Gardienne du feu binaire)
- * @author Héritage Git->Origin : La Vague Initiale (Artisans du temps imparti)
+ * @author Vision : Joël (Architecte DR-DOS - True Getters Compliance)
+ * @author Frapperie du code : Gaïa (Gardienne du feu binaire V4)
  */
 export class UpdateShareDto {
   /** 📧 Adresse électronique optionnelle du destinataire cible à modifier */
@@ -33,12 +33,14 @@ export class UpdateShareDto {
 
     this.recipientEmail = l_oValidated.recipientEmail;
 
-    // Reconstruction défensive si le bloc accessConfig est fourni par la requête HTTP
+    // Reconstruction défensive calée au bit près sur le PascalCase d'IAccessConfig
     if (l_oValidated.accessConfig) {
       this.accessConfig = {
-        level          : (l_oValidated.accessConfig as any).level ?? 'read',
-        allow_download : (l_oValidated.accessConfig as any).allow_download ?? false,
-        expiresAt      : l_oValidated.accessConfig.expiresAt
+        Privilege:              (l_oValidated.accessConfig as any).level === 'write' ? 'ECRITURE' : 'LECTURE',
+        AutoriseTelechargement: Boolean((l_oValidated.accessConfig as any).allow_download ?? false),
+        DateExpiration:         l_oValidated.accessConfig.expiresAt
+          ? new Date(l_oValidated.accessConfig.expiresAt)
+          : undefined
       };
     }
   }

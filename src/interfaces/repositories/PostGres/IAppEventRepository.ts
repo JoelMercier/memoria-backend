@@ -21,31 +21,31 @@ import { IBaseRepository    } from '@/interfaces/repositories/IBaseRepository';
  */
 export interface IAppEventData {
   /** 🤖 L'identifiant binaire fort obligatoire pour l'entité [Mémoria] */
-  idAppEvent   : AppEventId;
+  aeIdAppEvent   : AppEventId;
 
   /** 👥 L'identifiant unique de l'acteur (Peut être null pour le système ou le RGPD) */
-  userId       : UserId | null;
+  aeUserId       : UserId | null;
 
   /** 📅 La date d'enregistrement immuable calculée par la RAM du Domaine */
-  createdAt    : Date;
+  aeCreatedAt    : Date;
 
   /** 📥 [RÉPARÉ V4] Le Secteur fonctionnel typé (Char(4) - ex: 'AUTH', 'PEPI') */
-  SecteurId    : EventSecteurId;
+  aeSecteurId    : EventSecteurId;
 
   /** ⚙️ [RÉPARÉ V4] L'action technique typée (Char(4) - ex: 'CONN', 'CREA') */
-  ActionId     : EventActionId;
+  aeActionId     : EventActionId;
 
   /** 📂 La catégorie fonctionnelle parente au format quadrigramme */
-  CategoryId   : AppEventCategory;
+  aeCategoryId   : AppEventCategory;
 
   /** ⚠️ L'objet sévérité riche contenant le poids numérique machine */
-  SeverityId   : AppEventSeverity;
+  aeSeverityId   : AppEventSeverity;
 
   /** 📦 Libellé textuel ou message intelligible de l'événement pour l'écran */
-  Message      : string;
+  aeMessage      : string;
 
   /** 🗄️ Le dictionnaire Jsonb de contexte technique (IP, user-agent) [Mémoria] */
-  Metadata     : Record<string, unknown>;
+  aeMetadata     : Record<string, unknown>;
 }
 
 /**

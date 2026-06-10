@@ -1,15 +1,18 @@
 // ——— fichier : src/interfaces/services/IAuthService.ts
 
-import { IBaseService }     from '@/interfaces/services/IBaseService';
-import type { IUser }       from '@/interfaces/entities/user/IUser'; // Le contrat d'entité riche V4
-import { LoginDto }         from '@/dto/user/auth/LoginDto';
-import { RefreshTokenDto }  from '@/dto/user/auth/RefreshTokenDto';
-import { CreateUserDto }    from '@/dto/user/CreateUserDto';
-import { IUserRepository }  from '@/interfaces/repositories/IUserRepository'; // [CONFORME V4] Interface et non classe
+import { IBaseService }    from '@/interfaces/services/IBaseService';
+import type { IUser }      from '@/interfaces/entities/user/IUser';
+import { LoginDto }        from '@/dto/user/auth/LoginDto';
+import { RefreshTokenDto } from '@/dto/user/auth/RefreshTokenDto';
+import { CreateUserDto }   from '@/dto/user/CreateUserDto';
+import { IUserRepository } from '@/interfaces/repositories/PostGres/IUserRepository'; // 🗲 [RÉPARÉ CASSE]
+import type { User }       from '@/entities/User';
+import type { UserId }     from '@/domain/value-objects/ids';
+import type { IUserData }  from '@/interfaces/entities/user/IUserData';
 
 /**
  * 📦 Interface IAuthResult
- * ------------------------
+ * ----------------------------------------------------------------------------
  * Structure de restitution regroupant le profil enrichi de l'acteur et son doublet de jetons.
  *
  * @interface IAuthResult
@@ -29,7 +32,7 @@ export interface IAuthResult {
 
 /**
  * 📦 Interface IRefreshResult
- * ---------------------------
+ * ----------------------------------------------------------------------------
  * Structure de restitution regroupant le nouveau doublet de jetons généré après renouvellement.
  *
  * @interface IRefreshResult
@@ -44,19 +47,21 @@ export interface IRefreshResult {
   refreshToken : string;
 }
 
+
 /**
  * 🔒 Interface IAuthService
- * ----------------------------
+ * ----------------------------------------------------------------------------
  * Contrat métier régissant la logique de sécurité, d'enrôlement et de cycle de vie des sessions.
  * Pilote l'inscription des acteurs, la vérification des secrets et l'émission des privilèges.
+ * [RÉPARÉ V4] Alignement strict à 4 arguments génériques sur la maman IBaseService !
  *
  * @interface IAuthService
- * @extends {IBaseService<IUserRepository>} -- 🗲 Alignement strict sur l'interface du dépôt V4
+ * @extends {IBaseService<User, IUserData, UserId, IUserRepository>} -- 🗲 [SCELLÉ RECOUVREMENT]
  * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
- * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
  * @author Ouvriers du Code : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
-export interface IAuthService extends IBaseService<IUserRepository> {
+export interface IAuthService extends IBaseService<User, IUserData, UserId, IUserRepository> {
 
   /**
    * 📝 Orchestre l'inscription d'un nouvel utilisateur après validation stricte de ses données.

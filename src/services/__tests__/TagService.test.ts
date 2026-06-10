@@ -3,7 +3,7 @@ import { CreateTagDto } from '@/dto/tag/CreateTagDto';
 import { UpdateTagDto } from '@/dto/tag/UpdateTagDto';
 import { Tag } from '@/entities/Tag';
 import { TagErrorFactory } from '@/exceptions/TagErrorFactory';
-import type { ITagRepository } from '@/interfaces/repositories/ITagRepository';
+import type { ITagRepository } from '@/interfaces/repositories/PostGres/ITagRepository';
 import { TagService } from '@/services/TagService';
 
 const USER_ID = '00000000-0000-0000-0000-000000000001';

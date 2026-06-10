@@ -16,8 +16,8 @@ export function createAuditRouter(p_oAdminController: AppEventAdminController): 
   const l_oRouter = Router();
 
   // Enregistrement des routes d'extraction de masse
-  l_oRouter.get('/logs', (req, res, next) => p_oAdminController.getAllLogs(req, res, next));
-  l_oRouter.post('/purge', (req, res, next) => p_oAdminController.purgeOlderThan(req, res, next));
+  l_oRouter.get('/logs', (req, res, next) => p_oAdminController.getEvents(req, res, next));
+  l_oRouter.post('/purge', (req, res, next) => p_oAdminController.cleanup(req, res, next));
 
   return l_oRouter;
 }

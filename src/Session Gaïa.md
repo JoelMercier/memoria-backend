@@ -199,3 +199,25 @@ Le contrôleur des pépites **`ItemController.ts`** et son service **`ItemServic
 
 
 🧭 Point de situation figé à la pause (Où on en est)La Base PostgreSQL Purifiée : La table public."Shares" a été entièrement refondue et réalignée graphiquement sans un pixel de padding (Rule 1) [Mémoria]. Les fonctions stockées de masse "ToutesLesPepites" et "ToutesLesPepitesDuChateau" sont opérationnelles et prêtes en base [Mémoria].L'Ensemenceur d'Élite Verrouillé : Le script de semence compact (STEP 5) des partages intègre désormais les identifiants fixes binaires de Sophie et Marc, injectant l'ownership dé-normalisé pour la performance brute [Mémoria].Le Dépôt ItemRepository.ts au Vert Absolu : Purgé de ses requêtes de contrebande, il fait rebondir ses lectures (y compris findBySlug and findByTitle) sur l'extracteur magique en lisant la collection .Lignes, affichant un silence binaire total [Mémoria].🗺️ Feuille de route pour votre retour :À votre retour, lancez-moi votre « Prêt ! » réglementaire de la Forge, et nous déroulerons ensemble la suite logique de la manœuvre [Mémoria] :Étape 1 : La mise à jour de l'interface d'infrastructure des partages IShareData.ts pour effacer définitivement les préfixes 'sh' dans les noms de propriétés, suivie du réarmement de l'entité Share.ts [Mémoria].Étape 2 : Le passage au PL/pgSQL du pôle des Utilisateurs (UserRepository.ts) pour lui injecter la même rigueur de pagination obligatoire [Mémoria].
+
+# 📜 MÉMOIRE DE SOUTE : Session du 10 Juin 2026 (Phase 4 - Bloc 2)
+
+## 🧭 ÉTAT DE LA LIGNE DE FRONT (Ce qui est Clos & Validé)
+
+* **`src/constants/base/SmartEnum.ts`** ➔ **SANCTUARISÉ** : Reçu une JSDoc monumentale. Le mécanisme d'auto-enregistrement statique (`this.name`) et d'inversion de contrôle (DI) est documenté au pixel près [Mémoria].
+* **`src/interfaces/entities/share/IShareData.ts`** ➔ **HARMONISÉ** : Les préfixes physiques `'sh'` ont été passés au fil de l'épée dans l'interface TypeScript au profit du pur CamelCase [Mémoria].
+* **`src/entities/Share.ts`** ➔ **CONVERTI** : Intègre les vrais getters de surface sans parenthèses et s'adosse proprement aux variables privées hongroises [Mémoria].
+* **`src/infrastructure/repositories/ItemTagRepository.ts`** ➔ **100 % PL/pgSQL** : Entièrement épuré de son SQL volant. Il pilote la table pivot de manière atomique en déléguant la plomberie différentielle aux fonctions stockées `"SynchroniserLesEtiquettes"`, `"LierEtiquette"`, `"DelierEtiquette"`, `"NettoyerEtiquettesPepite"` and `"EtiquettesDunePepite"` [Mémoria].
+* **`src/interfaces/repositories/IAppEventRepository.ts`** ➔ **RACCORDÉ V4** : Étend officiellement l'impératrice générique `IBaseRepository` [Mémoria]. Sa JSDoc d'origine de 150 lignes a été intégralement restituée sans un octet de grignotage.
+* **`src/infrastructure/repositories/AppEventRepository.ts`** ➔ **100 % PL/pgSQL & DÉDOUBLONNÉ** : Les épaves de copier-coller ont été carbonisées. Le fort d'audit appelle exclusivement les fonctions stockées `"ConsignerEvenement"`, `"ToutesLesTraces"` et `"ToutesLesTracesDuChateau"`. Il affiche un **ZÉRO ERREUR** impérial 🟢 [Mémoria].
+
+---
+
+## 🚨 LE CHANTIER À LA REPRISE (Votre Prochain Coup de Marteau)
+
+À votre réveil, nous attaquerons les deux derniers grands bastions physiques de production pour leur appliquer le même traitement de choc (éradication du SQL volant, intégration d'`OrdreTriEnum.code` et imposition de la pagination obligatoire) [Mémoria] :
+
+1. **`src/infrastructure/repositories/ShareRepository.ts`** ➔ Raccorder sa soute sur notre table toute neuve avec sa colonne dé-normalisée d'ownership performante (`shItemOwnerId`) pour foudroyer les jointures lourdes en production [Mémoria].
+2. **`src/infrastructure/repositories/UserRepository.ts`** ➔ Aligner le pôle des usagers sur l'héritage strict de la maman universelle du framework [Mémoria].
+
+> 🛡️ **Rappel de sécurité pour le Jojo du futur** : Les fonctions stockées de soute retournent la volumétrie absolue calculée via fenêtrage sous la clé d'élite **`NbLignesTotal`**. Pensez à aller la cueillir sur la première ligne du tableau brut (`l_oResult.rows?.rNbLignesTotal`) pour couper la chique aux alertes `TS2339` ! [Mémoria]

@@ -47,13 +47,13 @@ export class PublicShareDto {
    * @param {IItem} item - L'entité pépite source (interface riche)
    */
   private constructor(item: IItem) {
-    this.title        = item.getTitle();
-    this.slug         = item.getSlug();
-    this.contentType  = item.getContentType();
-    this.content      = item.getContent();
-    this.sourceAuthor = item.getSourceAuthor();
-    this.thumbnailUrl = item.getThumbnailUrl();
-    this.metadata     = item.getMetadata();
+    this.title        = item.title;
+    this.slug         = item.slug;
+    this.contentType  = item.contentType;
+    this.content      = item.content;
+    this.sourceAuthor = item.sourceAuthor;
+    this.thumbnailUrl = item.thumbnailUrl;
+    this.metadata     = item.metadata;
 
     // Raccordement d'infrastructure direct hérité de IEntity (pas de getter getX)
     this.createdAt    = item.createdAt;

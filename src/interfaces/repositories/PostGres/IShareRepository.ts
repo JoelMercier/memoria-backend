@@ -5,6 +5,9 @@ import type { Share }       from '@/entities/Share';
 import type { IShareData }  from '@/interfaces/entities/share/IShareData';
 import { IPhysicalRW }      from '@/interfaces/repositories/IPhysicalRW';
 import { IMemoryRW }        from '@/interfaces/repositories/IMemoryRW'; // 🗲 [ALIGNÉ V4]
+import { IListOptions } from '@/interfaces/shared/IListOptions';
+import { IListResult } from '@/interfaces/shared/IListResult';
+
 
 /**
  * 📋 Interface Cadre IShareRepositoryBase 🛡️
@@ -24,7 +27,7 @@ interface IShareRepositoryBase {
    * @param {ItemId} p_axItemId - L'identifiant fort de la pépite cible
    * @returns {Promise<Share[]>} La liste des partages associés
    */
-  findByItemId(p_axItemId: ItemId): Promise<Share[]>;
+  findByItemId(p_axItemId: ItemId, p_oOptions: IListOptions): Promise<IListResult<Share>>
 
   /**
    * 🔍 Localise un partage unique via son jeton de sécurité textuel (Token).
@@ -42,7 +45,7 @@ interface IShareRepositoryBase {
    * @param {UserId} p_axUserId - L'identifiant unique de l'acteur propriétaire
    * @returns {Promise<Share[]>} Le catalogue des partages de l'acteur ou tableau vide
    */
-  findByUserId(p_axUserId: UserId): Promise<Share[]>;
+  findByUserId(p_axUserId: UserId, p_oOptions: IListOptions): Promise<IListResult<Share>>
 }
 
 /**

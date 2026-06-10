@@ -1,12 +1,13 @@
 // ——— fichier : src/infrastructure/repositories/ItemTagRepository.ts
 
-import type { QueryResultRow }        from 'pg';
-import { BaseRepository }       from '@/infrastructure/repositories/BaseRepositories';
+import type { QueryResultRow     } from 'pg';
+import type { IItemTagRepository } from '@/interfaces/repositories/PostGres/IItemTagRepository';
+
+import { BaseRepository        } from '@/infrastructure/repositories/BaseRepositories';
 import { UserId, ItemId, TagId } from '@/domain/value-objects/ids';
-import { Tag }                  from '@/entities/Tag';
-import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
-import type { IItemTagRepository }    from '@/interfaces/repositories/IItemTagRepository';
-import { IDatabaseConnection }  from '@/interfaces/database/IDatabaseConnection';
+import { Tag                   } from '@/entities/Tag';
+import { DatabaseErrorFactory  } from '@/exceptions/DatabaseErrorFactory';
+import { IDatabaseConnection   } from '@/interfaces/database/IDatabaseConnection';
 
 /**
  * 🗄️ Interface ITagRow (Miroir Physique Jojo-Style de la table "Tags" 🔌)
@@ -77,7 +78,7 @@ export class ItemTagRepository extends BaseRepository implements IItemTagReposit
 
       // Un unique appel de fonction souverain, atomique et ultrasécurisé !
       await this.db.query(
-        'Select public."SynchroniserLesEtiquettes"("Bin-UUID"($1), $2::Uuid[]);',
+        'Select "SynchroniserLesEtiquettes"("Bin-UUID"($1), $2::Uuid[]);',
         [p_oItemId, l_asCiblesBinaire]
       );
     } catch (l_oErreur) {
@@ -91,7 +92,7 @@ export class ItemTagRepository extends BaseRepository implements IItemTagReposit
    */
   public async add(p_oItemId: ItemId, p_oTagId: TagId): Promise<void> {
     try {
-      await this.db.query('Select public."LierEtiquette"($1, $2);', [p_oItemId, p_oTagId]);
+      await this.db.query('Select public."LierEtiquette"($1, $2);', [p_oItemId, p_oTagId] );
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
       throw DatabaseErrorFactory.queryFailed('ItemTag.add', l_sMsg);
@@ -104,9 +105,7 @@ export class ItemTagRepository extends BaseRepository implements IItemTagReposit
   public async remove(p_oItemId: ItemId, p_oTagId: TagId): Promise<boolean> {
     try {
       const l_oResult = await this.db.query<{ l_bImpacted: boolean } & QueryResultRow>(
-        'Select public."DelierEtiquette"($1, $2) as "l_bImpacted";',
-        [p_oItemId, p_oTagId]
-      );
+        'Select "DelierEtiquette"($1, $2) as "l_bImpacted";', [p_oItemId, p_oTagId] );
       return l_oResult.rows[0]?.l_bImpacted ?? false;
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
@@ -139,9 +138,7 @@ export class ItemTagRepository extends BaseRepository implements IItemTagReposit
     try {
       // 🗲 [RACCORDÉ SUR FONCTION STOCKÉE] Plus aucune trace de texte SQL brut en RAM !
       const l_oResult = await this.db.query<ITagRow>(
-        'Select * From public."EtiquettesDunePepite"($1);',
-        [p_oItemId]
-      );
+        'Select * From "EtiquettesDunePepite"($1);', [p_oItemId] );
       return l_oResult.rows.map((l_oLigne: ITagRow) => this.LigneVersTag(l_oLigne));
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';

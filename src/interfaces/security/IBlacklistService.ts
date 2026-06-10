@@ -1,6 +1,5 @@
 // ——— fichier : src/interfaces/security/IBlacklistService.ts
 
-import { IBaseService }         from '@/interfaces/services/IBaseService';
 import { IBlacklistRepository } from '@/interfaces/repositories/IBlacklistRepository';
 
 /**
@@ -8,15 +7,14 @@ import { IBlacklistRepository } from '@/interfaces/repositories/IBlacklistReposi
  * ----------------------------------------------------------------------------
  * Contrat d'infrastructure gérant la mise en quarantaine des jetons (Blacklist).
  * Neutralise instantanément les sessions révoquées (Logout, Rotation) avant leur date de péremption.
- * Hérite de la souveraineté d'accès au registre via le contrat générique de base.
+ * [ALIGNÉ PUR V4] Émancipée d'IBaseService pour éliminer l'enflure de types génériques fictifs.
  *
  * @interface IBlacklistService
- * @extends {IBaseService<IBlacklistRepository>}
  * @author Directrice du Silicium : Joël (MANIAC du PascalCase et Abstract Class Obsession)
  * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
  * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
-export interface IBlacklistService extends IBaseService<IBlacklistRepository> {
+export interface IBlacklistService {
 
   /**
    * Accesseur unique et immuable vers le dépôt d'infrastructure principal du service.
@@ -30,6 +28,9 @@ export interface IBlacklistService extends IBaseService<IBlacklistRepository> {
    * 🔏 Ajoute un identifiant de jeton (jti) au registre de quarantaine et déclenche une purge préventive.
    *
    * @async
+   * @param {string} p_sJti - L'identifiant unique du jeton JWT à révoquer
+   * @param {number} p_nExpiresAtEpochSeconds - Le timestamp absolu d'expiration du jeton
+   * @returns {Promise<void>}
    */
   add(p_sJti: string, p_nExpiresAtEpochSeconds: number): Promise<void>;
 
@@ -37,6 +38,8 @@ export interface IBlacklistService extends IBaseService<IBlacklistRepository> {
    * 🔍 Vérifie en temps réel si un identifiant (jti) fait l'objet d'une révocation active.
    *
    * @async
+   * @param {string} p_sJti - L'identifiant de jeton à auditer à la douane
+   * @returns {Promise<boolean>} True si le jeton a été révoqué (Logout ou usurpation)
    */
   isBlacklisted(p_sJti: string): Promise<boolean>;
 
@@ -44,6 +47,7 @@ export interface IBlacklistService extends IBaseService<IBlacklistRepository> {
    * 📊 Extrait la volumétrie physique actuelle de la table de quarantaine résidente.
    *
    * @async
+   * @returns {Promise<number>} Le nombre total de jetons actuellement sous séquestre
    */
   size(): Promise<number>;
 }

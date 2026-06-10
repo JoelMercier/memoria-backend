@@ -11,12 +11,12 @@ import { PasswordHasher }     from '@/utils/PasswordHasher';
 import { TokenManager }       from '@/utils/TokenManager';
 
 // ===== 🗄️ 3. COUCHE ADAPTATEURS : REPOSITORIES (INFRASTRUCTURE) =====
-import { UserRepository            } from '@/infrastructure/repositories/UserRepository';
-import { ItemRepository            } from '@/infrastructure/repositories/ItemRepository';
-import { TagRepository             } from '@/infrastructure/repositories/TagRepository';
-import { ItemTagRepository         } from '@/infrastructure/repositories/ItemTagRepository';
-import { ShareRepository           } from '@/infrastructure/repositories/ShareRepository';
-import { AppEventRepository        } from '@/infrastructure/repositories/AppEventRepository';
+import { UserRepository            } from '@/infrastructure/repositories/PostGres/UserRepository';
+import { ItemRepository            } from '@/infrastructure/repositories/PostGres/ItemRepository';
+import { TagRepository             } from '@/infrastructure/repositories/PostGres/TagRepository';
+import { ItemTagRepository         } from '@/infrastructure/repositories/PostGres/ItemTagRepository';
+import { ShareRepository           } from '@/infrastructure/repositories/PostGres/ShareRepository';
+import { AppEventRepository        } from '@/infrastructure/repositories/PostGres/AppEventRepository';
 import { MemoryBlacklistRepository } from '@/infrastructure/repositories/MemoryBlacklistRepository';
 
 // ===== 🧠 4. COUCHE NOYAU : SERVICES APPLICATIFS (DOMAINE) =====

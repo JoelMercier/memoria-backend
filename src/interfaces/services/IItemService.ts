@@ -7,8 +7,8 @@ import type { IItemData } from '@/interfaces/entities/item/IItemData';
 import { CreateItemDto }  from '@/dto/item/CreateItemDto';
 import { UpdateItemDto }  from '@/dto/item/UpdateItemDto';
 import { IListResult }    from '@/interfaces/shared/IListResult';
-import { IItemRepository } from '@/interfaces/repositories/IItemRepository';
-import { IItemRepositoryListOptions } from '@/interfaces/repositories/IItemRepositoryListOptions';
+import { IItemRepository, IItemRepositoryListOptions } from '@/interfaces/repositories/PostGres/IItemRepository';
+
 
 /**
  * 🔒 Interface IItemService 🛡️

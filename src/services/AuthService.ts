@@ -11,7 +11,7 @@ import type { LoginDto }      from '@/dto/user/auth/LoginDto';
 import type { RefreshTokenDto } from '@/dto/user/auth/RefreshTokenDto';
 import type { IUser }         from '@/interfaces/entities/user/IUser';
 import type { IUserData }     from '@/interfaces/entities/user/IUserData';
-import type { IUserRepository } from '@/interfaces/repositories/IUserRepository';
+import type { IUserRepository } from '@/interfaces/repositories/PostGres/IUserRepository';
 import type { IBlacklistService } from '@/interfaces/security/IBlacklistService';
 import type { IPasswordHasher }   from '@/interfaces/security/IPasswordHasher';
 import type { ITokenManager }     from '@/interfaces/security/ITokenManager';
@@ -19,13 +19,12 @@ import type { IAuthResult, IAuthService, IRefreshResult } from '@/interfaces/ser
 
 /**
  * 🏛️ Classe AuthService
- * ---------------------
+ * ----------------------------------------------------------------------------
  * Service de domaine gérant la cinématique de l'authentification et de la sécurité des comptes.
  * Version armée contre les inversions d'identifiants et épurée des reliques d'infrastructure.
  *
  * @class AuthService
  * @implements {IAuthService}
- *
  * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
  * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
  * @author Garde d'Élite des Types : Le Cartel du Donjon (Garde d'élite en surchauffe)
@@ -54,9 +53,9 @@ export class AuthService implements IAuthService {
    * @param {IBlacklistService} p_oBlacklistService - Le service de liste noire des sessions
    */
   public constructor(
-    p_oUserRepository : IUserRepository,
-    p_oPasswordHasher : IPasswordHasher,
-    p_oTokenManager   : ITokenManager,
+    p_oUserRepository   : IUserRepository,
+    p_oPasswordHasher   : IPasswordHasher,
+    p_oTokenManager     : ITokenManager,
     p_oBlacklistService : IBlacklistService
   ) {
     this.m_oUserRepository   = p_oUserRepository;
@@ -125,16 +124,16 @@ export class AuthService implements IAuthService {
     const l_oUser : User | null = await this.m_oUserRepository.findByEmail(p_oDto.email);
     if (!l_oUser) throw UserErrorFactory.invalidCredentials();
 
-    // 🪓 ALIGNEMENT INDUSTRIEL : Utilisation de getPasswordHash()
-    const l_bIsValid : boolean = await this.m_oPasswordHasher.verify(p_oDto.password, l_oUser.getPasswordHash());
+    // 🪓 [RÉPARÉ V4] Utilisation de la propriété de surface pure .passwordHash sans parenthèses ! [Mémoria]
+    const l_bIsValid : boolean = await this.m_oPasswordHasher.verify(p_oDto.password, l_oUser.passwordHash);
     if (!l_bIsValid) throw UserErrorFactory.invalidCredentials();
 
-    // 🪓 ALIGNEMENT INDUSTRIEL : Extraction propre via les nouvelles signatures de fonctions métiers de IUser
+    // 🪓 [RÉPARÉ V4] Extraction propre via les propriétés de façade pures de IUser ! [Mémoria]
     const { accessToken, refreshToken } = await this.m_oTokenManager.generateTokens({
-      sub    : l_oUser.getUserId(),
-      email  : l_oUser.getEmail(),
-      pseudo : l_oUser.getPseudo(),
-      role   : l_oUser.getRole()
+      sub    : l_oUser.idUser,
+      email  : l_oUser.courriel,
+      pseudo : l_oUser.pseudo,
+      role   : l_oUser.role
     });
 
     return { user: l_oUser, accessToken, refreshToken };
@@ -153,7 +152,6 @@ export class AuthService implements IAuthService {
   public async refresh(p_oDto: RefreshTokenDto): Promise<IRefreshResult> {
     const l_oPayload = await this.m_oTokenManager.verifyRefreshToken(p_oDto.refreshToken);
 
-    // 🗲 [RÉPARÉ V4] Ajout obligatoire du await car l'infrastructure de la liste noire est désormais asynchrone !
     if (l_oPayload.jti && await this.m_oBlacklistService.isBlacklisted(l_oPayload.jti)) {
       throw TokenError.revoked();
     }
@@ -163,23 +161,22 @@ export class AuthService implements IAuthService {
     if (!l_oUser) throw UserErrorFactory.notFound(l_axIdActeur);
 
     if (l_oPayload.jti && l_oPayload.exp) {
-      // Ajout asynchrone également pris en compte
       await this.m_oBlacklistService.add(l_oPayload.jti, l_oPayload.exp);
     }
 
-    // 🪓 ALIGNEMENT INDUSTRIEL : Extraction propre via les nouvelles signatures de fonctions métiers de IUser
-    const l_oTokens = await this.m_oTokenManager.generateTokens({
-      sub    : l_oUser.getUserId(),
-      email  : l_oUser.getEmail(),
-      pseudo : l_oUser.getPseudo(),
-      role   : l_oUser.getRole()
+    // 🪓 [RÉPARÉ V4] Extraction propre via les propriétés de façade pures de IUser sans parenthèses ! [Mémoria]
+    const { accessToken, refreshToken } = await this.m_oTokenManager.generateTokens({
+      sub    : l_oUser.idUser,
+      email  : l_oUser.courriel,
+      pseudo : l_oUser.pseudo,
+      role   : l_oUser.role
     });
 
-    return l_oTokens;
+    return { accessToken, refreshToken };
   }
 
   /**
-   * 🗑️ Révocation asynchrone de la session en cours de validité (Déconnexion).
+   * 🗑️ Révoque définitivement un jeton de rafraîchissement pour clore la session (Déconnexion).
    *
    * @public
    * @async
@@ -190,11 +187,10 @@ export class AuthService implements IAuthService {
     try {
       const l_oPayload = await this.m_oTokenManager.verifyRefreshToken(p_sRefreshToken);
       if (l_oPayload.jti && l_oPayload.exp) {
-        // Enclenchement asynchrone sécurisé
         await this.m_oBlacklistService.add(l_oPayload.jti, l_oPayload.exp);
       }
     } catch {
-      // Clôture silencieuse : un token expiré ou corrompu est déjà caduc
+      // Éradication silencieuse : si le jeton est déjà corrompu structurellement, la session est close.
     }
   }
 }

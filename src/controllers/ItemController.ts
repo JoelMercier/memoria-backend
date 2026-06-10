@@ -11,8 +11,8 @@ import { ResponseItemDto       } from '@/dto/item/ResponseItemDto';
 import { UserErrorFactory      } from '@/exceptions/UserErrorFactory';
 import { ApiResponseFactory    } from '@/utils/ApiResponseFactory';
 import { RequestIdGenerator    } from '@/utils/RequestIdGenerator';
-import { IItemRepositoryListOptions } from '@/interfaces/repositories/IItemRepositoryListOptions';
 import OrdreTriEnum from '@/constants/OrdreTriEnum';
+import { IItemRepositoryListOptions } from '@/interfaces/repositories/PostGres/IItemRepository';
 
 
 /**

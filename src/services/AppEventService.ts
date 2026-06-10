@@ -7,7 +7,7 @@ import { AppEventSecteur    } from '@/constants/AppEventSecteur';
 import { AppEventAction     } from '@/constants/AppEventAction';
 import { UserId,
          ItemId, ShareId    } from '@/domain/value-objects/ids';
-import { AppEventRepository } from '@/infrastructure/repositories/AppEventRepository';
+import { AppEventRepository } from '@/infrastructure/repositories/PostGres/AppEventRepository';
 
 /**
  * 🏛️ Classe AppEventService
@@ -61,6 +61,7 @@ export class AppEventService implements IAppEventService {
   /**
    * 🔔 Log générique interne du système.
    * Point de passage obligatoire pour l'insertion sécurisée en base de données.
+   * [RÉPARÉ V4] Résolution étanche des Value Objects nominaux et injection de l'UUID v7 !
    *
    * @public
    * @async
@@ -83,16 +84,21 @@ export class AppEventService implements IAppEventService {
     message        : string;
     metadata?      : Record<string, any>;
   }): Promise<any> {
+    // 🗲 Importation des constructeurs nominaux et de l'IdForge du Domaine
+    const { AppEventId, EventSecteurId, EventActionId } = await import('@/domain/value-objects/ids');
+    const { IdForge }                                   = await import('@/domain/utils/IdForge');
+
+    // 🪓 [SCELLÉ RECOUVREMENT V4] Conversion chirurgicale du code d'Enum vers le Value Object requis !
     return this.m_oAppEventRepository.create({
-      idAppEvent    : undefined as any,
-      userId        : p_oData.userId ?? null,
-      eventCategory : p_oData.eventCategory,
-      eventSecteur  : p_oData.eventSecteur,
-      eventAction   : p_oData.eventAction,
-      severity      : p_oData.severity || AppEventSeverity.INFO,
-      message       : p_oData.message,
-      metadata      : p_oData.metadata || {},
-      createdAt     : new Date()
+      aeIdAppEvent  : new AppEventId(IdForge.genererUuidV7()), // Forgeage de l'identifiant fort chronologique !
+      aeUserId      : p_oData.userId ?? null,
+      aeCategoryId  : p_oData.eventCategory,
+      aeSecteurId   : new EventSecteurId(p_oData.eventSecteur.code), // 🗲 [RÉPARÉ TS2739]
+      aeActionId    : new EventActionId(p_oData.eventAction.code),   // 🗲 [RÉPARÉ TS2739]
+      aeSeverityId  : p_oData.severity || AppEventSeverity.INFO,
+      aeMessage     : p_oData.message,
+      aeMetadata    : p_oData.metadata || {},
+      aeCreatedAt   : new Date()
     });
   }
 

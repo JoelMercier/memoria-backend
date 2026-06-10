@@ -7,8 +7,8 @@ import type { Share            } from '@/entities/Share';
 import type { IItem            } from '@/interfaces/entities/item/IItem';
 import type { IShare           } from '@/interfaces/entities/share/IShare';
 import type { IShareData       } from '@/interfaces/entities/share/IShareData';
-import type { IItemRepository  } from '@/interfaces/repositories/IItemRepository';
-import type { IShareRepository } from '@/interfaces/repositories/IShareRepository';
+import type { IItemRepository  } from '@/interfaces/repositories/PostGres/IItemRepository';
+import type { IShareRepository } from '@/interfaces/repositories/PostGres/IShareRepository';
 import type { IShareService    } from '@/interfaces/services/IShareService';
 
 import { IdForge             } from '@/domain/utils/IdForge'; // 🗲 [NEW V4] Fondeur UUID v7 du Domaine
@@ -16,6 +16,8 @@ import { UserId, ShareId     } from '@/domain/value-objects/ids';
 import { ItemErrorFactory    } from '@/exceptions/ItemErrorFactory';
 import { ShareErrorFactory   } from '@/exceptions/ShareErrorFactory';
 import { ShareTokenGenerator } from '@/utils/ShareTokenGenerator';
+import { IListOptions } from '@/interfaces/shared/IListOptions';
+import { IListResult } from '@/interfaces/shared/IListResult';
 
 /** ⚖️ Nombre maximal de tentatives de régénération en cas de collision de token */
 const MAX_TOKEN_GEN_ATTEMPTS : number = 5;
@@ -180,15 +182,18 @@ export class ShareService implements IShareService {
   }
 
   /**
-   * 📜 Liste l'intégralité des partages détenus par un utilisateur spécifique.
+   * 📜 Liste les partages détenus par un utilisateur spécifique (Version Paginée V4).
+   * [SCELLÉ CORRESPONDANCE] Raccordé de manière étanche au français d'élite de la soute.
    *
    * @public
    * @async
    * @param {UserId} p_axUserId - L'identifiant fort binaire de l'acteur cible
-   * @returns {Promise<IShare[]>} La collection des contrats de partage actifs
+   * @param {IListOptions} p_oOptions - Le dictionnaire de tri et de limites obligatoire [Mémoria]
+   * @returns {Promise<IListResult<Share>>} Le lot de résultats paginé avec sa volumétrie globale [Mémoria]
    */
-  public async listByUser(p_axUserId: UserId): Promise<IShare[]> {
-    return await this.shareRepository.findByUserId(p_axUserId);
+  public async listByUser(p_axUserId: UserId, p_oOptions: IListOptions): Promise<IListResult<Share>> {
+    // Raccordement direct sur le réacteur PL/pgSQL sans SQL volant !
+    return await this.shareRepository.findByUserId(p_axUserId, p_oOptions);
   }
 
   /**

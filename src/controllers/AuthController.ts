@@ -10,7 +10,7 @@ import      { RefreshTokenDto    } from '@/dto/user/auth/RefreshTokenDto';
 import      { ResponseUserDto    } from '@/dto/user/ResponseUserDto';
 import      { UserErrorFactory   } from '@/exceptions/UserErrorFactory';
 import type { IAuthController    } from '@/interfaces/controllers/IAuthController';
-import type { IUserRepository    } from '@/interfaces/repositories/IUserRepository';
+import type { IUserRepository    } from '@/interfaces/repositories/PostGres/IUserRepository';
 import type { IAuthService       } from '@/interfaces/services/IAuthService';
 import      { ApiResponseFactory } from '@/utils/ApiResponseFactory';
 import      { RequestIdGenerator } from '@/utils/RequestIdGenerator';

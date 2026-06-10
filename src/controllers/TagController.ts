@@ -13,6 +13,7 @@ import type { ITagController } from '@/interfaces/controllers/ITagController';
 import type { ITagService    } from '@/interfaces/services/ITagService';
 import { ApiResponseFactory  } from '@/utils/ApiResponseFactory';
 import { RequestIdGenerator  } from '@/utils/RequestIdGenerator';
+import OrdreTriEnum from '@/constants/OrdreTriEnum';
 
 /**
  * 🎛️ Classe TagController
@@ -85,13 +86,15 @@ export class TagController implements ITagController {
     }
     return value;
   }
-
   /**
    * 📜 GET /tags
-   * Récupère la collection complète des étiquettes détenues par l'appelant.
+   * Récupère la collection filtrée, ordonnée et obligatoirement paginée des étiquettes détenues par l'appelant.
+   * [SCELLÉ EXPOSITION V4] Extraction des critères réseau et déballage du français d'élite.
    *
-   * @param {Request} req - Requête HTTP
-   * @param {Response} res - Réponse HTTP
+   * @public
+   * @async
+   * @param {Request} req - Requête HTTP Express
+   * @param {Response} res - Réponse HTTP Express
    * @param {NextFunction} next - Passerelle d'erreurs Express
    * @returns {Promise<void>}
    */
@@ -99,14 +102,26 @@ export class TagController implements ITagController {
     try {
       const requestId : string = RequestIdGenerator.getFromRequest(req);
       const userId    : UserId = this.getUserId(req);
-      const tags               = await this.tagService.listByUser(userId);
+
+      // 🗲 [INJECTÉ V4] Extraction et normalisation des curseurs de bridage depuis la Query String
+      const { OrdreTriEnum } = await import('@/constants/OrdreTriEnum');
+      const l_oOptions = {
+        NbLignes:   req.query.NbLignes   ? Number(req.query.NbLignes)   : 50,
+        LigneDebut:  req.query.LigneDebut ? Number(req.query.LigneDebut) : 0,
+        ColonneTri:  (req.query.ColonneTri as string) || 'tgName',
+        OrdreAff:    OrdreTriEnum.DeCode<OrdreTriEnum>((req.query.OrdreAff as string) || 'ASC')
+      };
+
+      // 🪓 [RÉPARÉ TS2554] Transmission impérative du bouclier anti-fuite de soute
+      const l_oPackEtat = await this.tagService.listByUser(userId, l_oOptions);
 
       res
         .status(200)
         .json(
           ApiResponseFactory.success(
             'Liste des tags',
-            { tags: ResponseTagDto.fromTags(tags) },
+            // 🪓 [RÉPARÉ TS2345] On extrait uniquement le tableau d'entités vivantes de l'enveloppe d'état !
+            { tags: ResponseTagDto.fromTags(l_oPackEtat.Lignes) },
             requestId
           )
         );

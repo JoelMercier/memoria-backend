@@ -10,11 +10,11 @@ import      { type CreateShareSchemaType, ShareValidation } from '@/validation/z
  * Objet de transfert de données pour la création d'un lien de partage sécurisé.
  * Zéro dépendance externe vers Zod dans les types de propriétés.
  * Armé avec le caillou de couleur (Value Object) pour verrouiller la pépite ciblée.
+ * [ALIGNÉ PERFORMANCE V4] Embarque nativement la clé dé-normalisée d'ownership.
  *
  * @class CreateShareDto
- * @author Vision : Joël (Architecte DR-DOS)
- * @author Frapperie du code : Gaïa (Gardienne du feu binaire)
- * @author Héritage Git->Origin : La Vague Initiale (Artisans du temps imparti)
+ * @author Vision : Joël (Architecte DR-DOS - Ownership Safety Booster)
+ * @author Frapperie du code : Gaïa (Gardienne du feu binaire V4)
  */
 export class CreateShareDto {
   /** 📦 Caillou de couleur : Identifiant unique immuable de la pépite à partager */
@@ -23,8 +23,11 @@ export class CreateShareDto {
   /** 🤖 Identifiant unique et fortement typé de la trace du partage */
   public readonly idShare : ShareId;
 
-  /** 👥 Identifiant de l'acteur émetteur du partage à la frontière */
+  /** 👥 Identifiant de l'acteur connecté émetteur du partage à la frontière */
   public readonly idUser : UserId;
+
+  /** 👑 [RÉPARÉ INTERNE V4] Identifiant dé-normalisé fort de l'acteur propriétaire de la ressource */
+  public readonly itemOwnerId : UserId;
 
   /** 📧 Adresse électronique optionnelle du destinataire du partage */
   public readonly recipientEmail : string | null;
@@ -46,13 +49,24 @@ export class CreateShareDto {
     this.idItem         = new ItemId(l_oValidated.itemId);
     this.idUser         = new UserId(l_oValidated.userId);
     this.idShare        = new ShareId(l_oValidated.shareId);
+
+    // 🗲 [SOUDE PERFORMANCE V4] Résolution défensive de la clé d'ownership.
+    // Si la douane Zod ne l'extrait pas encore, elle s'aligne par défaut sur l'émetteur !
+    this.itemOwnerId    = (l_oValidated as any).itemOwnerId
+      ? new UserId((l_oValidated as any).itemOwnerId)
+      : new UserId(l_oValidated.userId);
+
     this.recipientEmail = l_oValidated.recipientEmail ?? null;
 
-    // Reconstruction d'acier du littéral d'objet calé sur IAccessConfig
+    // 🪓 [RÉALIGNEMENT CONSTITUTIONNEL V4] Éradication des contresens de casse !
+    // Mapping chirurgical depuis le schéma Zod vers le PascalCase souverain de l'interface.
     this.accessConfig   = {
-      level          : (l_oValidated.accessConfig as any).level ?? 'read',
-      allow_download : (l_oValidated.accessConfig as any).allow_download ?? false,
-      expiresAt      : l_oValidated.accessConfig.expiresAt
+      Privilege:              (l_oValidated.accessConfig as any).level === 'write' ? 'ECRITURE' : 'LECTURE',
+      AutoriseTelechargement: Boolean((l_oValidated.accessConfig as any).allow_download ?? false),
+      DateExpiration:         l_oValidated.accessConfig.expiresAt
+        ? new Date(l_oValidated.accessConfig.expiresAt)
+        : undefined
     };
+
   }
 }

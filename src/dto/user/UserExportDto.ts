@@ -1,6 +1,5 @@
 // ——— fichier : src/dto/user/UserExportDto.ts
 
-import type { IAccessConfig } from '@/interfaces/entities/share/IAccessConfig';
 import type { IItem         } from '@/interfaces/entities/item/IItem';
 import type { IShare        } from '@/interfaces/entities/share/IShare';
 import type { ITag          } from '@/interfaces/entities/tag/ITag';
@@ -29,13 +28,17 @@ interface IExportedItem {
   tags         : IExportedTag[];
 }
 
-/** 📦 Structure plate d'exportation pour un lien de partage (Share) */
+/** 📦 Structure plate d'exportation d'IHM publique pour un lien de partage (Share) */
 interface IExportedShare {
   id             : string;
   itemId         : string;
   recipientEmail : string | null;
   shareToken     : string;
-  accessConfig   : IAccessConfig;
+  accessConfig   : {
+    privilege          : string;
+    allowDownload      : boolean;
+    expiresAt          : Date | null | undefined;
+  };
   createdAt      : Date | undefined;
   updatedAt      : Date | undefined;
 }
@@ -62,12 +65,13 @@ export interface IItemWithTags {
 
 /**
  * 📦 Classe UserExportDto
- * ------------------------
+ * ----------------------------------------------------------------------------
  * Objet de transfert de données pour l'extraction complète RGPD (Article 20).
  * Aplatit et purge les entités complexes riches pour générer un JSON de transport pur.
+ * [RÉPARÉ V4] Utilisation exclusive des vrais getters de surface du Domaine !
  *
  * @class UserExportDto
- * @author Joël, Gaïa & Co
+ * @author Joël, Gaïa & Co (C++ Framework Architect - Clean Getters Alignment)
  */
 export class UserExportDto {
 
@@ -100,46 +104,45 @@ export class UserExportDto {
   private constructor(user: IUser, itemsWithTags: IItemWithTags[], tags: ITag[], shares: IShare[]) {
     this.exportDate = new Date().toISOString();
 
-    // 🪓 Correction chirurgicale : IAppUser/IUser n'exposent que des propriétés de données directes
+    // 🪓 [RÉPARÉ V4] Interrogation via les propriétés de surface sans parenthèses !
     this.user = {
-      id              : user.getUserId().valeur,
-      email           : user.getEmail(),
-      pseudo          : user.getPseudo(),
-      role            : String(user.getRole()),         // Force la conversion via toString()
-      authProvider    : String(user.getAuthProvider()), // Force la conversion via toString()
-      settingsUser    : user.getSettingsUser(),
-      gdprConsent     : user.getGdprConsent(),
-      gdprConsentDate : user.getGdprConsentDate(),
+      id              : user.idUser.valeur,
+      email           : user.courriel,
+      pseudo          : user.pseudo,
+      role            : user.role.code,
+      authProvider    : user.authProvider.code,
+      settingsUser    : user.settingsUser,
+      gdprConsent     : user.rgpdConsent,
+      gdprConsentDate : user.rgpdConsentDate,
       createdAt       : user.createdAt,
       updatedAt       : user.updatedAt
     };
 
-
     this.tags = tags.map(
       (t): IExportedTag => ({
-        id        : t.getTagId() as unknown as string, // Utilisation de la clé nominale scellée
-        tagName   : t.getTagName(),
-        createdAt : t.createdAt,                       // Accès aux propriétés directes d'IEntity
+        id        : t.idTag.valeur,       // 🗲 [RÉPARÉ V4] Vrai getter d'écurie sans getTagId() ! [Mémoria]
+        tagName   : t.tagName,           // 🗲 [RÉPARÉ V4] Vrai getter d'écurie sans getTagName() ! [Mémoria]
+        createdAt : t.createdAt,
         updatedAt : t.updatedAt
       })
     );
 
     this.items = itemsWithTags.map(
       ({ item, tags: itemTags }): IExportedItem => ({
-        id           : item.getItemId() as unknown as string, // Utilisation de la clé nominale scellée
-        contentType  : item.getContentType() as unknown as string,
-        title        : item.getTitle(),
-        slug         : item.getSlug(),
-        content      : item.getContent(),
-        sourceAuthor : item.getSourceAuthor(),
-        thumbnailUrl : item.getThumbnailUrl(),
-        metadata     : item.getMetadata(),
-        createdAt    : item.createdAt,                        // Accès aux propriétés directes d'IEntity
+        id           : item.idItem.valeur,    // 🗲 [RÉPARÉ V4] Vrai getter de surface ! [Mémoria]
+        contentType  : item.contentType.code, // 🗲 [RÉPARÉ V4] Accès direct au code de l'Enum ! [Mémoria]
+        title        : item.title,
+        slug         : item.slug,
+        content      : item.content,
+        sourceAuthor : item.sourceAuthor,
+        thumbnailUrl : item.thumbnailUrl,
+        metadata     : item.metadata,
+        createdAt    : item.createdAt,
         updatedAt    : item.updatedAt,
         tags         : itemTags.map(
           (t): IExportedTag => ({
-            id        : t.getTagId() as unknown as string,
-            tagName   : t.getTagName(),
+            id        : t.idTag.valeur,   // 🗲 [RÉPARÉ V4] Vrai getter ! [Mémoria]
+            tagName   : t.tagName,        // 🗲 [RÉPARÉ V4] Vrai getter ! [Mémoria]
             createdAt : t.createdAt,
             updatedAt : t.updatedAt
           })
@@ -149,12 +152,16 @@ export class UserExportDto {
 
     this.shares = shares.map(
       (s): IExportedShare => ({
-        id             : s.getShareId() as unknown as string, // Utilisation de la clé nominale scellée
-        itemId         : s.getItemId() as unknown as string,
-        recipientEmail : s.getCourrielDest(),
-        shareToken     : s.getJeton(),
-        accessConfig   : s.getAccessConfig(),
-        createdAt      : s.createdAt,                         // Accès aux propriétés directes d'IEntity
+        id             : s.idShare.valeur,     // 🗲 [RÉPARÉ V4] Vrai getter ! [Mémoria]
+        itemId         : s.idItem.valeur,      // 🗲 [RÉPARÉ V4] Vrai getter ! [Mémoria]
+        recipientEmail : s.courrielDest,       // 🗲 [RÉPARÉ V4] Vrai getter ! [Mémoria]
+        shareToken     : s.jeton,              // 🗲 [RÉPARÉ V4] Vrai getter ! [Mémoria]
+        accessConfig   : {                     // 🗲 [MAPPAGE PUBLIC D'IHM] Aligné sans "as any" ! [Mémoria]
+          privilege     : s.accessConfig.Privilege === 'ECRITURE' ? 'write' : 'read',
+          allowDownload : s.accessConfig.AutoriseTelechargement,
+          expiresAt     : s.accessConfig.DateExpiration
+        },
+        createdAt      : s.createdAt,
         updatedAt      : s.updatedAt
       })
     );
@@ -162,14 +169,6 @@ export class UserExportDto {
 
   /**
    * 🏭 Factory statique : Agrège l'ensemble des données d'infrastructure vers le DTO d'exportation.
-   *
-   * @static
-   * @function fromData
-   * @param {IUser} user - Profil utilisateur
-   * @param {IItemWithTags[]} itemsWithTags - Pépites indexées
-   * @param {ITag[]} tags - Étiquettes associées
-   * @param {IShare[]} shares - Partages actifs
-   * @returns {UserExportDto} Le package RGPD sérialisé
    */
   public static fromData(
     user          : IUser,
