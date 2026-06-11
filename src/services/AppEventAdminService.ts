@@ -9,6 +9,7 @@ import { AppEventAction        } from '@/constants/AppEventAction';
 import { AppEventId            } from '@/domain/value-objects/ids';
 import { IAppEventRepository   } from '@/interfaces/repositories/PostGres/IAppEventRepository';
 import type { AppEvent }         from '@/entities/AppEvent';
+import OrdreTriEnum from '@/constants/OrdreTriEnum';
 
 /**
  * 🏛️ Classe AppEventAdminService 🚨
@@ -97,8 +98,8 @@ export class AppEventAdminService implements IAppEventAdminService {
    * @returns {Promise<AppEvent[]>} La collection complète des entités d'événement d'audit
    */
   public async getAllLogs(): Promise<AppEvent[]> {
-    const l_oPackageResult = await this.m_oAppEventRepository.listByOptions({ NbLignes: 100, LigneDebut: 0 });
-    return l_oPackageResult.items;
+    const l_oPackageResult = await this.m_oAppEventRepository.listByOptions({ NbLignes: 100, LigneDebut: 0, ColonneTri: 'aeCreatedAt', OrdreAff: OrdreTriEnum.oDecroissant });
+    return l_oPackageResult.AppEvents;
   }
 
   /**

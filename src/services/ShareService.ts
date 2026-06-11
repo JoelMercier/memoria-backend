@@ -5,7 +5,6 @@ import type { UpdateShareDto   } from '@/dto/share/UpdateShareDto';
 import type { Item             } from '@/entities/Item';
 import type { Share            } from '@/entities/Share';
 import type { IItem            } from '@/interfaces/entities/item/IItem';
-import type { IShare           } from '@/interfaces/entities/share/IShare';
 import type { IShareData       } from '@/interfaces/entities/share/IShareData';
 import type { IItemRepository  } from '@/interfaces/repositories/PostGres/IItemRepository';
 import type { IShareRepository } from '@/interfaces/repositories/PostGres/IShareRepository';
@@ -143,7 +142,7 @@ export class ShareService implements IShareService {
    * @throws {ItemErrorFactory} Si la pépite cible est introuvable sur le disque
    * @returns {Promise<IShare>} L'entité de partage configurée et persistante
    */
-  public async create(p_axUserId: UserId, p_oDto: CreateShareDto): Promise<IShare> {
+  public async create(p_axUserId: UserId, p_oDto: CreateShareDto): Promise<Share> {
     const l_oItem : Item | null = await this.itemRepository.findById(p_oDto.idItem);
     if (!l_oItem) {
       throw ItemErrorFactory.notFound(p_oDto.idItem);
@@ -177,7 +176,7 @@ export class ShareService implements IShareService {
    * @param {ShareId} p_axShareId - L'identifiant binaire unique du lien de partage
    * @returns {Promise<IShare>} L'entité riche de partage hydratée
    */
-  public async findById(p_axUserId: UserId, p_axShareId: ShareId): Promise<IShare> {
+  public async findById(p_axUserId: UserId, p_axShareId: ShareId): Promise<Share> {
     return await this.ensureOwnership(p_axUserId, p_axShareId);
   }
 
@@ -207,7 +206,7 @@ export class ShareService implements IShareService {
    * @throws {ShareErrorFactory} Si le partage est inexistant
    * @returns {Promise<IShare>} L'entité de partage révisée et sauvegardée
    */
-  public async update(p_axUserId: UserId, p_axShareId: ShareId, p_oDto: UpdateShareDto): Promise<IShare> {
+  public async update(p_axUserId: UserId, p_axShareId: ShareId, p_oDto: UpdateShareDto): Promise<Share> {
     await this.ensureOwnership(p_axUserId, p_axShareId);
 
     const l_oUpdates : Partial<IShareData> = {};
