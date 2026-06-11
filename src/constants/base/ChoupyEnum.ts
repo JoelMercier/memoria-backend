@@ -1,6 +1,5 @@
-// ——— fichier : src/constants/base/ChoupyEnum.ts
-
 import { SmartEnum } from '@/constants/base/SmartEnum';
+
 /**
  * 🎛️ Classe ChoupyEnum 📐 (Le Calibreur et Protecteur de Buffers Binaires 🤖)
  * ----------------------------------------------------------------------------
@@ -14,6 +13,12 @@ import { SmartEnum } from '@/constants/base/SmartEnum';
  */
 export class ChoupyEnum extends SmartEnum<number> {
 
+  /** 🛡️ Regex de soute : Validation stricte du format UUID v4/v7 (36 caractères, hex + tirets) */
+  private static readonly m_rRegexUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+
+  /** 🛡️ Regex de soute : Validation de la pureté hexadécimale (Uniquement 0-9 et a-f) */
+  private static readonly m_rRegexHexa = /^[0-9a-fA-F]+$/;
+
   /**
    * Moule et scelle une dimension d'infrastructure immuable en RAM.
    *
@@ -26,13 +31,12 @@ export class ChoupyEnum extends SmartEnum<number> {
   private constructor(p_sLibelle: string, p_nLongueurOctets: number, p_nOrdreAff: number) {
     super(p_sLibelle, p_nLongueurOctets, p_nOrdreAff);
 
-    // 🗲 [SUGGESTION VALIDÉE] Gel constitutionnel de l'instance pour interdire toute altération en RAM
+    // 🗲 Gel constitutionnel de l'instance pour interdire toute altération en RAM
     Object.freeze(this);
   }
 
   /**
    * ⚖️ Obtient le poids équivalent de la dimension converti en bits.
-   * Useful pour documenter les messages de douane ou les logs système.
    *
    * @public
    * @returns {number} Le nombre total de bits (Octets * 8)
@@ -43,13 +47,25 @@ export class ChoupyEnum extends SmartEnum<number> {
 
   /**
    * ⚖️ Obtient la contenance équivalente convertie en Kilo-octets (Ko).
-   * Idéal pour le calibrage futur des clés lourdes ou des tampons de fichiers.
    *
    * @public
    * @returns {number} La dimension en Ko (Octets / 1024)
    */
   public get kiloOctets(): number {
     return this.code / 1024;
+  }
+
+  /**
+   * 🔍 Extracteur statique sécurisé pour clé numérique.
+   * Évite l'échec de typage si le code est passé sous forme de chaîne numérique.
+   *
+   * @static
+   * @param {string | number} p_vCode - Le poids en octet recherché
+   * @returns {ChoupyEnum} L'instance de calibre correspondante
+   */
+  public static override DeCode<E extends SmartEnum<any>>(p_vCode: string | number): E {
+    const l_nCodeNormalise = typeof p_vCode === 'string' ? parseInt(p_vCode, 10) : p_vCode;
+    return super.DeCode(l_nCodeNormalise);
   }
 
   /**
@@ -76,15 +92,22 @@ export class ChoupyEnum extends SmartEnum<number> {
     if (typeof p_vDonnee === 'string') {
       const l_sTexteNettoye = p_vDonnee.trim();
 
-      // Sous-cas A : C'est le format UUID v7 textuel standard à 36 caractères (avec tirets)
-      if (this.code === 16 && l_sTexteNettoye.length === 36 && l_sTexteNettoye.includes('-')) {
-        return; // Validation sémantique du tuyau UUID
+      // Sous-cas A : C'est le format UUID textuel standard à 36 caractères (avec tirets) pour un calibre 16 octets
+      if (this.code === 16 && l_sTexteNettoye.length === 36) {
+        if (!ChoupyEnum.m_rRegexUuid.test(l_sTexteNettoye)) {
+          throw new Error(`[Erreur Silicium 🚨] La chaîne de transport de 36 caractères n'est pas un UUID structurellement valide pour : ${l_sNomDimension}.`);
+        }
+        return;
       }
 
       // Sous-cas B : C'est une trame Hexadécimale brute (1 octet physique = 2 caractères hexa)
       const l_nLongueurAttendueHexa = this.code * 2;
       if (l_sTexteNettoye.length !== l_nLongueurAttendueHexa) {
         throw new Error(`[Erreur Silicium 🚨] La chaîne de transport textuelle fait ${l_sTexteNettoye.length} caractères, attendu exactement ${l_nLongueurAttendueHexa} caractères (format Hexa) pour : ${l_sNomDimension}.`);
+      }
+
+      if (!ChoupyEnum.m_rRegexHexa.test(l_sTexteNettoye)) {
+        throw new Error(`[Erreur Silicium 🚨] La trame de transport contient des caractères invalides pour le format Hexadécimal pour : ${l_sNomDimension}.`);
       }
       return;
     }
@@ -97,33 +120,14 @@ export class ChoupyEnum extends SmartEnum<number> {
   // 🏺 LES CALIBRES MACHINES ENRAMÉS (Garantie absolue de l'alignement matériel)
   // ----------------------------------------------------------------------------
 
-  /** 🪙 DIM_1 - 1 octet (char) : Pour les indicateurs ou drapeaux courts (Ex: "A", "I", "V") */
   public static readonly DIM_1 = new ChoupyEnum('1 octet (char)', 1, 5);
-
-  /** 🪙 DIM_2 - 2 octets (mot 16 bits) : Pour les codes courts (Ex: ISO "FR", "BE") */
   public static readonly DIM_2 = new ChoupyEnum('2 octets (mot 16 bits)', 2, 10);
-
-  /** 💽 DIM_3 - 3 octets (Trigramme 24 bits) : Pour les acronymes internationaux (Ex: Devises "EUR") */
   public static readonly DIM_3 = new ChoupyEnum('3 octets (Trigramme 24 bits)', 3, 15);
-
-  /** 💽 DIM_4 - 4 octets (Quadrigramme 32 bits) : Le standard Mémoria (Rôles "CUST", Sévérités "INFO") */
   public static readonly DIM_4 = new ChoupyEnum('4 octets (Quadrigramme 32 bits)', 4, 20);
-
-  /** 🚀 DIM_8 - 8 octets (GrosMot 64 bits) : Pour les extensions lourdes ou identifiants systèmes */
   public static readonly DIM_8 = new ChoupyEnum('8 octets (GrosMot 64 bits)', 8, 25);
-
-  /** 💎 DIM_16 - 16 octets (UUID''s 128 bits) : Le cœur V4 pour le stockage ByteA compact des UUID v7 */
   public static readonly DIM_16 = new ChoupyEnum(`16 octets (UUID's 128 bits)`, 16, 30);
-
-  /** 🛡️ DIM_32 - 32 octets (SHA-256 256 bits) : Pour les empreintes de hachage de vérification d''intégrité */
   public static readonly DIM_32 = new ChoupyEnum('32 octets (SHA-256 256 bits)', 32, 35);
-
-  /** 🔮 DIM_64 - 64 octets (SHA-512 512 bits) : Pour le chiffrement lourd et les signatures d''élite */
   public static readonly DIM_64 = new ChoupyEnum('64 octets (SHA-512 512 bits)', 64, 40);
-
-  /** 🔐 DIM_128 - 128 octets (CléAsym 1024 bits) : Premier palier des clés asymétriques étendues */
   public static readonly DIM_128 = new ChoupyEnum('128 octets (CléAsym 1024 bits)', 128, 45);
-
-  /** 🏰 DIM_256 - 256 octets (CléAsym 2048 bits) : Le coffre-fort maximal pour les chiffrements asymétriques lourds */
   public static readonly DIM_256 = new ChoupyEnum('256 octets (CléAsym 2048 bits)', 256, 50);
 }

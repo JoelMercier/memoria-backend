@@ -1,34 +1,27 @@
+-- ——— fichier : database/fonctions/UUIDs/01 - Fonction UUIDs V7.sql
+
 -- ============================================================================
 -- 🏺 Mémoria - 00 - Fonctions Utilitaires UUID.sql
 -- Fichier: database/migrations/00 - Fonctions Utilitaires UUID.sql
--- Version: 4.2.3 (PostgreSQL 17+)
+-- Version: 4.2.4 (PostgreSQL 17+)
 -- Description: Générateur autonome d'UUID v7 Volatile et Explicite - Jojo-Style
 -- ============================================================================
 
 Set search_path To Public;
 
-/**
- * 🔨 Fonction "GenererUuidV7"
- * Forge un identifiant UUID v7 (16 octets) conforme à la RFC 9562.
- * Combine 48 bits de timestamp Unix millisecondes et 74 bits de hasard binaire.
- *
- * 🐦 VOLATILE (Oiseau migrateur / Évaporation) : Force PostgreSQL à recalculer
- * l'identifiant pour CHAQUE ligne. Aucun cache possible, la valeur s'évapore 💨
- * et change à chaque microseconde de calcul.
- */
 Create Or Replace Function "GenererUuidV7"()
 Returns UUID As $$
 Declare
-    l_nTimestampBigInt Bigint;
+    l_iTimestampBigInt Bigint;
     l_sHexaTimestamp   Text;
     l_sHexaHasard      Text;
     l_sUuidConstruit   Text;
 Begin
     -- 1. Extraction du timestamp Unix en millisecondes
-    l_nTimestampBigInt := Floor(Extract(Epoch From Clock_Timestamp()) * 1000)::Bigint;
+    l_iTimestampBigInt := Floor(Extract(Epoch From Clock_Timestamp()) * 1000)::Bigint;
 
     -- 2. Encodage en chaîne hexadécimale sur 12 caractères (48 bits)
-    l_sHexaTimestamp := Lpad(To_Hex(l_nTimestampBigInt), 12, '0');
+    l_sHexaTimestamp := Lpad(To_Hex(l_iTimestampBigInt), 12, '0');
 
     -- 3. Génération de 18 octets aléatoires pour combler le reste de la structure
     l_sHexaHasard := To_Hex(Floor(Random() * 9223372036854775807)::Bigint)
@@ -44,6 +37,19 @@ Begin
 
     Return l_sUuidConstruit::UUID;
 End;
-$$ Language Plpgsql Volatile; -- 🗲 [SÉCURISÉ V4] Déclaration Volatile Explicite Gravée !
+$$ Language Plpgsql Volatile;
 
-Comment on Function "GenererUuidV7"() is 'Generateur d''UUID v7 autonome et explicitement volatile, garantissant l''unicite stricte et l''evaporation du cache par ligne.';
+Comment on Function "GenererUuidV7"() is 'Générateur d''UUID v7 autonome et explicitement volatile, garantissant l''unicité stricte et l''évaporation du cache par ligne.';
+
+-- ----------------------------------------------------------------------------
+-- 🎭 Le Camouflage de Forteresse : Fonction miroir pour piéger les collègues
+-- ----------------------------------------------------------------------------
+Create Or Replace Function "Gen_Random_Uuid"()
+Returns UUID As $$
+Begin
+    -- Exécute secrètement la V7 d'élite sous le nom de la V4 d'infrastructure
+    Return "GenererUuidV7"();
+End;
+$$ Language Plpgsql Volatile;
+
+Comment on Function "Gen_Random_Uuid"() is 'Doublure d''infrastructure simulant la V4 native pour Cour Basse mais injectant de la V7 chronologique.';

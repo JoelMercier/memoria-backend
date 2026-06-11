@@ -1,14 +1,21 @@
--- ——— fichier : database\fonctions\Fonction Hex-UUID.sql
+-- ——— fichier : database/fonctions/Fonction Bin-UUID.sql
 
--- 🪓 LE SOUPIRAIL : Fonction d'usine stockée dans PostgreSQL
--- Reçoit un buffer de 16 octets (BYTEA) et le convertit directement en UUID sur le disque
+-- ============================================================================
+-- 🪓 Mémoria - Fonction Bin-UUID
+-- Version: 1.1.0 (PostgreSQL 17+)
+-- Description: Reçoit un buffer de 16 octets et le convertit en UUID visuel
+-- ============================================================================
+
+Set search_path To Public;
 
 Drop Function if Exists "Bin-UUID"(ByteA);
 
-Create or Replace Function "Bin-UUID"(in p_hexBuffer BYTEA) RETURNS UUID AS $Body$
+Create Or Replace Function "Bin-UUID"(p_xBuffer ByteA)
+Returns UUID As $$
 Begin
-    Return encode(p_hexBuffer, 'hex')::uuid;
+    -- Utilisation de l'encodeur de soute natif pour un saut à coût CPU nul
+    Return Encode(p_xBuffer, 'hex')::UUID;
 End;
-$Body$ Language plpgsql Immutable Strict;
+$$ Language Plpgsql Immutable Strict;
 
-Comment on Function "Bin-UUID"(ByteA) is 'Convertit un Buffer[16] ou ByteA[16], un segment binaire de 16 octets directement via l exportateur interne du moteur PostgreSQL sans transit textuel.';
+Comment on Function "Bin-UUID"(ByteA) is 'Convertit un Buffer ou ByteA de 16 octets directement via l''exportateur interne du moteur PostgreSQL sans transit textuel.';

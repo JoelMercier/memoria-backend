@@ -13,18 +13,16 @@ Set CLIENT_ENCODING to 'UTF8';
 -- ----------------------------------------------------------------------------
 Drop Table if Exists "EventSecteurs";
 
-Create Table "EventSecteurs" (
+Create Table "EventSecteurs" ( -- Ordre physique des zones optimisé pour réduire le «padding»
     "esCreatedAt" Timestamp Not Null Default Current_Timestamp, -- 8 octets fixes
     "esUpdatedAt" Timestamp,                                    -- 8 octets fixes
     "esIdSecteur" Char(4) Not Null,                             -- 4 octets fixes (Quadrigramme unique)
     "esOrdreAff"  Smallint Not Null,                            -- 2 octets fixes (Ordre d'affichage)
     "esName"      Varchar(50) Not Null,                         -- Variable (Ferme la marche)
 
-    Constraint "EventSecteurs_esIdSecteur Primary Key ("esIdSecteur"),
-
+    Constraint "EventSecteurs_esIdSecteur_Pkey" Primary Key ("esIdSecteur"),
     Constraint "EventSecteurs_esName_Udx"     Unique ("esName"),
     Constraint "EventSecteurs_esOrdreAff_Udx" Unique ("esOrdreAff"),
-
     Constraint "EventSecteurs_esIdSecteur_Chk" Check ("esIdSecteur" = Upper("esIdSecteur")),
     Constraint "EventSecteurs_esOrdreAff_Chk"  Check ("esOrdreAff" >= 0)
 );
@@ -43,9 +41,9 @@ Comment on Table "EventSecteurs" is 'Dictionnaire centralisé des Secteurs fonct
 
 Comment on Column "EventSecteurs"."esCreatedAt" is 'Horodatage système automatique de la création du Secteur en base.';
 Comment on Column "EventSecteurs"."esUpdatedAt" is 'Horodatage système automatique de la modification via le trigger TraceModif.';
-Comment on Column "EventSecteurs"."esIdSecteur" is 'Quadrigramme fixe unique et en majuscules servant de clé primaire (ex: SYST, UTIL).';
+Comment on Column "EventSecteurs"."esIdSecteur" is 'Quadrigramme fixe unique et en majuscules servant de clé primaire (ex: ''AUTH'', ''PEPI'').';
 Comment on Column "EventSecteurs"."esOrdreAff"  is 'Position numérique unique pour le tri logique des listes déroulantes de l''interface.';
-Comment on Column "EventSecteurs"."esName"      is 'Libellé descriptif complet du Secteurs fonctionnel (ex: Système, Utilisateur).';
+Comment on Column "EventSecteurs"."esName"      is 'Libellé descriptif complet du Secteur fonctionnel (ex: Système, Utilisateur).';
 
 -- -------------------------------------------------------------------------------
 -- 🏺 4. Script d'ensemencement initial (Alignement parfait avec vos logs existants)
@@ -57,4 +55,6 @@ Insert Into "EventSecteurs" ("esOrdreAff", "esIdSecteur", "esName") Values
 (40, 'PEPI', 'Pépite'           ), -- Ex: pepite.creation / partage
 (50, 'BASE', 'Base de données'  ), -- Ex: bd.requete_lente
 (60, 'RGPD', 'RGPD'             )  -- Ex: rgpd.exportation
-On Conflict Do Nothing;
+On Conflict ("esIdSecteur") Do Update Set
+    "esOrdreAff" = Excluded."esOrdreAff",
+    "esName"     = Excluded."esName";

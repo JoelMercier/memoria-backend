@@ -13,7 +13,7 @@ Set CLIENT_ENCODING to 'UTF8';
 -- ----------------------------------------------------------------------------
 Drop Table if Exists "ContentTypes";
 
-Create Table "ContentTypes" (
+Create Table "ContentTypes" ( -- Ordre physique des zones optimisé pour réduire le «padding»
     "ctCreatedAt"     Timestamp Not Null Default Current_Timestamp, -- 8 octets fixes
     "ctUpdatedAt"     Timestamp,                                    -- 8 octets fixes
     "ctIdContentType" Char(4) Not Null,                             -- 4 octets fixes (Quadrigramme unique)
@@ -21,10 +21,8 @@ Create Table "ContentTypes" (
     "ctName"          Varchar(50) Not Null,                         -- Variable (Ferme la marche)
 
     Constraint "ContentTypes_ctIdContentType_Pkey" Primary Key ("ctIdContentType"),
-
     Constraint "ContentTypes_ctName_Udx"     Unique ("ctName"),
     Constraint "ContentTypes_ctOrdreAff_Udx" Unique ("ctOrdreAff"), -- Tri exclusif ergonomique [Mémoria]
-
     Constraint "ContentTypes_ctIdContentType_Chk" Check ("ctIdContentType" = Upper("ctIdContentType")),
     Constraint "ContentTypes_ctOrdreAff_Chk"      Check ("ctOrdreAff" >= 0)
 );
@@ -43,9 +41,9 @@ Comment on Table "ContentTypes" is 'Dictionnaire centralisé des formats de pép
 
 Comment on Column "ContentTypes"."ctCreatedAt"     is 'Horodatage système automatique de la création du type en base.';
 Comment on Column "ContentTypes"."ctUpdatedAt"     is 'Horodatage système automatique de la modification via le trigger TraceModif.';
-Comment on Column "ContentTypes"."ctOrdreAff"      is 'Position numérique unique pour le tri logique des listes déroulantes de l interface graphique.';
-Comment on Column "ContentTypes"."ctIdContentType" is 'Quadrigramme fixe unique et en majuscules servant de clé primaire (ex: Note, Book).';
-Comment on Column "ContentTypes"."ctName"          is 'Libellé descriptif complet du format de la ressource (ex: Livre, Podcast).';
+Comment on Column "ContentTypes"."ctOrdreAff"      is 'Position numérique unique pour le tri logique des listes déroulantes de l''interface graphique.';
+Comment on Column "ContentTypes"."ctIdContentType" is 'Quadrigramme fixe unique et en majuscules servant de clé primaire (ex: ''NOTE'', ''BOOK'').';
+Comment On Column "ContentTypes"."ctName"          is 'Libellé descriptif complet du format de la ressource (ex: Livre, Podcast).';
 
 -- -------------------------------------------------------------------------------
 -- 🏺 4. Script d'ensemencement initial (L'alignement avec les seeders de Phase 1)
@@ -56,4 +54,6 @@ Insert Into "ContentTypes" ("ctOrdreAff", "ctIdContentType", "ctName") Values
 (30, 'BOOK', 'Livre'  ),
 (40, 'PODC', 'Podcast'),
 (50, 'VIDE', 'Vidéo'  )
-On Conflict Do Nothing;
+On Conflict ("ctIdContentType") Do Update Set
+    "ctOrdreAff" = Excluded."ctOrdreAff",
+    "ctName"     = Excluded."ctName";

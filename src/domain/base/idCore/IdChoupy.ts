@@ -8,28 +8,13 @@ import { ChoupyEnum } from './ChoupyEnum';
  * 🏛️ Classe Abstraite IdChoupy 🧮 (L'Armure Universelle du Silicium 🤖)
  * ----------------------------------------------------------------------------
  * Racine unique et centralisée pour tous les identifiants typés du système.
- * Encapsule et protège les données immuables (Buffer ou string) face aux calibres ChoupyEnum.
- * Élimine définitivement la duplication de code (DRY) via un modèle générique strict.
- *
- * 💡 POURQUOI L'IMPORT RELATIF EN AMONT ?
- * Le couplage local avec ChoupyEnum est fusionnel et indissociable. L'utilisation
- * de l'alias absolu '@/...' est proscrite ici pour sanctuariser l'indépendance
- * de la soute idCore. Ce répertoire peut être copié-collé dans n'importe quel
- * autre framework futur sans aucune rupture de build ni modification de code.
- *
- * @class IdChoupy
- * @abstract
- * @template TMarqueNominale - Le jeton de type unique pour le Branding nominal du compilateur
- * @template TContenu - Le support physique de la donnée (string ou Buffer Node.js)
- * @author Directrice du Silicium : Joël (C++ Framework Architect - Portable Core Obsession)
- * @author Forge & Martelage du Code : Gaïa (Au burin, redressée sur le patron de conception)
  */
 export abstract class IdChoupy<TMarqueNominale, TContenu extends string | Buffer> {
 
   /** 🕵️‍♂️ Expression régulière de validation d'un UUID compact pur de 32 caractères hexadécimaux 🔍 */
-  private static readonly REGEX_HEX_COMPACT: RegExp = /^[0-9a-f]{32}$/;
+  private static readonly REGEX_HEX_COMPACT: RegExp = /^[0-9a-fA-F]{32}$/;
 
-  /** 🔒 Sceau de Branding Générique : Verrouille l'étanchéité nominale dès la compilation (Style Template C++) */
+  /** 🔒 Sceau de Branding Générique : Verrouille l'étanchéité nominale dès la compilation */
   declare private readonly __nomUniqueId: TMarqueNominale;
 
   /** 💾 Le support physique immuable stocké en RAM (Buffer de soute ou string de dictionnaire) */
@@ -44,14 +29,14 @@ export abstract class IdChoupy<TMarqueNominale, TContenu extends string | Buffer
    * @param {ChoupyEnum} p_oCalibreExige - Le guichet de douane ChoupyEnum chargé de valider la taille
    */
   protected constructor(p_vBrut: TContenu, p_oCalibreExige: ChoupyEnum) {
-    // Validation immédiate par le douanier injecté au constructeur
+    // 1. Validation immédiate par le douanier injecté au constructeur
     p_oCalibreExige.validerContenance(p_vBrut);
 
     if (typeof p_vBrut === 'string') {
       const l_sTexteNettoye = p_vBrut.trim();
 
-      // Si le calibre exige 16 octets (UUID v7) mais arrive sous forme de chaîne textuelle
-      if (p_oCalibreExige === ChoupyEnum.DIM_16 && l_sTexteNettoye.includes('-')) {
+      // Normalisation uniforme pour le calibre 16 octets (UUID v7 avec ou sans tirets)
+      if (p_oCalibreExige === ChoupyEnum.DIM_16) {
         const l_sCleanHex = l_sTexteNettoye.toLowerCase().replace(/[^0-9a-f]/g, '');
         if (!IdChoupy.REGEX_HEX_COMPACT.test(l_sCleanHex)) {
           throw new Error(`[Erreur Sécurité 🚨] Format d'UUID textuel invalide : attendu 32 caractères hexadécimaux épurés.`);
@@ -71,7 +56,7 @@ export abstract class IdChoupy<TMarqueNominale, TContenu extends string | Buffer
   }
 
   /**
-   * 🎛️ Accesseur Côté Face : Renvoie le segment binaire brut (uniquement si l'identifiant est un Buffer).
+   * 🎛️ Accesseur Côté Face : Renvoie le segment binaire brut (uniquement pour la lignée des UUIDs).
    *
    * @public
    * @returns {Buffer} Le buffer d'infrastructure mémoire pur pour PostgreSQL
@@ -84,8 +69,21 @@ export abstract class IdChoupy<TMarqueNominale, TContenu extends string | Buffer
   }
 
   /**
+   * 🗜️ Convertisseur Universel d'Infrastructure : Fournit un Buffer exploitable par le pool de connexion.
+   * Extrait le buffer natif ou convertit le quadrigramme à la volée en ASCII pur à 0% padding.
+   *
+   * @public
+   * @returns {Buffer} Le flux binaire d'acier prêt pour l'injection SQL
+   */
+  public toBuffer(): Buffer {
+    if (Buffer.isBuffer(this.m_vDonnee)) {
+      return this.m_vDonnee;
+    }
+    return Buffer.from(this.m_vDonnee as string, 'ascii');
+  }
+
+  /**
    * 📜 Accesseur Côté Pile : Re-formate la valeur brute sous sa forme textuelle normalisée.
-   * Restitue l'UUID standardisé avec ses 4 tirets ou la chaîne brute d'origine.
    *
    * @public
    * @returns {string} La représentation textuelle normalisée
@@ -107,8 +105,12 @@ export abstract class IdChoupy<TMarqueNominale, TContenu extends string | Buffer
    */
   public estEgalA(p_oAutreId: IdChoupy<any, any>): boolean {
     if (!p_oAutreId) return false;
-    if (Buffer.isBuffer(this.m_vDonnee) && Buffer.isBuffer(p_oAutreId.binaire)) {
-      return this.m_vDonnee.equals(p_oAutreId.binaire);
+
+    const l_bThisIsBuffer = Buffer.isBuffer(this.m_vDonnee);
+    const l_bAutreIsBuffer = p_oAutreId.toBuffer() && Buffer.isBuffer((p_oAutreId as any).m_vDonnee);
+
+    if (l_bThisIsBuffer && l_bAutreIsBuffer) {
+      return (this.m_vDonnee as Buffer).equals((p_oAutreId as any).m_vDonnee);
     }
     return this.valeur === p_oAutreId.valeur;
   }

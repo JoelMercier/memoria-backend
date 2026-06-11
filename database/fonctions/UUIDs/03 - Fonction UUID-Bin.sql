@@ -1,15 +1,21 @@
--- ——— fichier : database\fonctions\Fonction UUID-Hex.sql
+-- ——— fichier : database/fonctions/Fonction UUID-Bin.sql
 
--- 🪓 LE SOUPIRAIL : Fonction d'usine stockée dans PostgreSQL
--- Reçoit un UUID et extrait directement sa représentation binaire interne de 16 octets (BYTEA) sans aucun transtypage textuel
+-- ============================================================================
+-- 🪓 Mémoria - Fonction UUID-Bin
+-- Version: 1.1.0 (PostgreSQL 17+)
+-- Description: Reçoit un UUID et extrait son flux binaire interne de 16 octets
+-- ============================================================================
+
+Set search_path To Public;
+
 Drop Function if Exists "UUID-Bin"(UUID);
 
-Create or Replace Function "UUID-Bin"(p_uuUUID UUID) Returns ByteA AS $Body$
+Create Or Replace Function "UUID-Bin"(p_hUuid UUID)
+Returns ByteA As $$
 Begin
-    -- Utilisation de la fonction interne native de PostgreSQL qui extrait le flux binaire de 16 octets
-    -- Évite le double transtypage UUID => String, puis, String => ByteA.
-    Return uuid_send(p_uuUUID);
+    -- Utilisation de la fonction interne native qui extrait le flux binaire de 16 octets
+    Return Uuid_send(p_hUuid);
 End;
-$Body$ Language plpgsql Immutable Strict;
+$$ Language Plpgsql Immutable Strict;
 
 Comment on Function "UUID-Bin"(UUID) is 'Convertit un UUID directement en segment binaire de 16 octets (Bytea) via l''exportateur interne du moteur PostgreSQL sans transit textuel.';

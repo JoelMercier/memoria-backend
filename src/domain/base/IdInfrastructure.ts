@@ -53,7 +53,7 @@ export abstract class IdInfrastructure<T extends string | Buffer> {
     const l_rMonContenu = this.infrastructureBrute;
     const l_rSonContenu = p_oAutreId.infrastructureBrute;
 
-    if (l_rMonContenu instanceof Buffer && l_rSonContenu instanceof Buffer) {
+    if (Buffer.isBuffer(l_rMonContenu) && Buffer.isBuffer(l_rSonContenu)) {
       return l_rMonContenu.equals(l_rSonContenu);
     }
 

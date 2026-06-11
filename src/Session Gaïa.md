@@ -221,3 +221,36 @@ Le contrôleur des pépites **`ItemController.ts`** et son service **`ItemServic
 2. **`src/infrastructure/repositories/UserRepository.ts`** ➔ Aligner le pôle des usagers sur l'héritage strict de la maman universelle du framework [Mémoria].
 
 > 🛡️ **Rappel de sécurité pour le Jojo du futur** : Les fonctions stockées de soute retournent la volumétrie absolue calculée via fenêtrage sous la clé d'élite **`NbLignesTotal`**. Pensez à aller la cueillir sur la première ligne du tableau brut (`l_oResult.rows?.rNbLignesTotal`) pour couper la chique aux alertes `TS2339` ! [Mémoria]
+
+# 🏺 MEMORIA V4 — Parchemin de réarmement et rattrapage de contexte
+
+## 🏛️ 1. L'infrastructure physique (Base de données PostgreSQL 17+)
+* **L'agencement machine descendant (Jojo-Style)** : Alignement à 0% de padding physique. Les colonnes descendent par poids matériel : types fixes de 16 octets (`UUID`), horodateurs de 8 octets (`Timestamp`), quadrigrammes de 4 octets (`Char(4)`), `Boolean` (1 octet), puis les variables (`Varchar`, `Jsonb`, `Text`).
+* **Conformité des outils visuels (Arbitrage pgAdmin)** : Les clés primaires et étrangères dynamiques conservent le type `UUID` natif sur le disque pour préserver la santé mentale de l'artisan lors du débogage, mais transitent en `Buffer` binaire de 16 octets dans l'applicatif via les soupirailles `"UUID-Bin"` et `"Bin-UUID"`.
+* **Souveraineté des zones** : Chaque colonne porte le préfixe unique de sa table (`ro`, `ap`, `ct`, `ec`, `se`, `es`, `ea`, `us`, `tg`, `it`, `ti`, `sh`, `ae`). Aucun alias de table (le mot-clé `AS`) n'est toléré dans les requêtes standards.
+* **Le dictionnaire matriciel des 7 tables de référence (Char(4))** :
+  - `"Roles"` ➔ `CUST` (Utilisateur), `ADMN` (Administrateur), `SADM` (Super Administrateur). Tri par `roNiveau` / `roOrdreAff`.
+  - `"Providers"` ➔ `LOCA`, `GOOG`, `AZUR`, `APPL`.
+  - `"ContentTypes"` ➔ `NOTE`, `ARTI`, `BOOK`, `PODC`, `VIDE`.
+  - `"EventCategories"` ➔ `MONI`, `ANAL`, `AUDI`, `RGPD`.
+  - `"Severites"` ➔ `INFO`, `WARN`, `ERRO`, `CRIT` + la sucrerie de test `'FATA'`.
+  - `"EventSecteurs"` ➔ `SYST`, `UTIL`, `AUTH`, `PEPI`, `BASE`, `RGPD`.
+  - `"EventActions"` ➔ `DEMA`, `CONN`, `ENRE`, `ECHE`, `CREA`, `PART`, `EXPO`, `LENT`, et `PURG` (Purge de soute).
+* **Règles de contrebande et Forteresse d'audit** :
+  - L'ensemencement initial utilise `On Conflict Do Update Set` pour alimenter dynamiquement la chaufferie de RAM.
+  - La table `"Shares"` dénormalise `"shItemOwnerId"` (`UUID` du user propriétaire) pour foudroyer le coût CPU des jointures de Cour Basse.
+  - La table `"Events"` possède un trigger de forteresse `AFTER DELETE FOR EACH STATEMENT` exécutant `"EnregistrerBilanPurge"`() : il intercepte le nombre de lignes détruites via `Get Diagnostics` et injecte une ligne d'audit avec l'action `'PURG'` via l'usine secrète `"Gen_Random_Uuid"`() simulant de la V4 mais injectant de la V7 chronologique (RFC 9562).
+
+## 🗄️ 2. La couche applicative (TypeScript Élite)
+* **Éradication des enums natifs** : Remplacés par l'architecture `SmartEnum<string | number>` (comme `ChoupyEnum`). Les instances statiques exécutent `super()`, interceptent leur nom via `this.constructor.name` et s'auto-injectent en RAM à l'allumage du serveur sans harceler PostgreSQL.
+* **L'arbre généalogique des identifiants forts** : Pulvérisation de l'ancien `IdMetier.ts` en 10 fichiers atomiques étanches au sein du dossier `src/domain/value-objects/ids/` ré-exposés par un *Barrel export* (`index.ts`).
+  - `IdInfrastructure<T>` ➔ Gère le stockage brut privé `m_rContenuBrut` et la comparaison au bit près via `Buffer.isBuffer()`.
+  - `IdChoupy<TMarqueNominale, TContenu>` ➔ Matriarche gérant le *Branded Typing* fantôme (`declare private __nomUniqueId`), le nettoyage `.trim()`, le forçage des capitales et la méthode universelle `.toBuffer()`.
+  - Lignée `DIM_16` (`string | Buffer`) ➔ `UserId`, `ItemId`, `TagId`, `ShareId`, `SessionId`, `AppEventId`.
+  - Lignée `DIM_4` (`string`) ➔ `RoleId`, `SeverityId`, `ContentTypeId`, etc.
+* **Notation Hongroise Memoria stricte** : Portées (`g_`, `s_`, `m_`, `l_`, `p_`, `r_`) + Types (`i`, `f`, `d`, `c`, `b`, `w`, `s`, `h`, `o`, `e`, `v`) + Modificateurs (`x` pour hexadécimal, `u`, `p`, `a`). Interdiction absolue d'accéder à un membre `m_` hors de sa classe ou de son constructeur sous peine de privation de tournée de bière.
+
+## ⚡ 3. Chantiers accomplis et validés
+1. **`ItemTagRepository.sync`** : Réécriture différentielle au sein de la transaction `this.db.getPool().connect()` pour calculer précisément les insertions et suppressions strictes afin d'immuniser l'ancienneté du champ `tiCreatedAt` (Éradication du destructif *Delete-then-Insert*).
+2. **`EventSeverity.ts`** : Vieux fichier vestige (qui bégayait en `'ERROR'` et `'FATAL'`) supprimé définitivement. Sa politique de repli sécurisé a été rapatriée proprement sous forme de fabrique statique `SeverityId.From()` branchée sur le quadrigramme `'INFO'` par défaut.
+3. **`AnonymiserActeurSysteme`()** : Procédure stockée PL/pgSQL d'infiltration RGPD. Elle sabote de manière irréversible le profil dans `"Users"` (courriel fantôme basé sur l'ID, hash brisé, révocation du consentement), nettoie les destinataires de `"Shares"` au même millième de seconde, et bascule à `NULL` la colonne `"aeUserId"` dans la table `"Events"` pour rompre la traçabilité nominative tout en préservant les statistiques.
