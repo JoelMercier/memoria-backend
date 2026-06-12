@@ -40,7 +40,7 @@ export class CreateEventDto {
   public readonly severity      : AppEventSeverity;
 
   /** 💬 Corps du message ou description descriptive */
-  public readonly message       : string | null;
+  public readonly message       : string;
 
   /** 🎛️ Métadonnées d'infrastructure ou contexte additionnel */
   public readonly metadata      : Record<string, any>;
@@ -50,21 +50,20 @@ export class CreateEventDto {
    * Effectue le scellage nominal immédiat vers nos Value Objects et Constantes.
    *
    * @constructor
-   * @param {unknown} data - Payload brut d'infrastructure issu de la requête
+   * @param {unknown} data - Charge utile brut d'infrastructure issu de la requête
    */
   public constructor(data: unknown) {
-    const validated : CreateAppEventSchemaType = AppEventValidation.validateCreate(data);
+    const l_oRawBody : Record<string, unknown> = (data && typeof data === 'object') ? (data as Record<string, unknown>) : {};
+    const validated  : CreateAppEventSchemaType = AppEventValidation.validateCreate(l_oRawBody);
 
-    // Cast simples, légitimes et sécurisés par l'amont du .refine() de Zod
-    this.eventCategory = validated.eventCategory as unknown as AppEventCategory;
     this.idEvent       = new AppEventId(validated.idAppEvent);
+
+    this.eventCategory = AppEventCategory.fromSql(validated.eventCategory);
+    this.eventSecteur  = AppEventSecteur .fromSql(validated.eventSecteur);
+    this.eventAction   = AppEventAction  .fromSql(validated.eventAction );
+    this.severity      = AppEventSeverity.fromSql(validated.severity ?? 'INFO');
+
     this.userId        = validated.userId ? new UserId(validated.userId) : null;
-
-    // 🗲 Raccordement V4 : Hydratation étanche depuis les deux propriétés éclatées de Zod
-    this.eventSecteur  = validated.eventContext as unknown as AppEventSecteur;
-    this.eventAction   = validated.eventAction as unknown as AppEventAction;
-
-    this.severity      = (validated.severity ?? 'INFO') as unknown as AppEventSeverity;
     this.message       = validated.message;
     this.metadata      = validated.metadata as Record<string, any>;
   }

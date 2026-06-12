@@ -1,3 +1,5 @@
+-- ——— fichier : database\migration\Références\06 - Table EventSecteurs.sql
+
 -- ============================================================================
 -- 📦 Mémoria - EventSecteurs
 -- Fichier: database/migrations/06 - Table EventSecteurs.sql

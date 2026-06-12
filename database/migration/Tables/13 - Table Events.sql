@@ -21,7 +21,7 @@ Create Table "Events" ( -- Alignement machine descendant strict pour éliminer l
     "aeSeverityId" Char(4) Not Null,                             --  4 octets fixes (Zone clé étrangère liée à Severites)
     "aeSecteurId"  Char(4) Not Null,                             --  4 octets fixes (Zone clé étrangère liée à EventSecteurs)
     "aeActionId"   Char(4) Not Null,                             --  4 octets fixes (Zone clé étrangère liée à EventActions)
-    "aeMessage"    Text Not Null,                                -- Taille variable (Message lisible admin)
+    "aeMessage"    Varchar(255) Not Null,                        -- Taille variable (Message lisible admin)
     "aeMetadata"   Jsonb Not Null Default '{}'::Jsonb,           -- Taille variable lourde (Ferme la marche de la ligne)
 
     Constraint "Events_aeIdEvent_Pkey" Primary Key ("aeIdEvent"),

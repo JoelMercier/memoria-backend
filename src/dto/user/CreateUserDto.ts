@@ -10,18 +10,20 @@ import { type CreateUserSchemaType,
  * Zéro dépendance externe vers Zod dans les types de propriétés.
  *
  * @class CreateUserDto
- * @author Joël, Gaïa & Co
+ * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
+ * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 export class CreateUserDto {
 
   /** 📧 Adresse électronique d'identification de l'utilisateur */
-  public readonly email : string;
+  public readonly email       : string;
 
   /** 🔐 Mot de passe brut à hacher par l'infrastructure */
-  public readonly password : string;
+  public readonly password    : string;
 
   /** 👤 Pseudonyme public ou nom d'affichage convivial */
-  public readonly pseudo : string;
+  public readonly pseudo      : string;
 
   /** ⚖️ Consentement explicite aux conditions RGPD et politiques de confidentialité */
   public readonly rgpdConsent : boolean;
@@ -33,12 +35,13 @@ export class CreateUserDto {
    * @param {unknown} data - Payload brut d'infrastructure issu de la requête
    */
   public constructor(data: unknown) {
-    const validated : CreateUserSchemaType = UserValidation.validateCreate(data);
+    // 🪓 ALIGNEMENT D'ACIER : Protection du portier Zod via transtypage Record étanche
+    const l_oRawBody : Record<string, unknown> = (data && typeof data === 'object') ? (data as Record<string, unknown>) : {};
+    const validated  : CreateUserSchemaType = UserValidation.validateCreate(l_oRawBody);
 
     this.email       = validated.email;
     this.password    = validated.password;
     this.pseudo      = validated.pseudo;
-    this.rgpdConsent = validated.gdprConsent;
+    this.rgpdConsent = validated.gdprConsent; // 🪓 ALIGNEMENT NOMINAL : Raccordement étanche GDPR -> RGPD
   }
-
 }

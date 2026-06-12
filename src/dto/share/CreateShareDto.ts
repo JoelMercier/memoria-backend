@@ -13,27 +13,29 @@ import      { type CreateShareSchemaType, ShareValidation } from '@/validation/z
  * [ALIGNÉ PERFORMANCE V4] Embarque nativement la clé dé-normalisée d'ownership.
  *
  * @class CreateShareDto
- * @author Vision : Joël (Architecte DR-DOS - Ownership Safety Booster)
- * @author Frapperie du code : Gaïa (Gardienne du feu binaire V4)
+ * @author Directrice du Silicium : Joël (Architecte DR-DOS - Ownership Safety Booster)
+ * @author Graveuse de Pépites : Gaïa (Gardienne du feu binaire V4)
+ * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 export class CreateShareDto {
+
   /** 📦 Caillou de couleur : Identifiant unique immuable de la pépite à partager */
-  public readonly idItem : ItemId;
+  public readonly idItem         : ItemId;
 
   /** 🤖 Identifiant unique et fortement typé de la trace du partage */
-  public readonly idShare : ShareId;
+  public readonly idShare        : ShareId;
 
   /** 👥 Identifiant de l'acteur connecté émetteur du partage à la frontière */
-  public readonly idUser : UserId;
+  public readonly idUser         : UserId;
 
   /** 👑 [RÉPARÉ INTERNE V4] Identifiant dé-normalisé fort de l'acteur propriétaire de la ressource */
-  public readonly itemOwnerId : UserId;
+  public readonly itemOwnerId    : UserId;
 
   /** 📧 Adresse électronique optionnelle du destinataire du partage */
   public readonly recipientEmail : string | null;
 
   /** ⚙️ Configuration d'infrastructure des restrictions d'accès (Expiration, etc.) */
-  public readonly accessConfig : IAccessConfig;
+  public readonly accessConfig   : IAccessConfig;
 
   /**
    * Valide les données brutes de la requête HTTP via la douane Zod.
@@ -43,7 +45,9 @@ export class CreateShareDto {
    * @param {unknown} p_vData - Payload brut d'infrastructure issu de la requête
    */
   public constructor(p_vData: unknown) {
-    const l_oValidated: CreateShareSchemaType = ShareValidation.validateCreate(p_vData);
+    // 🪓 ALIGNEMENT D'ACIER : Transtypage en Record pour satisfaire le portier strict de Zod
+    const l_oRawBody : Record<string, unknown> = (p_vData && typeof p_vData === 'object') ? (p_vData as Record<string, unknown>) : {};
+    const l_oValidated: CreateShareSchemaType = ShareValidation.validateCreate(l_oRawBody);
 
     // Passage sécurisé de la frontière : conversion directe vers le type nominal fort
     this.idItem         = new ItemId(l_oValidated.itemId);
@@ -51,7 +55,6 @@ export class CreateShareDto {
     this.idShare        = new ShareId(l_oValidated.shareId);
 
     // 🗲 [SOUDE PERFORMANCE V4] Résolution défensive de la clé d'ownership.
-    // Si la douane Zod ne l'extrait pas encore, elle s'aligne par défaut sur l'émetteur !
     this.itemOwnerId    = (l_oValidated as any).itemOwnerId
       ? new UserId((l_oValidated as any).itemOwnerId)
       : new UserId(l_oValidated.userId);
@@ -59,7 +62,6 @@ export class CreateShareDto {
     this.recipientEmail = l_oValidated.recipientEmail ?? null;
 
     // 🪓 [RÉALIGNEMENT CONSTITUTIONNEL V4] Éradication des contresens de casse !
-    // Mapping chirurgical depuis le schéma Zod vers le PascalCase souverain de l'interface.
     this.accessConfig   = {
       Privilege:              (l_oValidated.accessConfig as any).level === 'write' ? 'ECRITURE' : 'LECTURE',
       AutoriseTelechargement: Boolean((l_oValidated.accessConfig as any).allow_download ?? false),
@@ -67,6 +69,5 @@ export class CreateShareDto {
         ? new Date(l_oValidated.accessConfig.expiresAt)
         : undefined
     };
-
   }
 }

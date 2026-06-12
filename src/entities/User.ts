@@ -1,12 +1,14 @@
 // ——— fichier : src/entities/User.ts
 
-import      { BaseEntity }         from '@/entities/BaseEntity';
-import      { Role }               from '@/constants/Role';
-import      { AuthProvider }       from '@/constants/AuthProvider';
-import      { RoleId, ProviderId } from '@/domain/value-objects/ids';
-import type { IUser }              from '@/interfaces/entities/user/IUser';
-import type { IUserData }          from '@/interfaces/entities/user/IUserData';
-import type { UserId }             from '@/domain/value-objects/ids';
+import type { IUser     } from '@/interfaces/entities/user/IUser';
+import type { IUserData } from '@/interfaces/entities/user/IUserData';
+import type { UserId    } from '@/domain/value-objects/ids';
+
+import { BaseEntity   } from '@/entities/BaseEntity';
+import { Role         } from '@/constants/Role';
+import { AuthProvider } from '@/constants/AuthProvider';
+import { RoleId,
+         ProviderId   } from '@/domain/value-objects/ids';
 
 /**
  * 🏛️ Classe User 👥 (Le Modèle Métier Immuable de l'Acteur)
@@ -47,10 +49,10 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
   private readonly m_rSettingsUser    : Record<string, any>;
 
   /** 🛡️ Indicateur légal d'approbation des conditions d'utilisation (rgpdConsent) */
-  private readonly m_bGdprConsent     : boolean;
+  private readonly m_bRgpdConsent     : boolean;
 
   /** ⏱️ Horodatage précis du scellage du consentement aux règles RGPD (rgpdConsentDate) */
-  private readonly m_dGdprConsentDate : Date | null;
+  private readonly m_dRgpdConsentDate : Date | null;
 
   /**
    * Instancie un utilisateur immuable à partir de son contrat de données.
@@ -70,8 +72,8 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
     this.m_eAuthProvider    = AuthProvider.fromSql(p_oData.authProviderId.valeur);
 
     this.m_rSettingsUser    = p_oData.settingsUser || {};
-    this.m_bGdprConsent     = p_oData.rgpdConsent;
-    this.m_dGdprConsentDate = p_oData.rgpdConsentDate ?? null;
+    this.m_bRgpdConsent     = p_oData.rgpdConsent;
+    this.m_dRgpdConsentDate = p_oData.rgpdConsentDate ?? null;
   }
 
   /**
@@ -152,7 +154,7 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
    * @returns {boolean} True si les conditions d'utilisation sont validées
    */
   public get rgpdConsent(): boolean {
-    return this.m_bGdprConsent;
+    return this.m_bRgpdConsent;
   }
 
   /**
@@ -162,7 +164,7 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
    * @returns {Date | null} Date précise de la signature ou NULL
    */
   public get rgpdConsentDate(): Date | null {
-    return this.m_dGdprConsentDate;
+    return this.m_dRgpdConsentDate;
   }
 
   /**

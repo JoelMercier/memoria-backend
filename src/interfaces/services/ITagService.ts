@@ -1,14 +1,14 @@
 // ——— fichier : src/interfaces/services/ITagService.ts
 
-import { IBaseService }     from '@/interfaces/services/IBaseService';
-import { UserId, TagId }    from '@/domain/value-objects/ids';
-import { ITagRepository }   from '@/interfaces/repositories/PostGres/ITagRepository'; // 🗲 [RÉPARÉ CASSE]
-import { Tag }              from '@/entities/Tag'; // 🗲 [INJECTÉ V4]
-import type { ITagData }    from '@/interfaces/entities/tag/ITagData'; // 🗲 [INJECTÉ V4]
+import type { ITagData     } from '@/interfaces/entities/tag/ITagData';
 import type { CreateTagDto } from '@/dto/tag/CreateTagDto';
 import type { UpdateTagDto } from '@/dto/tag/UpdateTagDto';
-import type { IListOptions } from '@/interfaces/shared/IListOptions'; // 🗲 [INJECTÉ V4]
-import type { IListResult }  from '@/interfaces/shared/IListResult';  // 🗲 [FRANÇAIS D'ÉLITE]
+import type { IListOptions } from '@/interfaces/shared/IListOptions';
+import type { IListResult  } from '@/interfaces/shared/IListResult';
+import { IBaseService      } from '@/interfaces/services/IBaseService';
+import { UserId, TagId     } from '@/domain/value-objects/ids';
+import { ITagRepository    } from '@/interfaces/repositories/PostGres/ITagRepository';
+import { Tag               } from '@/entities/Tag';
 
 /**
  * 📜 Interface ITagService

@@ -1,13 +1,13 @@
 // ——— fichier : src/interfaces/services/IUserService.ts
 
-import      { IBaseService      } from '@/interfaces/services/IBaseService';
-import      { UserId            } from '@/domain/value-objects/ids';
 import type { ChangePasswordDto } from '@/dto/user/ChangePasswordDto';
 import type { DeleteAccountDto  } from '@/dto/user/DeleteAccountDto';
 import type { UpdateProfileDto  } from '@/dto/user/UpdateProfileDto';
-import type { User             } from '@/entities/User'; // 🗲 [INJECTÉ V4 VIVANT]
-import type { IUserData         } from '@/interfaces/entities/user/IUserData'; // 🗲 [INJECTÉ V4]
-import      { IUserRepository   } from '@/interfaces/repositories/PostGres/IUserRepository'; // 🗲 [RÉPARÉ CASSE]
+import type { User              } from '@/entities/User';
+import type { IUserData         } from '@/interfaces/entities/user/IUserData';
+import      { IBaseService      } from '@/interfaces/services/IBaseService';
+import      { UserId            } from '@/domain/value-objects/ids';
+import      { IUserRepository   } from '@/interfaces/repositories/PostGres/IUserRepository';
 
 /**
  * 📜 Interface IUserService

@@ -1,3 +1,5 @@
+-- ——— fichier : database\migration\Références\07 - Table EventActions.sql
+
 -- ============================================================================
 -- 📦 Mémoria - EventActions
 -- Fichier: database/migrations/07 - Table EventActions.sql

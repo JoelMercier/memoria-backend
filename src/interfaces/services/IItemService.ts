@@ -1,12 +1,13 @@
 // ——— fichier : src/interfaces/services/IItemService.ts
 
-import { IBaseService }   from '@/interfaces/services/IBaseService';
-import { ItemId }         from '@/domain/value-objects/ids';
-import type { Item }      from '@/entities/Item';
+import type { Item      } from '@/entities/Item';
 import type { IItemData } from '@/interfaces/entities/item/IItemData';
-import { CreateItemDto }  from '@/dto/item/CreateItemDto';
-import { UpdateItemDto }  from '@/dto/item/UpdateItemDto';
-import { IListResult }    from '@/interfaces/shared/IListResult';
+
+import { IBaseService  } from '@/interfaces/services/IBaseService';
+import { ItemId        } from '@/domain/value-objects/ids';
+import { CreateItemDto } from '@/dto/item/CreateItemDto';
+import { UpdateItemDto } from '@/dto/item/UpdateItemDto';
+import { IListResult   } from '@/interfaces/shared/IListResult';
 import { IItemRepository, IItemRepositoryListOptions } from '@/interfaces/repositories/PostGres/IItemRepository';
 
 

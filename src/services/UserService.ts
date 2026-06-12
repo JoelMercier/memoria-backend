@@ -1,16 +1,16 @@
 // ——— fichier : src/services/UserService.ts
 
-import { UserId          } from '@/domain/value-objects/ids';
-import { User            } from '@/entities/User';
-import { UserErrorFactory } from '@/exceptions/UserErrorFactory';
 import type { ChangePasswordDto } from '@/dto/user/ChangePasswordDto';
-import type { DeleteAccountDto }  from '@/dto/user/DeleteAccountDto';
-import type { UpdateProfileDto }  from '@/dto/user/UpdateProfileDto';
-import type { IUser           } from '@/interfaces/entities/user/IUser';
-import type { IUserData       } from '@/interfaces/entities/user/IUserData';
-import type { IUserRepository    } from '@/interfaces/repositories/PostGres/IUserRepository';
-import type { IPasswordHasher    } from '@/interfaces/security/IPasswordHasher';
-import type { IUserService       } from '@/interfaces/services/IUserService';
+import type { DeleteAccountDto  } from '@/dto/user/DeleteAccountDto';
+import type { UpdateProfileDto  } from '@/dto/user/UpdateProfileDto';
+import type { IUserData         } from '@/interfaces/entities/user/IUserData';
+import type { IUserRepository   } from '@/interfaces/repositories/PostGres/IUserRepository';
+import type { IPasswordHasher   } from '@/interfaces/security/IPasswordHasher';
+import type { IUserService      } from '@/interfaces/services/IUserService';
+
+import { UserId           } from '@/domain/value-objects/ids';
+import { User             } from '@/entities/User';
+import { UserErrorFactory } from '@/exceptions/UserErrorFactory';
 
 /**
  * 🏛️ Classe UserService
@@ -59,6 +59,17 @@ export class UserService implements IUserService {
   }
 
   /**
+   * Accesseur public immuable pour le service de hachage cryptographique.
+   * Centralise la souveraineté d'accès aux outils de chiffrement des secrets.
+   *
+   * @public
+   * @returns {IPasswordHasher} L'instance du hacheur de mots de passe
+   */
+  public get hasher(): IPasswordHasher {
+    return this.m_oPasswordHasher;
+  }
+
+  /**
    * 👤 Met à jour le pseudonyme, le courriel ou les préférences graphiques de l'utilisateur.
    *
    * @public
@@ -66,25 +77,23 @@ export class UserService implements IUserService {
    * @param {UserId} p_axUserId - L'identifiant fort binaire de l'utilisateur cible
    * @param {UpdateProfileDto} p_oDto - Les nouveaux attributs de profil à appliquer
    * @throws {UserErrorFactory} Si la ressource est introuvable ou si le courriel/pseudo est déjà réservé
-   * @returns {Promise<IUser>} L'entité de l'utilisateur mise à jour
+   * @returns {Promise<User>} L'entité de l'utilisateur mise à jour
    */
-  public async updateProfile(p_axUserId: UserId, p_oDto: UpdateProfileDto): Promise<IUser> {
-    const l_oExisting : User | null = await this.m_oUserRepository.findById(p_axUserId);
+  public async updateProfile(p_axUserId: UserId, p_oDto: UpdateProfileDto): Promise<User> {
+    const l_oExisting : User | null = await this.repository.findById(p_axUserId);
     if (!l_oExisting) {
       throw UserErrorFactory.notFound(p_axUserId);
     }
 
-    // 🪓 ALIGNEMENT INDUSTRIEL RÉUSSI : .getEmail() uniformisé
-    if (p_oDto.email && p_oDto.email.toLowerCase() !== l_oExisting.getEmail().toLowerCase()) {
-      const l_oByEmail : User | null = await this.m_oUserRepository.findByEmail(p_oDto.email);
+    if (p_oDto.email && p_oDto.email.toLowerCase() !== l_oExisting.courriel.toLowerCase()) {
+      const l_oByEmail : User | null = await this.repository.findByEmail(p_oDto.email);
       if (l_oByEmail) {
         throw UserErrorFactory.profileConflict('email', p_oDto.email);
       }
     }
 
-    // 🪓 ALIGNEMENT INDUSTRIEL RÉUSSI : .getPseudo() uniformisé
-    if (p_oDto.pseudo && p_oDto.pseudo !== l_oExisting.getPseudo()) {
-      const l_oByPseudo : User | null = await this.m_oUserRepository.findByPseudo(p_oDto.pseudo);
+    if (p_oDto.pseudo && p_oDto.pseudo !== l_oExisting.pseudo) {
+      const l_oByPseudo : User | null = await this.repository.findByPseudo(p_oDto.pseudo);
       if (l_oByPseudo) {
         throw UserErrorFactory.profileConflict('pseudo', p_oDto.pseudo);
       }
@@ -101,7 +110,7 @@ export class UserService implements IUserService {
       l_oUpdates.settingsUser = p_oDto.settingsUser;
     }
 
-    const l_oUpdated : User | null = await this.m_oUserRepository.update(p_axUserId, l_oUpdates);
+    const l_oUpdated : User | null = await this.repository.update(p_axUserId, l_oUpdates);
     if (!l_oUpdated) {
       throw UserErrorFactory.notFound(p_axUserId);
     }
@@ -119,22 +128,22 @@ export class UserService implements IUserService {
    * @returns {Promise<void>}
    */
   public async changePassword(p_axUserId: UserId, p_oDto: ChangePasswordDto): Promise<void> {
-    const l_oUser : User | null = await this.m_oUserRepository.findById(p_axUserId);
+    const l_oUser : User | null = await this.repository.findById(p_axUserId);
     if (!l_oUser) {
       throw UserErrorFactory.notFound(p_axUserId);
     }
 
-    // 🪓 ALIGNEMENT INDUSTRIEL RÉUSSI : .getPasswordHash() uniformisé
-    const l_bOk : boolean = await this.m_oPasswordHasher.verify(
+    // 🪓 ALIGNEMENT INDUSTRIEL V4 : Lecture via l'accesseur get 'passwordHash' (sans parenthèses)
+    const l_bOk : boolean = await this.hasher.verify(
       p_oDto.currentPassword,
-      l_oUser.getPasswordHash()
+      l_oUser.passwordHash
     );
     if (!l_bOk) {
       throw UserErrorFactory.wrongPassword();
     }
 
-    const l_sNewHash : string = await this.m_oPasswordHasher.hash(p_oDto.newPassword);
-    const l_oUpdated : User | null = await this.m_oUserRepository.update(p_axUserId, {
+    const l_sNewHash : string = await this.hasher.hash(p_oDto.newPassword);
+    const l_oUpdated : User | null = await this.repository.update(p_axUserId, {
       passwordHash: l_sNewHash
     });
     if (!l_oUpdated) {
@@ -153,18 +162,17 @@ export class UserService implements IUserService {
    * @returns {Promise<void>}
    */
   public async deleteAccount(p_axUserId: UserId, p_oDto: DeleteAccountDto): Promise<void> {
-    const l_oUser : User | null = await this.m_oUserRepository.findById(p_axUserId);
+    const l_oUser : User | null = await this.repository.findById(p_axUserId);
     if (!l_oUser) {
       throw UserErrorFactory.notFound(p_axUserId);
     }
 
-    // 🪓 ALIGNEMENT INDUSTRIEL RÉUSSI : .getPasswordHash() uniformisé
-    const l_bOk : boolean = await this.m_oPasswordHasher.verify(p_oDto.password, l_oUser.getPasswordHash());
+    const l_bOk : boolean = await this.hasher.verify(p_oDto.password, l_oUser.passwordHash);
     if (!l_bOk) {
       throw UserErrorFactory.wrongPassword();
     }
 
-    const l_bDeleted : boolean = await this.m_oUserRepository.delete(p_axUserId);
+    const l_bDeleted : boolean = await this.repository.delete(p_axUserId);
     if (!l_bDeleted) {
       throw UserErrorFactory.notFound(p_axUserId);
     }

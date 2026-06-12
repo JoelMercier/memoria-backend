@@ -1,11 +1,12 @@
 // ——— fichier : src/interfaces/services/IUserExportService.ts
 
-import { IBaseService }       from '@/interfaces/services/IBaseService';
-import { UserId }             from '@/domain/value-objects/ids';
-import type { User }          from '@/entities/User'; // 🗲 [INJECTÉ V4]
-import type { IUserData }     from '@/interfaces/entities/user/IUserData'; // 🗲 [INJECTÉ V4]
+import type { User          } from '@/entities/User';
+import type { IUserData     } from '@/interfaces/entities/user/IUserData';
 import type { UserExportDto } from '@/dto/user/UserExportDto';
-import { IUserRepository }    from '@/interfaces/repositories/PostGres/IUserRepository'; // 🗲 [RÉPARÉ CASSE]
+
+import { IBaseService    } from '@/interfaces/services/IBaseService';
+import { UserId          } from '@/domain/value-objects/ids';
+import { IUserRepository } from '@/interfaces/repositories/PostGres/IUserRepository';
 
 /**
  * 📜 Interface IUserExportService

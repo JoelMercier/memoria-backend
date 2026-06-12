@@ -3,8 +3,8 @@
 import { z }                from 'zod';
 import { AppEventCategory } from '@/constants/AppEventCategory';
 import { AppEventSeverity } from '@/constants/AppEventSeverity';
-import { AppEventContext }  from '@/constants/AppEventSecteur'; // [NEW V4]
-import { AppEventAction }   from '@/constants/AppEventAction';  // [NEW V4]
+import { AppEventSecteur  } from '@/constants/AppEventSecteur';
+import { AppEventAction   } from '@/constants/AppEventAction';
 
 /**
  * 🗂️ Schémas de validation Zod pour les codes des Smart Enums d'audit.
@@ -16,18 +16,18 @@ const eventCategorySchema = z.string().trim().refine(
   { message: 'Catégorie d\'événement d\'audit invalide' }
 );
 
-const severitySchema = z.string().trim().nullable().refine(
-  (val) => val === null || AppEventSeverity.isValidCode(val),
+const severitySchema = z.string().trim().refine(
+  (val) => AppEventSeverity.isValidCode(val),
   { message: 'Niveau de gravité d\'audit invalide' }
 );
 
-/** [NEW V4] Contexte fonctionnel éclaté - Reçoit et valide le quadrigramme fixe (ex: 'SYST') */
-const eventContextSchema = z.string().trim().refine(
-  (val) => AppEventContext.isValidCode(val),
-  { message: 'Contexte fonctionnel d\'audit invalide' }
+/** [ALIGNE V4] Secteur technique éclaté - Reçoit et valide le quadrigramme fixe (ex: 'SYST') */
+const eventSecteurSchema = z.string().trim().refine(
+  (val) => AppEventSecteur.isValidCode(val),
+  { message: 'Secteur fonctionnel d\'audit invalide' }
 );
 
-/** [NEW V4] Action technique éclatée - Reçoit et valide le quadrigramme fixe (ex: 'DEMA') */
+/** [ALIGNE V4] Action technique éclatée - Reçoit et valide le quadrigramme fixe (ex: 'DEMA') */
 const eventActionSchema = z.string().trim().refine(
   (val) => AppEventAction.isValidCode(val),
   { message: 'Opération technique d\'audit invalide' }
@@ -41,8 +41,12 @@ const userIdSchema        = z.string().trim().nullable().optional();
 
 /**
  * 🎯 Schémas pour les champs textuels et contextuels de l'audit.
+ * messageSchema passe en Not Null strict et type varchar(255) sans limite.
  */
-const messageSchema       = z.string().trim().max(1024).nullable();
+/**
+ * 🎯 Schémas pour les champs textuels et contextuels de l'audit.
+ */
+const messageSchema       = z.string().trim().min(1, 'Le message d\'audit ne peut pas être vide').max(255, 'Le message trop long (255 caractères max)');
 const metadataSchema      = z.record(z.string(), z.any()).default({});
 
 /**
@@ -52,8 +56,8 @@ const createAppEventSchema = z.object({
   idAppEvent    : idEventSchema,
   userId        : userIdSchema,
   eventCategory : eventCategorySchema,
-  eventContext  : eventContextSchema, // [REARMÉ V4]
-  eventAction   : eventActionSchema,  // [REARMÉ V4]
+  eventSecteur  : eventSecteurSchema,
+  eventAction   : eventActionSchema,
   severity      : severitySchema,
   message       : messageSchema,
   metadata      : metadataSchema
@@ -66,8 +70,8 @@ const updateAppEventSchema = z.object({
   idAppEvent    : idEventSchema,
   userId        : userIdSchema,
   eventCategory : eventCategorySchema,
-  eventContext  : eventContextSchema, // [REARMÉ V4]
-  eventAction   : eventActionSchema,  // [REARMÉ V4]
+  eventSecteur  : eventSecteurSchema,
+  eventAction   : eventActionSchema,
   severity      : severitySchema,
   message       : messageSchema,
   metadata      : metadataSchema
@@ -82,7 +86,9 @@ export type UpdateAppEventSchemaType = z.infer<typeof updateAppEventSchema>;
  * Portier de sécurité gérant la validation stricte des payloads d'événements d'audit.
  *
  * @class AppEventValidation
- * @author Joël, Gaïa & Co
+ * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
+ * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 export class AppEventValidation {
 
@@ -91,10 +97,10 @@ export class AppEventValidation {
    *
    * @static
    * @function validateCreate
-   * @param {unknown} data - Les données brutes de l'infrastructure
+   * @param {Record<string, unknown>} data - Les données brutes de l'infrastructure
    * @returns {CreateAppEventSchemaType} Le payload d'événement validé
    */
-  public static validateCreate(data: unknown): CreateAppEventSchemaType {
+  public static validateCreate(data: Record<string, unknown>): CreateAppEventSchemaType {
     return createAppEventSchema.parse(data);
   }
 
@@ -103,10 +109,10 @@ export class AppEventValidation {
    *
    * @static
    * @function validateUpdate
-   * @param {unknown} data - Les données brutes de l'infrastructure
+   * @param {Record<string, unknown>} data - Les données brutes de l'infrastructure
    * @returns {UpdateAppEventSchemaType} Le payload d'événement validé
    */
-  public static validateUpdate(data: unknown): UpdateAppEventSchemaType {
+  public static validateUpdate(data: Record<string, unknown>): UpdateAppEventSchemaType {
     return updateAppEventSchema.parse(data);
   }
 }

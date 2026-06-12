@@ -10,15 +10,17 @@ import { type UpdateProfileSchemaType,
  * Zéro dépendance externe vers Zod dans les types de propriétés.
  *
  * @class UpdateProfileDto
- * @author Joël, Gaïa & Co
+ * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
+ * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 export class UpdateProfileDto {
 
   /** 👤 Nouveau pseudonyme d'affichage public optionnel */
-  public readonly pseudo? : string;
+  public readonly pseudo?       : string;
 
   /** 📧 Nouvelle adresse électronique de correspondance optionnelle */
-  public readonly email? : string;
+  public readonly email?        : string;
 
   /** 🗄️ Configuration optionnelle des préférences utilisateur de l'interface */
   public readonly settingsUser? : Record<string, unknown>;
@@ -30,11 +32,12 @@ export class UpdateProfileDto {
    * @param {unknown} data - Payload brut d'infrastructure issu de la requête
    */
   public constructor(data: unknown) {
-    const validated : UpdateProfileSchemaType = UserValidation.validateUpdateProfile(data);
+    // 🪓 ALIGNEMENT D'ACIER : Protection du portier Zod via transtypage Record étanche
+    const l_oRawBody : Record<string, unknown> = (data && typeof data === 'object') ? (data as Record<string, unknown>) : {};
+    const validated  : UpdateProfileSchemaType = UserValidation.validateUpdateProfile(l_oRawBody);
 
     this.pseudo       = validated.pseudo;
     this.email        = validated.email;
     this.settingsUser = validated.settingsUser;
   }
-
 }

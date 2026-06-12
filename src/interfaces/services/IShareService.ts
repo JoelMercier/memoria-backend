@@ -1,15 +1,15 @@
 // ——— fichier : src/interfaces/services/IShareService.ts
 
-import type { CreateShareDto }   from '@/dto/share/CreateShareDto';
-import type { UpdateShareDto }   from '@/dto/share/UpdateShareDto';
-import type { IItem }            from '@/interfaces/entities/item/IItem';
-import { Share }                 from '@/entities/Share'; // 🗲 [INJECTÉ V4]
-import type { IShareData }       from '@/interfaces/entities/share/IShareData'; // 🗲 [INJECTÉ V4]
-import type { UserId, ShareId }  from '@/domain/value-objects/ids';
-import { IBaseService }          from '@/interfaces/services/IBaseService';
-import { IShareRepository }      from '@/interfaces/repositories/PostGres/IShareRepository'; // 🗲 [RÉPARÉ ALIAS ALIGNÉ]
-import type { IListOptions }     from '@/interfaces/shared/IListOptions'; // 🗲 [INJECTÉ V4]
-import type { IListResult }      from '@/interfaces/shared/IListResult';   // 🗲 [FRANÇAIS D'ÉLITE]
+import type { CreateShareDto   } from '@/dto/share/CreateShareDto';
+import type { UpdateShareDto   } from '@/dto/share/UpdateShareDto';
+import type { IItem            } from '@/interfaces/entities/item/IItem';
+import type { IListOptions     } from '@/interfaces/shared/IListOptions';
+import type { IListResult      } from '@/interfaces/shared/IListResult';
+import type { IShareData       } from '@/interfaces/entities/share/IShareData';
+import type { UserId, ShareId  } from '@/domain/value-objects/ids';
+import { Share                 } from '@/entities/Share';
+import { IBaseService          } from '@/interfaces/services/IBaseService';
+import { IShareRepository      } from '@/interfaces/repositories/PostGres/IShareRepository';
 
 /**
  * 📜 Interface IShareService

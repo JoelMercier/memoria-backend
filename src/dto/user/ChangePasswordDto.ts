@@ -10,7 +10,9 @@ import { type ChangePasswordSchemaType,
  * Zéro dépendance externe vers Zod dans les types de propriétés.
  *
  * @class ChangePasswordDto
- * @author Joël, Gaïa & Co
+ * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
+ * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 export class ChangePasswordDto {
 
@@ -27,10 +29,11 @@ export class ChangePasswordDto {
    * @param {unknown} data - Payload brut d'infrastructure issu de la requête
    */
   public constructor(data: unknown) {
-    const validated : ChangePasswordSchemaType = UserValidation.validateChangePassword(data);
+    // 🪓 ALIGNEMENT D'ACIER : Protection du portier Zod via transtypage Record étanche
+    const l_oRawBody : Record<string, unknown> = (data && typeof data === 'object') ? (data as Record<string, unknown>) : {};
+    const validated  : ChangePasswordSchemaType = UserValidation.validateChangePassword(l_oRawBody);
 
     this.currentPassword = validated.currentPassword;
     this.newPassword     = validated.newPassword;
   }
-
 }

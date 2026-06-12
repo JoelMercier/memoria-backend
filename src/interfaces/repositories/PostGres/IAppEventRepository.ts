@@ -9,6 +9,8 @@ import { AppEvent           } from '@/entities/AppEvent';
 import { IListOptions       } from '@/interfaces/shared/IListOptions';
 import { IBaseRepository    } from '@/interfaces/repositories/IBaseRepository';
 
+
+
 /**
  * 📋 Interface exclusive pour le sac de données brutes de l'événement d'audit.
  * ----------------------------------------------------------------------------
@@ -58,7 +60,7 @@ export interface IAppEventData {
 export interface IAppEventListOptions extends IListOptions {
   /** 👥 Filtre optionnel ciblant les traces d'un acteur spécifique */
   userId?        : UserId;
-  /** 📥 [ALIGNÉ V4] Filtre optionnel sur le Secteur fonctionnel de soute */
+  /** 📥 Filtre optionnel sur le Secteur fonctionnel de soute */
   secteurId?   : EventSecteurId;
   /** ⚙️ Filtre optionnel sur l'action technique unitaire */
   actionId?    : EventActionId;

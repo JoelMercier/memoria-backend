@@ -5,61 +5,108 @@ import type { IShare        } from '@/interfaces/entities/share/IShare';
 import type { ITag          } from '@/interfaces/entities/tag/ITag';
 import type { IUser         } from '@/interfaces/entities/user/IUser';
 
-/** 📦 Structure plate d'exportation pour une étiquette (Tag) */
+/**
+ * 📦 Structure plate d'exportation pour une étiquette (Tag).
+ */
 interface IExportedTag {
+  /** 🆔 Identifiant textuel de l'étiquette */
   id        : string;
+  /** 📝 Libellé sémantique du tag */
   tagName   : string;
+  /** ⏱️ Horodatage de création en soute */
   createdAt : Date | undefined;
+  /** ⏱️ Horodatage de révision technique */
   updatedAt : Date | undefined;
 }
 
-/** 📦 Structure plate d'exportation pour une pépite (Item) rattachée */
+/**
+ * 📦 Structure plate d'exportation pour une pépite (Item) rattachée.
+ */
 interface IExportedItem {
+  /** 🆔 Identifiant textuel de la pépite */
   id           : string;
+  /** 🏷️ Code sémantique du type de contenu (ex: 'TEXT') */
   contentType  : string;
+  /** 📝 Titre principal de la pépite */
   title        : string;
+  /** Track normalisé d'accès visuel */
   slug         : string;
+  /** 📄 Corps textuel ou charge utile brute */
   content      : string;
+  /** ✍️ Auteur original ou source certifiée */
   sourceAuthor : string;
+  /** 🖼️ URL de la miniature d'illustration */
   thumbnailUrl : string | null | undefined;
+  /** 🎛️ Métadonnées d'infrastructure dynamiques */
   metadata     : Record<string, unknown>;
+  /** ⏱️ Horodatage de création en soute */
   createdAt    : Date | undefined;
+  /** ⏱️ Horodatage de révision technique */
   updatedAt    : Date | undefined;
+  /** 🏷️ Collection des étiquettes associées à cette pépite */
   tags         : IExportedTag[];
 }
 
-/** 📦 Structure plate d'exportation d'IHM publique pour un lien de partage (Share) */
+/**
+ * 📦 Structure plate d'exportation d'IHM publique pour un lien de partage (Share).
+ */
 interface IExportedShare {
+  /** 🆔 Identifiant textuel du partage */
   id             : string;
+  /** 📦 Identifiant de la pépite verrouillée */
   itemId         : string;
+  /** 📧 Courriel électronique de l'acteur destinataire */
   recipientEmail : string | null;
+  /** 🔑 Jeton cryptographique d'accès externe */
   shareToken     : string;
+  /** ⚙️ Configuration d'infrastructure des restrictions d'accès */
   accessConfig   : {
+    /** Palier d'accès sémantique (ex: 'read', 'write') */
     privilege          : string;
+    /** Autorisation de téléchargement des pièces jointes */
     allowDownload      : boolean;
+    /** Horodatage limite de validité du jeton */
     expiresAt          : Date | null | undefined;
   };
+  /** ⏱️ Horodatage de création du partage */
   createdAt      : Date | undefined;
+  /** ⏱️ Horodatage de modification du partage */
   updatedAt      : Date | undefined;
 }
 
-/** 📦 Structure plate d'exportation pour le profil utilisateur racine */
+/**
+ * 📦 Structure plate d'exportation pour le profil utilisateur racine.
+ */
 interface IExportedUser {
+  /** 🆔 Identifiant unique textuel de l'utilisateur */
   id              : string;
+  /** 📧 Adresse électronique unique de connexion */
   email           : string;
+  /** 👤 Pseudonyme public d'affichage */
   pseudo          : string;
+  /** 🗂️ Jeton textuel du rôle hiérarchique de sécurité */
   role            : string;
+  /** 🌐 Jeton textuel du fournisseur d'authentification */
   authProvider    : string;
+  /** 🗄️ Dictionnaire des préférences d'interface utilisateur */
   settingsUser    : Record<string, unknown>;
-  gdprConsent     : boolean;
-  gdprConsentDate : Date | null | undefined;
+  /** 🛡️ Approbation légale des règles de protection des données (RGPD) */
+  rgpdConsent     : boolean;
+  /** ⏱️ Horodatage du scellage du consentement RGPD */
+  rgpdConsentDate : Date | null | undefined;
+  /** ⏱️ Horodatage de création de l'acteur */
   createdAt       : Date | undefined;
+  /** ⏱️ Horodatage de dernière révision administrative */
   updatedAt       : Date | undefined;
 }
 
-/** 📦 Structure d'infrastructure liant une pépite à ses étiquettes */
+/**
+ * 📦 Structure d'infrastructure liant une pépite à ses étiquettes.
+ */
 export interface IItemWithTags {
+  /** 📦 L'entité pépite concernée */
   item : IItem;
+  /** 🏷️ La liste des tags rattachés */
   tags : ITag[];
 }
 
@@ -68,10 +115,11 @@ export interface IItemWithTags {
  * ----------------------------------------------------------------------------
  * Objet de transfert de données pour l'extraction complète RGPD (Article 20).
  * Aplatit et purge les entités complexes riches pour générer un JSON de transport pur.
- * [RÉPARÉ V4] Utilisation exclusive des vrais getters de surface du Domaine !
  *
  * @class UserExportDto
- * @author Joël, Gaïa & Co (C++ Framework Architect - Clean Getters Alignment)
+ * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
+ * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 export class UserExportDto {
 
@@ -79,20 +127,19 @@ export class UserExportDto {
   public readonly exportDate : string;
 
   /** 👥 Bloc de données plat représentant l'identité de l'utilisateur */
-  public readonly user : IExportedUser;
+  public readonly user       : IExportedUser;
 
   /** 📦 Collection des pépites détenues par l'utilisateur */
-  public readonly items : IExportedItem[];
+  public readonly items      : IExportedItem[];
 
   /** 🏷️ Collection exhaustive des étiquettes créées par l'utilisateur */
-  public readonly tags : IExportedTag[];
+  public readonly tags       : IExportedTag[];
 
   /** 🔗 Collection des liens de partages configurés par l'utilisateur */
-  public readonly shares : IExportedShare[];
+  public readonly shares     : IExportedShare[];
 
   /**
    * Construit le payload d'export en nettoyant méticuleusement les entités.
-   * Chasse les peaux de bananes de fonctions et s'aligne sur les vrais accesseurs.
    *
    * @private
    * @constructor
@@ -104,7 +151,6 @@ export class UserExportDto {
   private constructor(user: IUser, itemsWithTags: IItemWithTags[], tags: ITag[], shares: IShare[]) {
     this.exportDate = new Date().toISOString();
 
-    // 🪓 [RÉPARÉ V4] Interrogation via les propriétés de surface sans parenthèses !
     this.user = {
       id              : user.idUser.valeur,
       email           : user.courriel,
@@ -112,16 +158,16 @@ export class UserExportDto {
       role            : user.role.code,
       authProvider    : user.authProvider.code,
       settingsUser    : user.settingsUser,
-      gdprConsent     : user.rgpdConsent,
-      gdprConsentDate : user.rgpdConsentDate,
+      rgpdConsent     : user.rgpdConsent,     // 🪓 [REPASSÉ FRANCONIEN V4]
+      rgpdConsentDate : user.rgpdConsentDate, // 🪓 [REPASSÉ FRANCONIEN V4]
       createdAt       : user.createdAt,
       updatedAt       : user.updatedAt
     };
 
     this.tags = tags.map(
       (t): IExportedTag => ({
-        id        : t.idTag.valeur,       // 🗲 [RÉPARÉ V4] Vrai getter d'écurie sans getTagId() ! [Mémoria]
-        tagName   : t.tagName,           // 🗲 [RÉPARÉ V4] Vrai getter d'écurie sans getTagName() ! [Mémoria]
+        id        : t.idTag.valeur,
+        tagName   : t.tagName,
         createdAt : t.createdAt,
         updatedAt : t.updatedAt
       })
@@ -129,8 +175,8 @@ export class UserExportDto {
 
     this.items = itemsWithTags.map(
       ({ item, tags: itemTags }): IExportedItem => ({
-        id           : item.idItem.valeur,    // 🗲 [RÉPARÉ V4] Vrai getter de surface ! [Mémoria]
-        contentType  : item.contentType.code, // 🗲 [RÉPARÉ V4] Accès direct au code de l'Enum ! [Mémoria]
+        id           : item.idItem.valeur,
+        contentType  : item.contentType.code,
         title        : item.title,
         slug         : item.slug,
         content      : item.content,
@@ -141,8 +187,8 @@ export class UserExportDto {
         updatedAt    : item.updatedAt,
         tags         : itemTags.map(
           (t): IExportedTag => ({
-            id        : t.idTag.valeur,   // 🗲 [RÉPARÉ V4] Vrai getter ! [Mémoria]
-            tagName   : t.tagName,        // 🗲 [RÉPARÉ V4] Vrai getter ! [Mémoria]
+            id        : t.idTag.valeur,
+            tagName   : t.tagName,
             createdAt : t.createdAt,
             updatedAt : t.updatedAt
           })
@@ -152,11 +198,11 @@ export class UserExportDto {
 
     this.shares = shares.map(
       (s): IExportedShare => ({
-        id             : s.idShare.valeur,     // 🗲 [RÉPARÉ V4] Vrai getter ! [Mémoria]
-        itemId         : s.idItem.valeur,      // 🗲 [RÉPARÉ V4] Vrai getter ! [Mémoria]
-        recipientEmail : s.courrielDest,       // 🗲 [RÉPARÉ V4] Vrai getter ! [Mémoria]
-        shareToken     : s.jeton,              // 🗲 [RÉPARÉ V4] Vrai getter ! [Mémoria]
-        accessConfig   : {                     // 🗲 [MAPPAGE PUBLIC D'IHM] Aligné sans "as any" ! [Mémoria]
+        id             : s.idShare.valeur,
+        itemId         : s.idItem.valeur,
+        recipientEmail : s.courrielDest,
+        shareToken     : s.jeton,
+        accessConfig   : {
           privilege     : s.accessConfig.Privilege === 'ECRITURE' ? 'write' : 'read',
           allowDownload : s.accessConfig.AutoriseTelechargement,
           expiresAt     : s.accessConfig.DateExpiration

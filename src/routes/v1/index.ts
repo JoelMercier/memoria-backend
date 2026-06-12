@@ -90,7 +90,7 @@ export function createV1Router(): Router {
     tokenManager,
     blacklistService
   );
-  const itemService       = new ItemService(itemRepository, itemTagRepository, tagRepository);
+  const itemService       = new ItemService(itemRepository, itemTagRepository);
   const tagService        = new TagService(tagRepository);
   const shareService      = new ShareService(shareRepository, itemRepository);
   const userService       = new UserService(userRepository, passwordHasher);

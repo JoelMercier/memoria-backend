@@ -1,7 +1,7 @@
+-- ——— fichier : database\fonctions\Partages\Fonctions TousLesPartages.sql
+
 -- ============================================================================
 -- 🗄️ Mémoria - Fonctions Stockées d'Infrastructure : Partages
--- Fichier: database\Refonte\28 - Fonctions Shares Unifiees.sql
--- Version: 4.5.0 (PostgreSQL 17+)
 -- Description: Unification des flux de lecture et d'écriture du pôle Shares
 -- ============================================================================
 
@@ -18,7 +18,7 @@ Create Or Replace Function public."TousLesPartagesDunePepite"(
     p_sOrdreTri       Character Varying
 )
 Returns Table (
-    "shIdShare"       UUID,             -- 🪓 Densité physique décroissante anti-padding (Rule 1)
+    "shIdShare"       UUID,
     "shItemId"        UUID,
     "shItemOwnerId"   UUID,
     "shCreatedAt"     TimeStamp Without Time Zone,
@@ -163,15 +163,9 @@ $$;
 
 Comment On Function public."TousLesPartagesDuChateau" is 'Extracteur universel d''administration d''IHM pour le grand coffre-fort des partages.';
 
--- ============================================================================
--- 🗄️ Mémoria - Fonctions Stockées d'Écriture : Partages
--- Fichier: database\Refonte\29 - Fonctions Ecriture Shares.sql
--- Version: 4.5.0 (PostgreSQL 17+)
--- Description: Verrous transactionnels unitaires d'écriture pour le pôle Shares
--- ============================================================================
 
 -- ----------------------------------------------------------------------------
--- 🏛️ 1. Écriture Nominale Ideumpotente : CreerPartage
+-- 🏛️ 1. Écriture Nominale : CreerPartage
 -- ----------------------------------------------------------------------------
 Drop Function If Exists public."CreerPartage"(UUID, UUID, UUID, Character Varying, Character Varying, JsonB);
 

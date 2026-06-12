@@ -10,12 +10,14 @@ import { type LoginSchemaType,
  * Zéro dépendance externe vers Zod dans les types de propriétés.
  *
  * @class LoginDto
- * @author Joël, Gaïa & Co
+ * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
+ * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 export class LoginDto {
 
   /** 📧 Adresse électronique d'identification de l'utilisateur */
-  public readonly email : string;
+  public readonly email    : string;
 
   /** 🔐 Mot de passe brut à soumettre à l'infrastructure de hachage */
   public readonly password : string;
@@ -27,10 +29,11 @@ export class LoginDto {
    * @param {unknown} data - Payload brut d'infrastructure issu de la requête
    */
   public constructor(data: unknown) {
-    const validated : LoginSchemaType = AuthValidation.validateLogin(data);
+    // 🪓 ALIGNEMENT D'ACIER : Protection du portier Zod via transtypage Record étanche
+    const l_oRawBody : Record<string, unknown> = (data && typeof data === 'object') ? (data as Record<string, unknown>) : {};
+    const validated  : LoginSchemaType = AuthValidation.validateLogin(l_oRawBody);
 
     this.email    = validated.email;
     this.password = validated.password;
   }
-
 }

@@ -112,7 +112,7 @@ export class UserExportService implements IUserExportService {
 
     // 🪓 [RÉPARÉ V4] Extraction simultanée : on consomme l'enveloppe et on capte du IListResult étanche [Mémoria]
     const [l_oItemPack, l_oTagPack, l_oSharePack] : [IListResult<Item>, IListResult<Tag>, IListResult<Share>] = await Promise.all([
-      this.m_oItemRepository .listByUser(p_axUserId, { ...l_oGabaritMax, ColonneTri: 'itCreatedAt' }),
+      this.m_oItemRepository .listByUser(p_axUserId  , { ...l_oGabaritMax, ColonneTri: 'itCreatedAt' }),
       this.m_oTagRepository  .findByUserId(p_axUserId, { ...l_oGabaritMax, ColonneTri: 'tgName', OrdreAff: OrdreTriEnum.DeCode<OrdreTriEnum>('ASC') }),
       this.m_oShareRepository.findByUserId(p_axUserId, { ...l_oGabaritMax, ColonneTri: 'shCreatedAt' })
     ]);

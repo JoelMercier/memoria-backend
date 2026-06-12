@@ -11,7 +11,9 @@ import { type DeleteAccountSchemaType,
  * Zéro dépendance externe vers Zod dans les types de propriétés.
  *
  * @class DeleteAccountDto
- * @author Joël, Gaïa & Co
+ * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
+ * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 export class DeleteAccountDto {
 
@@ -25,9 +27,10 @@ export class DeleteAccountDto {
    * @param {unknown} data - Payload brut d'infrastructure issu de la requête
    */
   public constructor(data: unknown) {
-    const validated : DeleteAccountSchemaType = UserValidation.validateDeleteAccount(data);
+    // 🪓 ALIGNEMENT D'ACIER : Protection du portier Zod via transtypage Record étanche
+    const l_oRawBody : Record<string, unknown> = (data && typeof data === 'object') ? (data as Record<string, unknown>) : {};
+    const validated  : DeleteAccountSchemaType = UserValidation.validateDeleteAccount(l_oRawBody);
 
     this.password = validated.password;
   }
-
 }
