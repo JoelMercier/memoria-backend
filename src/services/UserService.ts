@@ -1,15 +1,15 @@
 // ——— fichier : src/services/UserService.ts
 
 import type { ChangePasswordDto } from '@/dto/user/ChangePasswordDto';
-import type { DeleteAccountDto  } from '@/dto/user/DeleteAccountDto';
-import type { UpdateProfileDto  } from '@/dto/user/UpdateProfileDto';
-import type { IUserData         } from '@/interfaces/entities/user/IUserData';
-import type { IUserRepository   } from '@/interfaces/repositories/PostGres/IUserRepository';
-import type { IPasswordHasher   } from '@/interfaces/security/IPasswordHasher';
-import type { IUserService      } from '@/interfaces/services/IUserService';
+import type { DeleteAccountDto } from '@/dto/user/DeleteAccountDto';
+import type { UpdateProfileDto } from '@/dto/user/UpdateProfileDto';
+import type { IUserData } from '@/interfaces/entities/user/IUserData';
+import type { IUserRepository } from '@/interfaces/repositories/PostGres/IUserRepository';
+import type { IPasswordHasher } from '@/interfaces/security/IPasswordHasher';
+import type { IUserService } from '@/interfaces/services/IUserService';
 
-import { UserId           } from '@/domain/value-objects/ids';
-import { User             } from '@/entities/User';
+import type { UserId } from '@/domain/value-objects/ids';
+import type { User } from '@/entities/User';
 import { UserErrorFactory } from '@/exceptions/UserErrorFactory';
 
 /**
@@ -25,12 +25,11 @@ import { UserErrorFactory } from '@/exceptions/UserErrorFactory';
  * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 export class UserService implements IUserService {
-
   /** 🗄️ Entrepôt de persistance abstrait des utilisateurs (IUserRepository) */
-  private readonly m_oUserRepository : IUserRepository;
+  private readonly m_oUserRepository: IUserRepository;
 
   /** 🛡️ Service d'encodage et de vérification cryptographique des secrets */
-  private readonly m_oPasswordHasher : IPasswordHasher;
+  private readonly m_oPasswordHasher: IPasswordHasher;
 
   /**
    * Initialise les fondations de gestion d'identité par injection d'abstractions.
@@ -39,10 +38,7 @@ export class UserService implements IUserService {
    * @param {IUserRepository} p_oUserRepository - Le dépôt d'infrastructure abstrait des utilisateurs
    * @param {IPasswordHasher} p_oPasswordHasher - Le hacheur de mots de passe
    */
-  public constructor(
-    p_oUserRepository : IUserRepository,
-    p_oPasswordHasher : IPasswordHasher
-  ) {
+  public constructor(p_oUserRepository: IUserRepository, p_oPasswordHasher: IPasswordHasher) {
     this.m_oUserRepository = p_oUserRepository;
     this.m_oPasswordHasher = p_oPasswordHasher;
   }
@@ -70,7 +66,7 @@ export class UserService implements IUserService {
   }
 
   /**
-   * 👤 Met à jour le pseudonyme, le courriel ou les préférences graphiques de l'utilisateur.
+   * 👤 Met à jour le pseudonyme, le courriel ou les préférences de l'utilisateur.
    *
    * @public
    * @async
@@ -80,26 +76,26 @@ export class UserService implements IUserService {
    * @returns {Promise<User>} L'entité de l'utilisateur mise à jour
    */
   public async updateProfile(p_axUserId: UserId, p_oDto: UpdateProfileDto): Promise<User> {
-    const l_oExisting : User | null = await this.repository.findById(p_axUserId);
+    const l_oExisting: User | null = await this.repository.findById(p_axUserId);
     if (!l_oExisting) {
       throw UserErrorFactory.notFound(p_axUserId);
     }
 
     if (p_oDto.email && p_oDto.email.toLowerCase() !== l_oExisting.courriel.toLowerCase()) {
-      const l_oByEmail : User | null = await this.repository.findByEmail(p_oDto.email);
+      const l_oByEmail: User | null = await this.repository.findByEmail(p_oDto.email);
       if (l_oByEmail) {
         throw UserErrorFactory.profileConflict('email', p_oDto.email);
       }
     }
 
     if (p_oDto.pseudo && p_oDto.pseudo !== l_oExisting.pseudo) {
-      const l_oByPseudo : User | null = await this.repository.findByPseudo(p_oDto.pseudo);
+      const l_oByPseudo: User | null = await this.repository.findByPseudo(p_oDto.pseudo);
       if (l_oByPseudo) {
         throw UserErrorFactory.profileConflict('pseudo', p_oDto.pseudo);
       }
     }
 
-    const l_oUpdates : Partial<IUserData> = {};
+    const l_oUpdates: Partial<IUserData> = {};
     if (p_oDto.email !== undefined) {
       l_oUpdates.email = p_oDto.email;
     }
@@ -110,7 +106,7 @@ export class UserService implements IUserService {
       l_oUpdates.settingsUser = p_oDto.settingsUser;
     }
 
-    const l_oUpdated : User | null = await this.repository.update(p_axUserId, l_oUpdates);
+    const l_oUpdated: User | null = await this.repository.update(p_axUserId, l_oUpdates);
     if (!l_oUpdated) {
       throw UserErrorFactory.notFound(p_axUserId);
     }
@@ -128,22 +124,18 @@ export class UserService implements IUserService {
    * @returns {Promise<void>}
    */
   public async changePassword(p_axUserId: UserId, p_oDto: ChangePasswordDto): Promise<void> {
-    const l_oUser : User | null = await this.repository.findById(p_axUserId);
+    const l_oUser: User | null = await this.repository.findById(p_axUserId);
     if (!l_oUser) {
       throw UserErrorFactory.notFound(p_axUserId);
     }
 
-    // 🪓 ALIGNEMENT INDUSTRIEL V4 : Lecture via l'accesseur get 'passwordHash' (sans parenthèses)
-    const l_bOk : boolean = await this.hasher.verify(
-      p_oDto.currentPassword,
-      l_oUser.passwordHash
-    );
+    const l_bOk: boolean = await this.hasher.verify(p_oDto.currentPassword, l_oUser.passwordHash);
     if (!l_bOk) {
       throw UserErrorFactory.wrongPassword();
     }
 
-    const l_sNewHash : string = await this.hasher.hash(p_oDto.newPassword);
-    const l_oUpdated : User | null = await this.repository.update(p_axUserId, {
+    const l_sNewHash: string = await this.hasher.hash(p_oDto.newPassword);
+    const l_oUpdated: User | null = await this.repository.update(p_axUserId, {
       passwordHash: l_sNewHash
     });
     if (!l_oUpdated) {
@@ -162,17 +154,17 @@ export class UserService implements IUserService {
    * @returns {Promise<void>}
    */
   public async deleteAccount(p_axUserId: UserId, p_oDto: DeleteAccountDto): Promise<void> {
-    const l_oUser : User | null = await this.repository.findById(p_axUserId);
+    const l_oUser: User | null = await this.repository.findById(p_axUserId);
     if (!l_oUser) {
       throw UserErrorFactory.notFound(p_axUserId);
     }
 
-    const l_bOk : boolean = await this.hasher.verify(p_oDto.password, l_oUser.passwordHash);
+    const l_bOk: boolean = await this.hasher.verify(p_oDto.password, l_oUser.passwordHash);
     if (!l_bOk) {
       throw UserErrorFactory.wrongPassword();
     }
 
-    const l_bDeleted : boolean = await this.repository.delete(p_axUserId);
+    const l_bDeleted: boolean = await this.repository.delete(p_axUserId);
     if (!l_bDeleted) {
       throw UserErrorFactory.notFound(p_axUserId);
     }

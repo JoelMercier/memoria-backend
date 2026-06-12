@@ -34,17 +34,19 @@ export type UpdateTagSchemaType = z.infer<typeof updateTagSchema>;
  * Valide les longueurs de chaînes et nettoie les entrées utilisateur avant persistance.
  *
  * @class TagValidation
+ * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
+ * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 export class TagValidation {
-
   /**
    * 🎯 Valide le payload de création d'un Tag.
    *
    * @static
-   * @param {unknown} data - Les données brutes de la requête HTTP
+   * @param {Record<string, unknown>} data - Les données brutes de la soute
    * @returns {CreateTagSchemaType} Le DTO de tag validé
    */
-  public static validateCreate(data: unknown): CreateTagSchemaType {
+  public static validateCreate(data: Record<string, unknown>): CreateTagSchemaType {
     return createTagSchema.parse(data);
   }
 
@@ -52,10 +54,10 @@ export class TagValidation {
    * 🎯 Valide le payload de mise à jour d'un Tag.
    *
    * @static
-   * @param {unknown} data - Les données brutes de la requête HTTP
+   * @param {Record<string, unknown>} data - Les données brutes de la soute
    * @returns {UpdateTagSchemaType} Le DTO de tag validé
    */
-  public static validateUpdate(data: unknown): UpdateTagSchemaType {
+  public static validateUpdate(data: Record<string, unknown>): UpdateTagSchemaType {
     return updateTagSchema.parse(data);
   }
 }

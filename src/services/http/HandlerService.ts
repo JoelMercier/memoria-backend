@@ -17,13 +17,11 @@ import { RequestIdGenerator } from '@/utils/RequestIdGenerator';
  *
  * @class HandlerService
  * @implements {IHandlerService}
- * @author 🧠 feat(donjon): Joël (Abstrait' Obsession)
- * @author ☄️ refactor(forge): Gaïa (Trébuchet lourd)
- * @author 🛡️ fix(remparts): Le Cartel du Donjon (Garde d'élite)
- * @author 🏺 chore(fossile): L'Ancien Régime & Co (Gergovie textuelle)
+ * @author Directrice du Silicium : Joël (Abstrait' Obsession)
+ * @author Graveuse de Pépites : Gaïa (Trébuchet lourd V4)
+ * @author Garde d'Élite des Types : Le Cartel du Donjon (Garde d'élite)
  */
 export class HandlerService implements IHandlerService {
-
   /** 🪵 Instance immuable du journal applicatif global */
   private readonly m_rLogger = LoggerSingleton.getInstance();
 
@@ -32,10 +30,14 @@ export class HandlerService implements IHandlerService {
    * Différencie les anomalies maîtrisées du domaine des pannes d'infrastructure brutes.
    *
    * @public
-   * @function handleError
+   * @param {unknown} error - L'exception capturée à la volée
+   * @param {Request} req - L'objet de requête HTTP Express
+   * @param {Response} res - L'objet de réponse HTTP Express
+   * @param {NextFunction} _next - Le maillon suivant du pipeline Express (inutilisé)
+   * @returns {void}
    */
   public handleError(error: unknown, req: Request, res: Response, _next: NextFunction): void {
-    const requestId : string = RequestIdGenerator.getFromRequest(req);
+    const requestId: string = RequestIdGenerator.getFromRequest(req);
 
     if (error instanceof ApiError) {
       error.log();
@@ -73,10 +75,13 @@ export class HandlerService implements IHandlerService {
    * 🔍 Intercepte les requêtes en échec de routage pour lever une anomalie 404 standardisée.
    *
    * @public
-   * @function handleNotFound
+   * @param {Request} req - L'objet de requête HTTP Express
+   * @param {Response} res - L'objet de réponse HTTP Express
+   * @param {NextFunction} _next - Le maillon suivant du pipeline Express (inutilisé)
+   * @returns {void}
    */
   public handleNotFound(req: Request, res: Response, _next: NextFunction): void {
-    const requestId : string = RequestIdGenerator.getFromRequest(req);
+    const requestId: string = RequestIdGenerator.getFromRequest(req);
     res
       .status(404)
       .json(

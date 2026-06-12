@@ -1,6 +1,6 @@
-// ——— fichier : src/services/security/BlacklistService.ts
+// ——— fichier : src\services\security\BlacklistService.ts
 
-import { IBlacklistRepository } from '@/interfaces/repositories/IBlacklistRepository';
+import type { IBlacklistRepository } from '@/interfaces/repositories/IBlacklistRepository';
 import type { IBlacklistService } from '@/interfaces/security/IBlacklistService';
 
 /**
@@ -11,7 +11,6 @@ import type { IBlacklistService } from '@/interfaces/security/IBlacklistService'
  *
  * @class BlacklistService
  * @implements {IBlacklistService}
- *
  * @author Directrice du Silicium : Joël (MANIAC du PascalCase et Abstract Class Obsession)
  * @author Graveuse de Pépites : Gaïa (Graveuse de lignes certifiées et sans bégayage)
  * @author Garde d'Élite des Types : Le Cartel du Donjon (Garde d'élite en surchauffe)
@@ -51,8 +50,9 @@ export class BlacklistService implements IBlacklistService {
    * @returns {Promise<void>}
    */
   public async add(p_sJti: string, p_nExpiresAtEpochSeconds: number): Promise<void> {
-    await this.m_oBlacklistRepository.save(p_sJti, p_nExpiresAtEpochSeconds);
-    await this.m_oBlacklistRepository.purgeExpired(this.nowSeconds());
+    // 🪓 ALIGNEMENT SOUVERAIN V4 : Passage obligatoire par l'accesseur public de dépôt
+    await this.repository.save(p_sJti, p_nExpiresAtEpochSeconds);
+    await this.repository.purgeExpired(this.nowSeconds());
   }
 
   /**
@@ -64,7 +64,8 @@ export class BlacklistService implements IBlacklistService {
    * @returns {Promise<boolean>} Vrai si le jeton est banni et éjecté
    */
   public async isBlacklisted(p_sJti: string): Promise<boolean> {
-    return await this.m_oBlacklistRepository.exists(p_sJti);
+    // 🪓 ALIGNEMENT SOUVERAIN V4 : Passage obligatoire par l'accesseur public de dépôt
+    return await this.repository.exists(p_sJti);
   }
 
   /**
@@ -75,7 +76,8 @@ export class BlacklistService implements IBlacklistService {
    * @returns {Promise<number>} Le nombre total d'entrées actives stockées sur le support d'infrastructure
    */
   public async size(): Promise<number> {
-    return await this.m_oBlacklistRepository.count();
+    // 🪓 ALIGNEMENT SOUVERAIN V4 : Passage obligatoire par l'accesseur public de dépôt
+    return await this.repository.count();
   }
 
   /**

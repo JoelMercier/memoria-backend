@@ -32,10 +32,10 @@ const pseudoSchema = z
  * 👥 Schéma de validation Zod pour l'inscription d'un nouvel utilisateur (RGPD inclus).
  */
 const createUserSchema = z.object({
-  email       : emailSchema,
-  password    : passwordSchema,
-  pseudo      : pseudoSchema,
-  gdprConsent : z.boolean().refine((v): v is true => v === true, {
+  email: emailSchema,
+  password: passwordSchema,
+  pseudo: pseudoSchema,
+  gdprConsent: z.boolean().refine((v): v is true => v === true, {
     message: 'Le consentement RGPD est obligatoire'
   })
 });
@@ -44,34 +44,35 @@ const createUserSchema = z.object({
  * 👥 Schéma de validation Zod pour la modification globale (Administration).
  */
 const updateUserSchema = z.object({
-  email        : emailSchema.optional(),
-  password     : passwordSchema.optional(),
-  pseudo       : pseudoSchema.optional(),
-  settingsUser : z.record(z.string(), z.unknown()).optional()
+  email: emailSchema.optional(),
+  password: passwordSchema.optional(),
+  pseudo: pseudoSchema.optional(),
+  settingsUser: z.record(z.string(), z.unknown()).optional()
 });
 
 /**
  * 👥 Schéma de validation Zod pour la destitution administrative d'un compte.
+ * [RÉPARÉ V4] Ajout de .trim() pour interdire l'injection de blancs d'espaces.
  */
 const deleteUserSchema = z.object({
-  password : z.string().min(1, 'Le mot de passe est requis')
+  password: z.string().trim().min(1, 'Le mot de passe est requis')
 });
 
 /**
  * 👥 Schéma de validation Zod pour la mise à jour autonome du profil.
  */
 const updateProfileSchema = z.object({
-  pseudo       : z.string().trim().min(3).max(30).optional(),
-  email        : z.string().email().max(255).optional(),
-  settingsUser : z.record(z.string(), z.unknown()).optional()
+  pseudo: z.string().trim().min(3).max(30).optional(),
+  email: z.string().email().max(255).optional(),
+  settingsUser: z.record(z.string(), z.unknown()).optional()
 });
 
 /**
  * 🔑 Schéma de validation Zod pour le renouvellement sécurisé du mot de passe.
  */
 const changePasswordSchema = z.object({
-  currentPassword : z.string().min(1, 'Mot de passe actuel requis'),
-  newPassword     : z
+  currentPassword: z.string().min(1, 'Mot de passe actuel requis'),
+  newPassword: z
     .string()
     .min(8, '8 caractères minimum')
     .max(72)
@@ -82,18 +83,19 @@ const changePasswordSchema = z.object({
 
 /**
  * 🚪 Schéma de validation Zod pour la clôture définitive et légale du compte (RGPD).
+ * [RÉPARÉ V4] Ajout de .trim() pour interdire l'injection de blancs d'espaces.
  */
 const deleteAccountSchema = z.object({
-  password : z.string().min(1, 'Mot de passe requis pour confirmer la suppression')
+  password: z.string().trim().min(1, 'Mot de passe requis pour confirmer la suppression')
 });
 
 /** 📋 Types inférés extraits des schémas d'accès et d'évolution du profil */
-export type UpdateProfileSchemaType  = z.infer<typeof updateProfileSchema>;
+export type UpdateProfileSchemaType = z.infer<typeof updateProfileSchema>;
 export type ChangePasswordSchemaType = z.infer<typeof changePasswordSchema>;
-export type DeleteAccountSchemaType  = z.infer<typeof deleteAccountSchema>;
-export type CreateUserSchemaType     = z.infer<typeof createUserSchema>;
-export type UpdateUserSchemaType     = z.infer<typeof updateUserSchema>;
-export type DeleteUserSchemaType     = z.infer<typeof deleteUserSchema>;
+export type DeleteAccountSchemaType = z.infer<typeof deleteAccountSchema>;
+export type CreateUserSchemaType = z.infer<typeof createUserSchema>;
+export type UpdateUserSchemaType = z.infer<typeof updateUserSchema>;
+export type DeleteUserSchemaType = z.infer<typeof deleteUserSchema>;
 
 /**
  * 🏛️ Classe UserValidation
@@ -102,17 +104,19 @@ export type DeleteUserSchemaType     = z.infer<typeof deleteUserSchema>;
  * Applique la politique de complexité des mots de passe et sécurise le consentement RGPD.
  *
  * @class UserValidation
+ * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
+ * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 export class UserValidation {
-
   /**
    * 🎯 Valide le payload d'inscription d'un utilisateur.
    *
    * @static
-   * @param {unknown} data - Les données brutes de la requête HTTP
+   * @param {Record<string, unknown>} data - Les données de la soute
    * @returns {CreateUserSchemaType} Le DTO validé
    */
-  public static validateCreate(data: unknown): CreateUserSchemaType {
+  public static validateCreate(data: Record<string, unknown>): CreateUserSchemaType {
     return createUserSchema.parse(data);
   }
 
@@ -120,10 +124,10 @@ export class UserValidation {
    * 🎯 Valide le payload de modification administrative d'un utilisateur.
    *
    * @static
-   * @param {unknown} data - Les données brutes de la requête HTTP
+   * @param {Record<string, unknown>} data - Les données de la soute
    * @returns {UpdateUserSchemaType} Le DTO validé
    */
-  public static validateUpdate(data: unknown): UpdateUserSchemaType {
+  public static validateUpdate(data: Record<string, unknown>): UpdateUserSchemaType {
     return updateUserSchema.parse(data);
   }
 
@@ -131,10 +135,10 @@ export class UserValidation {
    * 🎯 Valide le payload de suppression administrative d'un utilisateur.
    *
    * @static
-   * @param {unknown} data - Les données brutes de la requête HTTP
+   * @param {Record<string, unknown>} data - Les données de la soute
    * @returns {DeleteUserSchemaType} Le DTO validé
    */
-  public static validateDelete(data: unknown): DeleteUserSchemaType {
+  public static validateDelete(data: Record<string, unknown>): DeleteUserSchemaType {
     return deleteUserSchema.parse(data);
   }
 
@@ -142,10 +146,10 @@ export class UserValidation {
    * 🎯 Valide le payload de mise à jour autonome de profil.
    *
    * @static
-   * @param {unknown} data - Les données brutes de la requête HTTP
+   * @param {Record<string, unknown>} data - Les données de la soute
    * @returns {UpdateProfileSchemaType} Le DTO de profil validé
    */
-  public static validateUpdateProfile(data: unknown): UpdateProfileSchemaType {
+  public static validateUpdateProfile(data: Record<string, unknown>): UpdateProfileSchemaType {
     return updateProfileSchema.parse(data);
   }
 
@@ -153,10 +157,10 @@ export class UserValidation {
    * 🎯 Valide le payload de changement de mot de passe.
    *
    * @static
-   * @param {unknown} data - Les données brutes de la requête HTTP
+   * @param {Record<string, unknown>} data - Les données de la soute
    * @returns {ChangePasswordSchemaType} Le DTO de changement de mot de passe validé
    */
-  public static validateChangePassword(data: unknown): ChangePasswordSchemaType {
+  public static validateChangePassword(data: Record<string, unknown>): ChangePasswordSchemaType {
     return changePasswordSchema.parse(data);
   }
 
@@ -164,10 +168,10 @@ export class UserValidation {
    * 🎯 Valide le payload de clôture définitive de compte.
    *
    * @static
-   * @param {unknown} data - Les données brutes de la requête HTTP
+   * @param {Record<string, unknown>} data - Les données de la soute
    * @returns {DeleteAccountSchemaType} Le DTO de clôture validé
    */
-  public static validateDeleteAccount(data: unknown): DeleteAccountSchemaType {
+  public static validateDeleteAccount(data: Record<string, unknown>): DeleteAccountSchemaType {
     return deleteAccountSchema.parse(data);
   }
 }

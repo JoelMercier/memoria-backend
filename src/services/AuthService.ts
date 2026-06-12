@@ -1,27 +1,26 @@
 // ——— fichier : src/services/AuthService.ts
 
-import { IdForge }            from '@/domain/utils/IdForge'; // 🗲 [NEW V4] Fondeur UUID v7 du Domaine
-import { User }               from '@/entities/User';
+import { IdForge } from '@/domain/utils/IdForge';
+import type { User } from '@/entities/User';
 import { ConflictErrorFactory } from '@/exceptions/ConflictErrorFactory';
-import { TokenError }         from '@/exceptions/TokenError';
-import { UserErrorFactory }   from '@/exceptions/UserErrorFactory';
+import { TokenError } from '@/exceptions/TokenError';
+import { UserErrorFactory } from '@/exceptions/UserErrorFactory';
 import { ProviderId, RoleId, UserId } from '@/domain/value-objects/ids';
 import type { CreateUserDto } from '@/dto/user/CreateUserDto';
-import type { LoginDto }      from '@/dto/user/auth/LoginDto';
+import type { LoginDto } from '@/dto/user/auth/LoginDto';
 import type { RefreshTokenDto } from '@/dto/user/auth/RefreshTokenDto';
-import type { IUser }         from '@/interfaces/entities/user/IUser';
-import type { IUserData }     from '@/interfaces/entities/user/IUserData';
+import type { IUser } from '@/interfaces/entities/user/IUser';
+import type { IUserData } from '@/interfaces/entities/user/IUserData';
 import type { IUserRepository } from '@/interfaces/repositories/PostGres/IUserRepository';
 import type { IBlacklistService } from '@/interfaces/security/IBlacklistService';
-import type { IPasswordHasher }   from '@/interfaces/security/IPasswordHasher';
-import type { ITokenManager }     from '@/interfaces/security/ITokenManager';
+import type { IPasswordHasher } from '@/interfaces/security/IPasswordHasher';
+import type { ITokenManager } from '@/interfaces/security/ITokenManager';
 import type { IAuthResult, IAuthService, IRefreshResult } from '@/interfaces/services/IAuthService';
 
 /**
  * 🏛️ Classe AuthService
  * ----------------------------------------------------------------------------
  * Service de domaine gérant la cinématique de l'authentification et de la sécurité des comptes.
- * Version armée contre les inversions d'identifiants et épurée des reliques d'infrastructure.
  *
  * @class AuthService
  * @implements {IAuthService}
@@ -30,110 +29,99 @@ import type { IAuthResult, IAuthService, IRefreshResult } from '@/interfaces/ser
  * @author Garde d'Élite des Types : Le Cartel du Donjon (Garde d'élite en surchauffe)
  */
 export class AuthService implements IAuthService {
-
   /** 🗄️ Entrepôt de persistance abstrait des utilisateurs (IUserRepository) */
-  private readonly m_oUserRepository   : IUserRepository;
+  private readonly m_oUserRepository: IUserRepository;
 
   /** 🛡️ Service d'encodage cryptographique des mots de passe */
-  private readonly m_oPasswordHasher   : IPasswordHasher;
+  private readonly m_oPasswordHasher: IPasswordHasher;
 
   /** 🔑 Gestionnaire de cycle de vie et de signature des jetons de sécurité */
-  private readonly m_oTokenManager     : ITokenManager;
+  private readonly m_oTokenManager: ITokenManager;
 
   /** 🗄️ Registre de quarantaine en mémoire pour les jetons révoqués */
-  private readonly m_oBlacklistService : IBlacklistService;
+  private readonly m_oBlacklistService: IBlacklistService;
 
   /**
    * Initialise les fondations de sécurité par injection d'abstractions.
-   *
-   * @constructor
-   * @param {IUserRepository} p_oUserRepository - Le dépôt d'infrastructure des utilisateurs
-   * @param {IPasswordHasher} p_oPasswordHasher - Le hacheur de mots de passe
-   * @param {ITokenManager} p_oTokenManager - Le gestionnaire de jetons JWT
-   * @param {IBlacklistService} p_oBlacklistService - Le service de liste noire des sessions
    */
   public constructor(
-    p_oUserRepository   : IUserRepository,
-    p_oPasswordHasher   : IPasswordHasher,
-    p_oTokenManager     : ITokenManager,
-    p_oBlacklistService : IBlacklistService
+    p_oUserRepository: IUserRepository,
+    p_oPasswordHasher: IPasswordHasher,
+    p_oTokenManager: ITokenManager,
+    p_oBlacklistService: IBlacklistService
   ) {
-    this.m_oUserRepository   = p_oUserRepository;
-    this.m_oPasswordHasher   = p_oPasswordHasher;
-    this.m_oTokenManager     = p_oTokenManager;
+    this.m_oUserRepository = p_oUserRepository;
+    this.m_oPasswordHasher = p_oPasswordHasher;
+    this.m_oTokenManager = p_oTokenManager;
     this.m_oBlacklistService = p_oBlacklistService;
   }
 
   /**
    * Accesseur public immuable exigé par le contrat ancêtre IBaseService.
-   * Centralise la souveraineté d'accès au dépôt d'infrastructure des utilisateurs.
-   *
-   * @public
-   * @returns {IUserRepository} L'instance du dépôt d'infrastructure abstrait
    */
   public get repository(): IUserRepository {
     return this.m_oUserRepository;
   }
 
+  /** 🛡️ Accesseur public pour le hacheur cryptographique des secrets */
+  public get hasher(): IPasswordHasher {
+    return this.m_oPasswordHasher;
+  }
+
+  /** 🔑 Accesseur public pour le gestionnaire d'infrastructure JWT */
+  public get tokens(): ITokenManager {
+    return this.m_oTokenManager;
+  }
+
+  /** 🗄️ Accesseur public pour le registre de quarantaine Redis/Mémoire */
+  public get blacklist(): IBlacklistService {
+    return this.m_oBlacklistService;
+  }
+
   /**
    * 📝 Inscription d'un nouvel utilisateur (Fail-fast unitaire inclus).
-   *
-   * @public
-   * @async
-   * @param {CreateUserDto} p_oDto - L'objet de transfert de données pour l'enrôlement de l'acteur
-   * @throws {UserErrorFactory} Si l'adresse de courriel existe déjà sur le disque
-   * @throws {ConflictErrorFactory} Si le pseudo d'affichage est déjà réservé
-   * @returns {Promise<IUser>} L'instance de l'utilisateur créé et persistant
    */
   public async register(p_oDto: CreateUserDto): Promise<IUser> {
-    const l_oExistingEmail: User | null = await this.m_oUserRepository.findByEmail(p_oDto.email);
+    // 🪓 ALIGNEMENT SOUVERAIN V4 : Interrogation obligatoire via l'accesseur this.repository
+    const l_oExistingEmail: User | null = await this.repository.findByEmail(p_oDto.email);
     if (l_oExistingEmail) throw UserErrorFactory.emailExists(p_oDto.email);
 
-    const l_oExistingPseudo: User | null = await this.m_oUserRepository.findByPseudo(p_oDto.pseudo);
+    const l_oExistingPseudo: User | null = await this.repository.findByPseudo(p_oDto.pseudo);
     if (l_oExistingPseudo) throw ConflictErrorFactory.usernameExists(p_oDto.pseudo);
 
-    const l_sPasswordHash : string = await this.m_oPasswordHasher.hash(p_oDto.password);
+    const l_sPasswordHash: string = await this.hasher.hash(p_oDto.password);
 
-    // 🪓 [REARMÉ V4] Injection de IdForge pour couler un vrai UUID v7 chronologique
-    const l_oUserData : IUserData = {
-      idUser          : new UserId(IdForge.genererUuidV7()), // Exit la loterie v4 bête 🐦 💨
-      email           : p_oDto.email,
-      passwordHash    : l_sPasswordHash,
-      pseudo          : p_oDto.pseudo,
-      roleId          : new RoleId('CUST'),
-      authProviderId  : new ProviderId('LOCA'),
-      settingsUser    : {},
-      rgpdConsent     : p_oDto.rgpdConsent,
-      rgpdConsentDate : new Date(),
-      createdAt       : new Date()
+    const l_oUserData: IUserData = {
+      idUser: new UserId(IdForge.genererUuidV7()),
+      email: p_oDto.email,
+      passwordHash: l_sPasswordHash,
+      pseudo: p_oDto.pseudo,
+      roleId: new RoleId('CUST'),
+      authProviderId: new ProviderId('LOCA'),
+      settingsUser: {},
+      rgpdConsent: p_oDto.rgpdConsent,
+      rgpdConsentDate: new Date(),
+      createdAt: new Date()
     };
 
-    return await this.m_oUserRepository.create(l_oUserData);
+    return await this.repository.create(l_oUserData);
   }
 
   /**
    * 🔐 Authentification initiale (Vérification des secrets et émission des jetons).
-   *
-   * @public
-   * @async
-   * @param {LoginDto} p_oDto - Les données d'identification de l'acteur (Courriel, Mot de passe)
-   * @throws {UserErrorFactory} Si les identifiants de connexion ou le secret sont invalides
-   * @returns {Promise<IAuthResult>} Le profil enrichi de ses jetons de session
    */
   public async login(p_oDto: LoginDto): Promise<IAuthResult> {
-    const l_oUser : User | null = await this.m_oUserRepository.findByEmail(p_oDto.email);
+    const l_oUser: User | null = await this.repository.findByEmail(p_oDto.email);
     if (!l_oUser) throw UserErrorFactory.invalidCredentials();
 
-    // 🪓 [RÉPARÉ V4] Utilisation de la propriété de surface pure .passwordHash sans parenthèses ! [Mémoria]
-    const l_bIsValid : boolean = await this.m_oPasswordHasher.verify(p_oDto.password, l_oUser.passwordHash);
+    const l_bIsValid: boolean = await this.hasher.verify(p_oDto.password, l_oUser.passwordHash);
     if (!l_bIsValid) throw UserErrorFactory.invalidCredentials();
 
-    // 🪓 [RÉPARÉ V4] Extraction propre via les propriétés de façade pures de IUser ! [Mémoria]
-    const { accessToken, refreshToken } = await this.m_oTokenManager.generateTokens({
-      sub    : l_oUser.idUser,
-      email  : l_oUser.courriel,
-      pseudo : l_oUser.pseudo,
-      role   : l_oUser.role
+    const { accessToken, refreshToken } = await this.tokens.generateTokens({
+      sub: l_oUser.idUser,
+      email: l_oUser.courriel,
+      pseudo: l_oUser.pseudo,
+      role: l_oUser.role
     });
 
     return { user: l_oUser, accessToken, refreshToken };
@@ -141,40 +129,32 @@ export class AuthService implements IAuthService {
 
   /**
    * 🔄 Renouvelle la validité des sessions via le jeton de rafraîchissement (Rotation incluse).
-   *
-   * @public
-   * @async
-   * @param {RefreshTokenDto} p_oDto - L'objet de transfert contenant le jeton de rafraîchissement
-   * @throws {TokenError} Si le jeton fourni a fait l'objet d'une révocation active (liste noire)
-   * @throws {UserErrorFactory} Si l'acteur rattaché au jeton est introuvable sur le disque
-   * @returns {Promise<IRefreshResult>} Le nouveau doublet de jetons d'accès et renouvellement
    */
   public async refresh(p_oDto: RefreshTokenDto): Promise<IRefreshResult> {
-    const l_oPayload = await this.m_oTokenManager.verifyRefreshToken(p_oDto.refreshToken);
+    const l_oPayload = await this.tokens.verifyRefreshToken(p_oDto.refreshToken);
 
-    if (l_oPayload.jti && await this.m_oBlacklistService.isBlacklisted(l_oPayload.jti)) {
+    if (l_oPayload.jti && (await this.blacklist.isBlacklisted(l_oPayload.jti))) {
       throw TokenError.revoked();
     }
 
-    const l_axIdActeur = typeof l_oPayload.sub === 'string' ? new UserId(l_oPayload.sub) : (l_oPayload.sub as UserId);
-    const l_oUser : User | null = await this.m_oUserRepository.findById(l_axIdActeur);
+    const l_axIdActeur =
+      typeof l_oPayload.sub === 'string' ? new UserId(l_oPayload.sub) : l_oPayload.sub;
+    const l_oUser: User | null = await this.repository.findById(l_axIdActeur);
     if (!l_oUser) throw UserErrorFactory.notFound(l_axIdActeur);
 
     if (l_oPayload.jti && l_oPayload.exp) {
-      await this.m_oBlacklistService.add(l_oPayload.jti, l_oPayload.exp);
+      await this.blacklist.add(l_oPayload.jti, l_oPayload.exp);
     }
 
-    // 🪓 [RÉPARÉ V4] Extraction propre via les propriétés de façade pures de IUser sans parenthèses ! [Mémoria]
-    const { accessToken, refreshToken } = await this.m_oTokenManager.generateTokens({
-      sub    : l_oUser.idUser,
-      email  : l_oUser.courriel,
-      pseudo : l_oUser.pseudo,
-      role   : l_oUser.role
+    const { accessToken, refreshToken } = await this.tokens.generateTokens({
+      sub: l_oUser.idUser,
+      email: l_oUser.courriel,
+      pseudo: l_oUser.pseudo,
+      role: l_oUser.role
     });
 
     return { accessToken, refreshToken };
   }
-
   /**
    * 🗑️ Révoque définitivement un jeton de rafraîchissement pour clore la session (Déconnexion).
    *
@@ -185,9 +165,10 @@ export class AuthService implements IAuthService {
    */
   public async logout(p_sRefreshToken: string): Promise<void> {
     try {
-      const l_oPayload = await this.m_oTokenManager.verifyRefreshToken(p_sRefreshToken);
+      // 🪓 ALIGNEMENT SOUVERAIN V4 : Passage obligatoire par les accesseurs de surface
+      const l_oPayload = await this.tokens.verifyRefreshToken(p_sRefreshToken);
       if (l_oPayload.jti && l_oPayload.exp) {
-        await this.m_oBlacklistService.add(l_oPayload.jti, l_oPayload.exp);
+        await this.blacklist.add(l_oPayload.jti, l_oPayload.exp);
       }
     } catch {
       // Éradication silencieuse : si le jeton est déjà corrompu structurellement, la session est close.

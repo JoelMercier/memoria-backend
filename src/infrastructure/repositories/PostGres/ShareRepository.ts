@@ -1,34 +1,34 @@
 // ——— fichier : src/infrastructure/repositories/ShareRepository.ts
 
-import type { QueryResultRow      } from 'pg';
+import type { QueryResultRow } from 'pg';
 import type { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
-import type { IAccessConfig       } from '@/interfaces/entities/share/IAccessConfig';
-import type { IShareData          } from '@/interfaces/entities/share/IShareData';
-import type { IListOptions        } from '@/interfaces/shared/IListOptions';
-import type { IListResult         } from '@/interfaces/shared/IListResult';
+import type { IAccessConfig } from '@/interfaces/entities/share/IAccessConfig';
+import type { IShareData } from '@/interfaces/entities/share/IShareData';
+import type { IListOptions } from '@/interfaces/shared/IListOptions';
+import type { IListResult } from '@/interfaces/shared/IListResult';
+import type { IShareRepository } from '@/interfaces/repositories/PostGres/IShareRepository';
 
-import { BaseRepository          } from '@/infrastructure/repositories/BaseRepositories';
+import { BaseRepository } from '@/infrastructure/repositories/BaseRepositories';
 import { UserId, ItemId, ShareId } from '@/domain/value-objects/ids';
-import { Share                   } from '@/entities/Share';
-import { DatabaseErrorFactory    } from '@/exceptions/DatabaseErrorFactory';
-import { ShareErrorFactory       } from '@/exceptions/ShareErrorFactory';
-import { OrdreTriEnum            } from '@/constants/OrdreTriEnum';
-import { IShareRepository } from '@/interfaces/repositories/PostGres/IShareRepository';
+import { Share } from '@/entities/Share';
+import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
+import { ShareErrorFactory } from '@/exceptions/ShareErrorFactory';
+import { OrdreTriEnum } from '@/constants/OrdreTriEnum';
 
 /**
  * 🗄️ Interface interne calée au bit près sur le stockage physique décroissant de la table "Shares"
  * [RÉPARÉ V4] Aligné au caractère près sur les préfixes physiques unifiés "sh" de la base.
  */
 interface IShareRow extends QueryResultRow {
-  shIdShare       : Buffer;    // 16 octets fixes tassés en RAM
-  shItemId        : Buffer;    // 16 octets fixes tassés en RAM
-  shItemOwnerId   : Buffer;    // 16 octets fixes tassés en RAM (Dé-normalisé !)
-  shCreatedAt     : Date;
-  shUpdatedAt     : Date | null;
-  shCourrielDest  : string | null;
-  shJeton         : string;
-  shConfiguration : IAccessConfig;
-  rNbLignesTotal? : string;    // Volumétrie calculée par le chateau
+  shIdShare: Buffer; // 16 octets fixes tassés en RAM
+  shItemId: Buffer; // 16 octets fixes tassés en RAM
+  shItemOwnerId: Buffer; // 16 octets fixes tassés en RAM (Dé-normalisé !)
+  shCreatedAt: Date;
+  shUpdatedAt: Date | null;
+  shCourrielDest: string | null;
+  shJeton: string;
+  shConfiguration: IAccessConfig;
+  rNbLignesTotal?: string; // Volumétrie calculée par le chateau
 }
 
 /**
@@ -44,7 +44,6 @@ interface IShareRow extends QueryResultRow {
  * @author Frapperie du code : Gaïa (Au burin, raccordée sur la Choupy Doctrine V4)
  */
 export class ShareRepository extends BaseRepository implements IShareRepository {
-
   /**
    * Initialise le dépôt de partage et hérite de la classe mère.
    *
@@ -65,15 +64,15 @@ export class ShareRepository extends BaseRepository implements IShareRepository 
    */
   private rowToShare(p_oRow: IShareRow): Share {
     return new Share({
-      idShare       : new ShareId(p_oRow.shIdShare),
-      itemId        : new ItemId(p_oRow.shItemId),
-      itemOwnerId   : new UserId(p_oRow.shItemOwnerId), // Alimentation de la colonne performante !
-      courrielDest  : p_oRow.shCourrielDest,
-      jeton         : p_oRow.shJeton,
-      configuration : p_oRow.shConfiguration,
-      createdAt     : p_oRow.shCreatedAt,
-      updatedAt     : p_oRow.shUpdatedAt ?? undefined
-    } as any);
+      idShare: new ShareId(p_oRow.shIdShare),
+      itemId: new ItemId(p_oRow.shItemId),
+      itemOwnerId: new UserId(p_oRow.shItemOwnerId), // Alimentation de la colonne performante !
+      courrielDest: p_oRow.shCourrielDest,
+      jeton: p_oRow.shJeton,
+      configuration: p_oRow.shConfiguration,
+      createdAt: p_oRow.shCreatedAt,
+      updatedAt: p_oRow.shUpdatedAt ?? undefined
+    });
   }
 
   /**
@@ -88,10 +87,9 @@ export class ShareRepository extends BaseRepository implements IShareRepository 
   public async findById(p_axIdShare: ShareId): Promise<Share | null> {
     try {
       // 🗲 Raccordement direct sur le tir laser de la base
-      const l_oResult = await this.db.query<IShareRow>(
-        'Select * From "TrouverPartageParId"($1);',
-        [p_axIdShare]
-      );
+      const l_oResult = await this.db.query<IShareRow>('Select * From "TrouverPartageParId"($1);', [
+        p_axIdShare
+      ]);
       return l_oResult.rows[0] ? this.rowToShare(l_oResult.rows[0]) : null;
     } catch (l_oErr) {
       const l_sMsg = l_oErr instanceof Error ? l_oErr.message : 'unknown';
@@ -122,16 +120,19 @@ export class ShareRepository extends BaseRepository implements IShareRepository 
     }
   }
 
-
   /**
    * 🔍 Extraction ciblée : Récupère les partages attachés à une pépite.
    * [RÉPARÉ V4] Intègre la pagination obligatoire et utilise la fonction stockée dédiée !
    */
-  public async findByItemId(p_axItemId: ItemId, p_oOptions: IListOptions): Promise<IListResult<Share>> {
+  public async findByItemId(
+    p_axItemId: ItemId,
+    p_oOptions: IListOptions
+  ): Promise<IListResult<Share>> {
     try {
-      const l_nLimit    = p_oOptions.NbLignes ?? 50;
-      const l_nOffset   = p_oOptions.LigneDebut ?? 0;
-      const l_sOrdreTri = p_oOptions.OrdreAff instanceof OrdreTriEnum ? p_oOptions.OrdreAff.code : 'DESC';
+      const l_nLimit = p_oOptions.NbLignes ?? 50;
+      const l_nOffset = p_oOptions.LigneDebut ?? 0;
+      const l_sOrdreTri =
+        p_oOptions.OrdreAff instanceof OrdreTriEnum ? p_oOptions.OrdreAff.code : 'DESC';
 
       const l_oResult = await this.db.query<IShareRow>(
         'Select * From "TousLesPartagesDunePepite"($1, $2, $3, $4, $5);',
@@ -142,11 +143,11 @@ export class ShareRepository extends BaseRepository implements IShareRepository 
       const l_aoLignes = l_oResult.rows.map((row) => this.rowToShare(row));
 
       return {
-        LigneDebut:    l_nOffset,
-        NbLignesDem:   l_nLimit,
-        NbLignesRenv:  l_aoLignes.length,
+        LigneDebut: l_nOffset,
+        NbLignesDem: l_nLimit,
+        NbLignesRenv: l_aoLignes.length,
         NbLignesTotal: l_nTotal,
-        Lignes:        l_aoLignes
+        Lignes: l_aoLignes
       };
     } catch (l_oErr) {
       const l_sMsg = l_oErr instanceof Error ? l_oErr.message : 'unknown';
@@ -158,11 +159,15 @@ export class ShareRepository extends BaseRepository implements IShareRepository 
    * 🔍 Jointure croisée ultra-rapide : Énumère les partages d'un utilisateur.
    * [PULVÉRISÉ] Plus aucun INNER JOIN Items ! Utilisation directe de la colonne dé-normalisée shItemOwnerId indexée.
    */
-  public async findByUserId(p_axUserId: UserId, p_oOptions: IListOptions): Promise<IListResult<Share>> {
+  public async findByUserId(
+    p_axUserId: UserId,
+    p_oOptions: IListOptions
+  ): Promise<IListResult<Share>> {
     try {
-      const l_nLimit    = p_oOptions.NbLignes ?? 50;
-      const l_nOffset   = p_oOptions.LigneDebut ?? 0;
-      const l_sOrdreTri = p_oOptions.OrdreAff instanceof OrdreTriEnum ? p_oOptions.OrdreAff.code : 'DESC';
+      const l_nLimit = p_oOptions.NbLignes ?? 50;
+      const l_nOffset = p_oOptions.LigneDebut ?? 0;
+      const l_sOrdreTri =
+        p_oOptions.OrdreAff instanceof OrdreTriEnum ? p_oOptions.OrdreAff.code : 'DESC';
 
       const l_oResult = await this.db.query<IShareRow>(
         'Select * From "TousLesPartagesDunActeur"($1, $2, $3, $4, $5);',
@@ -173,18 +178,17 @@ export class ShareRepository extends BaseRepository implements IShareRepository 
       const l_aoLignes = l_oResult.rows.map((row) => this.rowToShare(row));
 
       return {
-        LigneDebut:    l_nOffset,
-        NbLignesDem:   l_nLimit,
-        NbLignesRenv:  l_aoLignes.length,
+        LigneDebut: l_nOffset,
+        NbLignesDem: l_nLimit,
+        NbLignesRenv: l_aoLignes.length,
         NbLignesTotal: l_nTotal,
-        Lignes:        l_aoLignes
+        Lignes: l_aoLignes
       };
     } catch (l_oErr) {
       const l_sMsg = l_oErr instanceof Error ? l_oErr.message : 'unknown';
       throw DatabaseErrorFactory.queryFailed('Share.findByUserId', l_sMsg);
     }
   }
-
 
   /**
    * 📜 VRAI FINDALL CONSTITUTIONNEL V4 🏛️
@@ -200,9 +204,10 @@ export class ShareRepository extends BaseRepository implements IShareRepository 
    */
   public async findAll(p_oOptions: IListOptions): Promise<IListResult<Share>> {
     try {
-      const l_nLimit    = p_oOptions.NbLignes ?? 50;
-      const l_nOffset   = p_oOptions.LigneDebut ?? 0;
-      const l_sOrdreTri = p_oOptions.OrdreAff instanceof OrdreTriEnum ? p_oOptions.OrdreAff.code : 'DESC';
+      const l_nLimit = p_oOptions.NbLignes ?? 50;
+      const l_nOffset = p_oOptions.LigneDebut ?? 0;
+      const l_sOrdreTri =
+        p_oOptions.OrdreAff instanceof OrdreTriEnum ? p_oOptions.OrdreAff.code : 'DESC';
 
       // 🗲 Appel de l'extracteur global de soute sans SQL volant !
       const l_oResult = await this.db.query<IShareRow>(
@@ -215,11 +220,11 @@ export class ShareRepository extends BaseRepository implements IShareRepository 
       const l_aoLignes = l_oResult.rows.map((row) => this.rowToShare(row));
 
       return {
-        LigneDebut:    l_nOffset,
-        NbLignesDem:   l_nLimit,
-        NbLignesRenv:  l_aoLignes.length,
+        LigneDebut: l_nOffset,
+        NbLignesDem: l_nLimit,
+        NbLignesRenv: l_aoLignes.length,
         NbLignesTotal: l_nTotal,
-        Lignes:        l_aoLignes
+        Lignes: l_aoLignes
       };
     } catch (l_oErr) {
       const l_sMsg = l_oErr instanceof Error ? l_oErr.message : 'unknown';
@@ -272,11 +277,7 @@ export class ShareRepository extends BaseRepository implements IShareRepository 
     try {
       const l_oResult = await this.db.query<IShareRow>(
         'Select * From "ModifierPartage"($1, $2, $3);',
-        [
-          p_axIdShare,
-          p_oData.courrielDest ?? null,
-          p_oData.configuration ?? null
-        ]
+        [p_axIdShare, p_oData.courrielDest ?? null, p_oData.configuration ?? null]
       );
 
       if (!l_oResult.rows || l_oResult.rows.length === 0) {
@@ -311,5 +312,4 @@ export class ShareRepository extends BaseRepository implements IShareRepository 
       throw DatabaseErrorFactory.queryFailed('Share.delete', l_sMsg);
     }
   }
-
 }

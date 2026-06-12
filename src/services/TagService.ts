@@ -1,16 +1,17 @@
 // ——— fichier : src/services/TagService.ts
 
-import { IdForge }             from '@/domain/utils/IdForge'; // 🗲 [NEW V4] Fondeur UUID v7 du Domaine
-import { UserId, TagId }       from '@/domain/value-objects/ids';
-import { Tag }                 from '@/entities/Tag';
-import { TagErrorFactory }     from '@/exceptions/TagErrorFactory';
-import type { CreateTagDto }   from '@/dto/tag/CreateTagDto';
-import type { UpdateTagDto }   from '@/dto/tag/UpdateTagDto';
-import type { ITagData }       from '@/interfaces/entities/tag/ITagData';
+import { IdForge } from '@/domain/utils/IdForge';
+import type { UserId } from '@/domain/value-objects/ids';
+import { TagId } from '@/domain/value-objects/ids';
+import type { Tag } from '@/entities/Tag';
+import { TagErrorFactory } from '@/exceptions/TagErrorFactory';
+import type { CreateTagDto } from '@/dto/tag/CreateTagDto';
+import type { UpdateTagDto } from '@/dto/tag/UpdateTagDto';
+import type { ITagData } from '@/interfaces/entities/tag/ITagData';
 import type { ITagRepository } from '@/interfaces/repositories/PostGres/ITagRepository';
-import type { ITagService }    from '@/interfaces/services/ITagService';
-import type { IListOptions }   from '@/interfaces/shared/IListOptions'; // 🗲 [INJECTÉ V4]
-import type { IListResult }    from '@/interfaces/shared/IListResult';  // 🗲 [FRANÇAIS D'ÉLITE]
+import type { ITagService } from '@/interfaces/services/ITagService';
+import type { IListOptions } from '@/interfaces/shared/IListOptions';
+import type { IListResult } from '@/interfaces/shared/IListResult';
 
 /**
  * 🏛️ Classe TagService
@@ -26,9 +27,8 @@ import type { IListResult }    from '@/interfaces/shared/IListResult';  // 🗲 
  * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 export class TagService implements ITagService {
-
   /** 🗄️ Entrepôt de persistance abstrait des étiquettes (ITagRepository) */
-  private readonly m_oTagRepository : ITagRepository;
+  private readonly m_oTagRepository: ITagRepository;
 
   /**
    * Initialise le cas d'usage par injection d'abstractions de dépôts.
@@ -72,15 +72,15 @@ export class TagService implements ITagService {
    * @returns {Promise<Tag>} L'entité de l'étiquette créée et indexée
    */
   public async create(p_axUserId: UserId, p_oDto: CreateTagDto): Promise<Tag> {
-    // 🪓 [REARMÉ V4] Forgeage propre de l'ID nominal via notre usine à UUID v7
-    const l_oData : ITagData = {
-      idTag     : new TagId(IdForge.genererUuidV7()), // Exit le v4 bête 🐦 💨
-      idUser    : p_axUserId,
-      tagName   : p_oDto.tagName,
-      createdAt : new Date()
+    const l_oData: ITagData = {
+      idTag: new TagId(IdForge.genererUuidV7()),
+      idUser: p_axUserId,
+      tagName: p_oDto.tagName,
+      createdAt: new Date()
     };
 
-    return await this.m_oTagRepository.create(l_oData);
+    // 🪓 ALIGNEMENT SOUVERAIN V4 : Interrogation obligatoire via l'accesseur public this.repository
+    return await this.repository.create(l_oData);
   }
 
   /**
@@ -94,13 +94,13 @@ export class TagService implements ITagService {
    * @returns {Promise<Tag>} L'entité riche du tag réhydraté
    */
   public async findById(p_axUserId: UserId, p_axTagId: TagId): Promise<Tag> {
-    const l_oTag : Tag | null = await this.m_oTagRepository.findById(p_axTagId);
+    // 🪓 ALIGNEMENT SOUVERAIN V4 : Interrogation obligatoire via l'accesseur public this.repository
+    const l_oTag: Tag | null = await this.repository.findById(p_axTagId);
 
     if (!l_oTag) {
       throw TagErrorFactory.notFound(p_axTagId);
     }
 
-    // 🪓 [RÉPARÉ V4] Interrogation directe du vrai getter .userId de surface ! [Mémoria]
     if (!l_oTag.userId.estEgalA(p_axUserId)) {
       throw TagErrorFactory.accessDenied(p_axTagId, p_axUserId);
     }
@@ -119,8 +119,8 @@ export class TagService implements ITagService {
    * @returns {Promise<IListResult<Tag>>} Le lot de résultats paginé avec sa volumétrie globale [Mémoria]
    */
   public async listByUser(p_axUserId: UserId, p_oOptions: IListOptions): Promise<IListResult<Tag>> {
-    // 🗲 Propagation obligatoire du bouclier anti-fuite vers le dépôt physique
-    return await this.m_oTagRepository.findByUserId(p_axUserId, p_oOptions);
+    // 🪓 ALIGNEMENT SOUVERAIN V4 : Interrogation obligatoire via l'accesseur public this.repository
+    return await this.repository.findByUserId(p_axUserId, p_oOptions);
   }
 
   /**
@@ -135,26 +135,27 @@ export class TagService implements ITagService {
    * @returns {Promise<Tag>} L'entité du tag modifiée et sauvegardée
    */
   public async update(p_axUserId: UserId, p_axTagId: TagId, p_oDto: UpdateTagDto): Promise<Tag> {
-    const l_oExisting : Tag | null = await this.m_oTagRepository.findById(p_axTagId);
+    // 🪓 ALIGNEMENT SOUVERAIN V4 : Interrogation obligatoire via l'accesseur public this.repository
+    const l_oExisting: Tag | null = await this.repository.findById(p_axTagId);
 
     if (!l_oExisting) {
       throw TagErrorFactory.notFound(p_axTagId);
     }
 
-    // 🪓 [RÉPARÉ V4] Vrai getter .userId sans parenthèses ! [Mémoria]
     if (!l_oExisting.userId.estEgalA(p_axUserId)) {
       throw TagErrorFactory.accessDenied(p_axTagId, p_axUserId);
     }
 
-    // 🪓 [RÉPARÉ V4] Vrai getter .tagName sans parenthèses ! [Mémoria]
     if (p_oDto.tagName.toLowerCase() !== l_oExisting.tagName.toLowerCase()) {
-      const l_oConflict : Tag | null = await this.m_oTagRepository.findByName(p_axUserId, p_oDto.tagName);
+      // 🪓 ALIGNEMENT SOUVERAIN V4 : Interrogation obligatoire via l'accesseur public this.repository
+      const l_oConflict: Tag | null = await this.repository.findByName(p_axUserId, p_oDto.tagName);
       if (l_oConflict) {
         throw TagErrorFactory.nameExists(p_axUserId, p_oDto.tagName);
       }
     }
 
-    const l_oUpdated : Tag | null = await this.m_oTagRepository.update(p_axTagId, {
+    // 🪓 ALIGNEMENT SOUVERAIN V4 : Interrogation obligatoire via l'accesseur public this.repository
+    const l_oUpdated: Tag | null = await this.repository.update(p_axTagId, {
       tagName: p_oDto.tagName
     });
 
@@ -176,18 +177,19 @@ export class TagService implements ITagService {
    * @returns {Promise<void>}
    */
   public async delete(p_axUserId: UserId, p_axTagId: TagId): Promise<void> {
-    const l_oExisting : Tag | null = await this.m_oTagRepository.findById(p_axTagId);
+    // 🪓 ALIGNEMENT SOUVERAIN V4 : Interrogation obligatoire via l'accesseur public this.repository
+    const l_oExisting: Tag | null = await this.repository.findById(p_axTagId);
 
     if (!l_oExisting) {
       throw TagErrorFactory.notFound(p_axTagId);
     }
 
-    // 🪓 [RÉPARÉ V4] Vrai getter .userId sans parenthèses ! [Mémoria]
     if (!l_oExisting.userId.estEgalA(p_axUserId)) {
       throw TagErrorFactory.accessDenied(p_axTagId, p_axUserId);
     }
 
-    const l_bDeleted : boolean = await this.m_oTagRepository.delete(p_axTagId);
+    // 🪓 ALIGNEMENT SOUVERAIN V4 : Interrogation obligatoire via l'accesseur public this.repository
+    const l_bDeleted: boolean = await this.repository.delete(p_axTagId);
     if (!l_bDeleted) {
       throw TagErrorFactory.notFound(p_axTagId);
     }

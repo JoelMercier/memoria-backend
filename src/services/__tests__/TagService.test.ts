@@ -1,23 +1,30 @@
+// ——— fichier : src/services/__tests__/TagService.test.ts
+
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { TagService } from '../TagService'; // 🪓 IMPORT DE PROXIMITÉ LOCAL
 import { CreateTagDto } from '@/dto/tag/CreateTagDto';
 import { UpdateTagDto } from '@/dto/tag/UpdateTagDto';
 import { Tag } from '@/entities/Tag';
 import { TagErrorFactory } from '@/exceptions/TagErrorFactory';
+import { UserId, TagId } from '@/domain/value-objects/ids';
 import type { ITagRepository } from '@/interfaces/repositories/PostGres/ITagRepository';
-import { TagService } from '@/services/TagService';
 
-const USER_ID = '00000000-0000-0000-0000-000000000001';
-const OTHER_USER_ID = '00000000-0000-0000-0000-000000000002';
-const TAG_ID = '11111111-1111-1111-1111-111111111111';
+// 🪓 ALIGNEMENT NOMINAL : Instanciation de fiers Value Objects d'écurie pour la soute V4
+const USER_ID = new UserId('018f3a3c-5000-7000-8000-000000000001');
+const OTHER_USER_ID = new UserId('018f3a3c-5000-7000-8000-000000000002');
+const TAG_ID = new TagId('018f3a3c-5000-7000-8000-00000000000A');
 
-function makeTag(overrides: Partial<{ id: string; userId: string; tagName: string }> = {}): Tag {
+/**
+ * Fabrique d'entités de simulation (mocks) d'étiquettes conformes à la charte V4.
+ */
+function makeTag(overrides: Partial<{ idTag: TagId; idUser: UserId; tagName: string }> = {}): Tag {
   return new Tag({
-    id: overrides.id ?? TAG_ID,
-    userId: overrides.userId ?? USER_ID,
+    idTag: overrides.idTag ?? TAG_ID,
+    idUser: overrides.idUser ?? USER_ID,
     tagName: overrides.tagName ?? 'philosophie',
     createdAt: new Date('2026-01-01'),
     updatedAt: undefined
-  });
+  }); // Sûreté de surface face à l'ancêtre BaseEntity
 }
 
 describe('TagService', () => {
@@ -25,6 +32,7 @@ describe('TagService', () => {
   let service: TagService;
 
   beforeEach(() => {
+    // 🪓 ALIGNEMENT CONTRAT : Implémentation complète des signatures exigées par ITagRepository
     tagRepository = {
       findById: vi.fn(),
       findByUserId: vi.fn(),
@@ -32,7 +40,9 @@ describe('TagService', () => {
       findByIds: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
-      delete: vi.fn()
+      delete: vi.fn(),
+      db: {} as any,
+      findAll: vi.fn()
     };
     service = new TagService(tagRepository);
   });
@@ -44,27 +54,29 @@ describe('TagService', () => {
 
       const result = await service.create(USER_ID, new CreateTagDto({ tagName: 'philosophie' }));
 
+      // Contrôle de l'injection d'infrastructure via expect.objectContaining
       expect(tagRepository.create).toHaveBeenCalledWith(
-        expect.objectContaining({ userId: USER_ID, tagName: 'philosophie' })
+        expect.objectContaining({ idUser: USER_ID, tagName: 'philosophie' })
       );
       expect(result).toBe(tag);
     });
   });
 
   describe('findById', () => {
-    it('lève notFound si le tag n existe pas', async () => {
+    it("lève notFound si le tag n'existe pas", async () => {
       vi.mocked(tagRepository.findById).mockResolvedValue(null);
       await expect(service.findById(USER_ID, TAG_ID)).rejects.toBeInstanceOf(TagErrorFactory);
     });
 
     it('lève accessDenied si le tag appartient à un autre user', async () => {
-      vi.mocked(tagRepository.findById).mockResolvedValue(makeTag({ userId: OTHER_USER_ID }));
+      vi.mocked(tagRepository.findById).mockResolvedValue(makeTag({ idUser: OTHER_USER_ID }));
       await expect(service.findById(USER_ID, TAG_ID)).rejects.toBeInstanceOf(TagErrorFactory);
     });
 
     it('retourne le tag si ownership ok', async () => {
       const tag: Tag = makeTag();
       vi.mocked(tagRepository.findById).mockResolvedValue(tag);
+
       const result = await service.findById(USER_ID, TAG_ID);
       expect(result).toBe(tag);
     });
@@ -74,7 +86,7 @@ describe('TagService', () => {
     it('lève nameExists si un autre tag porte déjà le nouveau nom', async () => {
       vi.mocked(tagRepository.findById).mockResolvedValue(makeTag({ tagName: 'philosophie' }));
       vi.mocked(tagRepository.findByName).mockResolvedValue(
-        makeTag({ id: 'other-id', tagName: 'histoire' })
+        makeTag({ idTag: new TagId('018f3a3c-5000-7000-8000-00000000000F'), tagName: 'histoire' })
       );
 
       await expect(
@@ -95,7 +107,7 @@ describe('TagService', () => {
       );
 
       expect(tagRepository.update).toHaveBeenCalledWith(TAG_ID, { tagName: 'histoire' });
-      expect(result.getTagName()).toBe('histoire');
+      expect(result.tagName).toBe('histoire'); // 🪓 [RÉPARÉ V4] True getter de surface
     });
   });
 
@@ -109,7 +121,7 @@ describe('TagService', () => {
     });
 
     it("refuse de supprimer un tag qui n'est pas le nôtre", async () => {
-      vi.mocked(tagRepository.findById).mockResolvedValue(makeTag({ userId: OTHER_USER_ID }));
+      vi.mocked(tagRepository.findById).mockResolvedValue(makeTag({ idUser: OTHER_USER_ID }));
       await expect(service.delete(USER_ID, TAG_ID)).rejects.toBeInstanceOf(TagErrorFactory);
       expect(tagRepository.delete).not.toHaveBeenCalled();
     });

@@ -10,37 +10,46 @@
  *  - Interface Segregation / Facade Pattern : Offre un point d'accès unifié aux douanes.
  *
  * @file index.ts
- * @author Joël, Gaïa & Co
+ * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
+ * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
  */
 
 /** 🏛️ Exportation des classes actives de validation (Portiers de sécurité) */
-export { AuthValidation           } from '@/validation/zod/AuthValidation';
-export { ItemValidation           } from '@/validation/zod/ItemValidation';
-export { ShareValidation          } from '@/validation/zod/ShareValidation';
-export { TagValidation            } from '@/validation/zod/TagValidation';
-export { UserValidation           } from '@/validation/zod/UserValidation';
+export { AppEventValidation } from '@/validation/zod/AppEventValidation'; // 🪓 [RACCORDÉ V4] Intégration de la douane d'audit
+export { AuthValidation } from '@/validation/zod/AuthValidation';
+export { ItemValidation } from '@/validation/zod/ItemValidation';
+export { ShareValidation } from '@/validation/zod/ShareValidation';
+export { TagValidation } from '@/validation/zod/TagValidation';
+export { UserValidation } from '@/validation/zod/UserValidation';
+
+/** 🚨 Contrats de structure pour le module d'Audit Système (Logs) */
+export type {
+  CreateAppEventSchemaType,
+  UpdateAppEventSchemaType
+} from '@/validation/zod/AppEventValidation'; // 🪓 [RACCORDÉ V4]
 
 /** 🔑 Contrats de structure pour le module d'Authentification */
-export type { LoginSchemaType,
-              RefreshTokenSchemaType } from '@/validation/zod/AuthValidation';
+export type { LoginSchemaType, RefreshTokenSchemaType } from '@/validation/zod/AuthValidation';
 
 /** 📦 Contrats de structure pour le domaine des Pépites (Items) */
-export type { CreateItemSchemaType,
-              UpdateItemSchemaType   } from '@/validation/zod/ItemValidation';
+export type { CreateItemSchemaType, UpdateItemSchemaType } from '@/validation/zod/ItemValidation';
 
 /** 🔗 Contrats de structure pour le domaine des Partages (Shares) */
-export type { CreateShareSchemaType,
-              UpdateShareSchemaType  } from '@/validation/zod/ShareValidation';
+export type {
+  CreateShareSchemaType,
+  UpdateShareSchemaType
+} from '@/validation/zod/ShareValidation';
 
 /** 🏷️ Contrats de structure pour le domaine des Mots-clés (Tags) */
-export type { CreateTagSchemaType,
-              UpdateTagSchemaType    } from '@/validation/zod/TagValidation';
+export type { CreateTagSchemaType, UpdateTagSchemaType } from '@/validation/zod/TagValidation';
 
 /** 👥 Contrats de structure pour le domaine des Utilisateurs (Users) */
-export type { CreateUserSchemaType,
-              UpdateUserSchemaType,
-              DeleteUserSchemaType,
-              UpdateProfileSchemaType,
-              ChangePasswordSchemaType,
-              DeleteAccountSchemaType } from '@/validation/zod/UserValidation';
-              
+export type {
+  CreateUserSchemaType,
+  UpdateUserSchemaType,
+  DeleteUserSchemaType,
+  UpdateProfileSchemaType,
+  ChangePasswordSchemaType,
+  DeleteAccountSchemaType
+} from '@/validation/zod/UserValidation';
