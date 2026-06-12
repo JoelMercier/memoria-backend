@@ -91,10 +91,12 @@ export function createV1Router(): Router {
     tokenManager,
     blacklistService
   );
-  const itemService = new ItemService(itemRepository, itemTagRepository);
-  const tagService = new TagService(tagRepository);
+
+  const itemService  = new ItemService(itemRepository, itemTagRepository, tagRepository);
+  const tagService   = new TagService(tagRepository);
   const shareService = new ShareService(shareRepository, itemRepository);
-  const userService = new UserService(userRepository, passwordHasher);
+  const userService  = new UserService(userRepository, passwordHasher);
+
   const userExportService = new UserExportService(
     userRepository,
     itemRepository,
@@ -107,12 +109,12 @@ export function createV1Router(): Router {
   const authMiddleware = new AuthMiddleware(tokenManager, blacklistService);
 
   // --- 🎛️ F. Instanciation des Contrôleurs d'Interface ---
-  const authController = new AuthController(authService, userRepository);
-  const itemController = new ItemController(itemService);
-  const tagController = new TagController(tagService);
-  const shareController = new ShareController(shareService);
-  const publicShareController = new PublicShareController(shareService);
-  const userController = new UserController(userService, userExportService);
+  const authController          = new AuthController(authService, userRepository);
+  const itemController          = new ItemController(itemService);
+  const tagController           = new TagController(tagService);
+  const shareController         = new ShareController(shareService);
+  const publicShareController   = new PublicShareController(shareService);
+  const userController          = new UserController(userService, userExportService);
   const appEventAdminController = new AppEventAdminController(l_oAppEventAdminService);
 
   // --- 🛣️ G. Assemblage Final du Pipeline de Distribution Étanche ---
@@ -127,6 +129,7 @@ export function createV1Router(): Router {
 
   // Ancrage du nouveau territoire d'audit protégé par droit d'accès admin
   v1.use('/audit', authMiddleware.requireAuth(), createAuditRouter(appEventAdminController));
+// ——— À corriger à la ligne 94 de : src/routes/v1/index.ts
 
   return v1;
 }

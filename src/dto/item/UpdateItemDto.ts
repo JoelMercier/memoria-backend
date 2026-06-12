@@ -49,7 +49,9 @@ export class UpdateItemDto {
    * @param {unknown} data - Payload brut d'infrastructure issu de la requête
    */
   public constructor(data: unknown) {
-    const validated : UpdateItemSchemaType = ItemValidation.validateUpdate(data);
+    // 🪓 ALIGNEMENT D'ACIER : Protection du portier Zod via transtypage Record étanche
+    const l_oRawBody : Record<string, unknown> = (data && typeof data === 'object') ? (data as Record<string, unknown>) : {};
+    const validated  : UpdateItemSchemaType = ItemValidation.validateUpdate(l_oRawBody);
 
     // Cast chirurgical pour s'adapter à notre instance de SmartEnum (sans Enum de transport)
     this.contentType  = validated.contentType ? (validated.contentType as unknown as ContentType) : undefined;

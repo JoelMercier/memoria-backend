@@ -24,7 +24,8 @@ export class CreateTagDto {
    * @param {unknown} data - Payload brut d'infrastructure issu de la requête
    */
   public constructor(data: unknown) {
-    const validated : CreateTagSchemaType = TagValidation.validateCreate(data);
+    const l_oRawBody : Record<string, unknown> = (data && typeof data === 'object') ? (data as Record<string, unknown>) : {};
+    const validated  : CreateTagSchemaType = TagValidation.validateCreate(l_oRawBody);
 
     this.tagName = validated.tagName;
   }

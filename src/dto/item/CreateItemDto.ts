@@ -49,8 +49,9 @@ export class CreateItemDto {
    * @param {unknown} data - Payload brut d'infrastructure issu de la requête
    */
   public constructor(data: unknown) {
-    const validated : CreateItemSchemaType = ItemValidation.validateCreate(data);
-
+    const l_oRawBody : Record<string, unknown> = (data && typeof data === 'object') ? (data as Record<string, unknown>) : {};
+    const validated  : CreateItemSchemaType = ItemValidation.validateCreate(l_oRawBody);
+    
     // Cast chirurgical d'alignement avec notre instance de SmartEnum
     this.contentType  = validated.contentType as unknown as ContentType;
     this.title        = validated.title;

@@ -29,7 +29,9 @@ export class UpdateShareDto {
    * @param {unknown} p_vData - Payload brut d'infrastructure issu de la requête
    */
   public constructor(p_vData: unknown) {
-    const l_oValidated: UpdateShareSchemaType = ShareValidation.validateUpdate(p_vData);
+    // 🪓 ALIGNEMENT D'ACIER : Protection du portier Zod via transtypage Record étanche
+    const l_oRawBody : Record<string, unknown> = (p_vData && typeof p_vData === 'object') ? (p_vData as Record<string, unknown>) : {};
+    const l_oValidated : UpdateShareSchemaType = ShareValidation.validateUpdate(l_oRawBody);
 
     this.recipientEmail = l_oValidated.recipientEmail;
 
