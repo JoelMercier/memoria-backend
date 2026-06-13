@@ -32,7 +32,7 @@ export class CreateShareDto {
   public readonly itemOwnerId    : UserId;
 
   /** 📧 Adresse électronique optionnelle du destinataire du partage */
-  public readonly recipientEmail : string | null;
+  public readonly recipientCourriel : string | null;
 
   /** ⚙️ Configuration d'infrastructure des restrictions d'accès (Expiration, etc.) */
   public readonly accessConfig   : IAccessConfig;
@@ -59,7 +59,7 @@ export class CreateShareDto {
       ? new UserId((l_oValidated as any).itemOwnerId)
       : new UserId(l_oValidated.userId);
 
-    this.recipientEmail = l_oValidated.recipientEmail ?? null;
+    this.recipientCourriel = l_oValidated.recipientCourriel ?? null;
 
     // 🪓 [RÉALIGNEMENT CONSTITUTIONNEL V4] Éradication des contresens de casse !
     this.accessConfig   = {

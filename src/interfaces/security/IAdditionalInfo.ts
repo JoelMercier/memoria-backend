@@ -22,7 +22,7 @@ export interface IAdditionalInfo {
   code? : string;
 
   /**
-   * ✏️ Nom du champ de formulaire ou de propriété incriminé (ex: 'email').
+   * ✏️ Nom du champ de formulaire ou de propriété incriminé (ex: 'courriel').
    *
    * @type {string}
    */

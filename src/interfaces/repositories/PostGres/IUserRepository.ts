@@ -18,10 +18,10 @@ interface IUserRepositoryBase {
    * Réalise un tir laser indexé direct en Cour Basse pour l'authentification.
    *
    * @async
-   * @param {string} p_sEmail - Le courriel à analyser et nettoyer
+   * @param {string} p_sCourriel - Le courriel à analyser et nettoyer
    * @returns {Promise<User | null>} L'entité correspondante ou null
    */
-  findByEmail(p_sEmail: string): Promise<User | null>;
+  findByCourriel(p_sCourriel: string): Promise<User | null>;
 
   /**
    * 👤 Alignement nominal : Localise un acteur via son pseudonyme public.
@@ -38,10 +38,10 @@ interface IUserRepositoryBase {
    * Évite le chargement complet de l'entité en RAM pour les contrôles rapides.
    *
    * @async
-   * @param {string} p_sEmail - Le courriel à vérifier
+   * @param {string} p_sCourriel - Le courriel à vérifier
    * @returns {Promise<boolean>} True si le courriel est déjà capturé
    */
-  existsByEmail(p_sEmail: string): Promise<boolean>;
+  existsByCourriel(p_sCourriel: string): Promise<boolean>;
 
   /**
    * 👤 Vérification d'existence : Valide la présence d'un pseudonyme public.

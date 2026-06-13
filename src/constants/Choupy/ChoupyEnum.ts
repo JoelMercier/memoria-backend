@@ -100,14 +100,14 @@ export class ChoupyEnum extends SmartEnum<number> {
   // ----------------------------------------------------------------------------
   // 🏺 LES CALIBRES MACHINES ENRAMÉS (Garantie absolue de l'alignement matériel)
   // ----------------------------------------------------------------------------
-  public static readonly DIM_1 = new ChoupyEnum('1 octet (char)', 1, 5);
-  public static readonly DIM_2 = new ChoupyEnum('2 octets (mot 16 bits)', 2, 10);
-  public static readonly DIM_3 = new ChoupyEnum('3 octets (Trigramme 24 bits)', 3, 15);
-  public static readonly DIM_4 = new ChoupyEnum('4 octets (Quadrigramme 32 bits)', 4, 20);
-  public static readonly DIM_8 = new ChoupyEnum('8 octets (GrosMot 64 bits)', 8, 25);
-  public static readonly DIM_16 = new ChoupyEnum(`16 octets (UUID's 128 bits)`, 16, 30);
-  public static readonly DIM_32 = new ChoupyEnum('32 octets (SHA-256 256 bits)', 32, 35);
-  public static readonly DIM_64 = new ChoupyEnum('64 octets (SHA-512 512 bits)', 64, 40);
-  public static readonly DIM_128 = new ChoupyEnum('128 octets (CléAsym 1024 bits)', 128, 45);
-  public static readonly DIM_256 = new ChoupyEnum('256 octets (CléAsym 2048 bits)', 256, 50);
+  public static readonly DIM_1   = new ChoupyEnum('1 octet (char)'                 ,   1,  5);
+  public static readonly DIM_2   = new ChoupyEnum('2 octets (mot 16 bits)'         ,   2, 10);
+  public static readonly DIM_3   = new ChoupyEnum('3 octets (Trigramme 24 bits)'   ,   3, 15);
+  public static readonly DIM_4   = new ChoupyEnum('4 octets (Quadrigramme 32 bits)',   4, 20);
+  public static readonly DIM_8   = new ChoupyEnum('8 octets (GrosMot 64 bits)'     ,   8, 25);
+  public static readonly DIM_16  = new ChoupyEnum(`16 octets (UUID's 128 bits)`    ,  16, 30);
+  public static readonly DIM_32  = new ChoupyEnum('32 octets (SHA-256 256 bits)'   ,  32, 35);
+  public static readonly DIM_64  = new ChoupyEnum('64 octets (SHA-512 512 bits)'   ,  64, 40);
+  public static readonly DIM_128 = new ChoupyEnum('128 octets (CléAsym 1024 bits)' , 128, 45);
+  public static readonly DIM_256 = new ChoupyEnum('256 octets (CléAsym 2048 bits)' , 256, 50);
 }

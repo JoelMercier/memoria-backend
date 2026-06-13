@@ -16,16 +16,16 @@ const ACTOR_ID = new UserId('018f3a3c-5000-7000-8000-000000000001');
 
 const createMockUser = (): User =>
   ({
-    idUser: ACTOR_ID,
-    courriel: 'joel@memoria.fr',
-    passwordHash: 'SECRET_HACHE_CONFORME',
-    pseudo: 'DR-DOS-Maniac',
-    role: { code: 'CUST' } as any,
-    authProvider: { code: 'LOCA' } as any,
-    settingsUser: {},
-    rgpdConsent: true,
+    idUser         : ACTOR_ID,
+    courriel       : 'joel@memoria.fr',
+    passwordHash   : 'SECRET_HACHE_CONFORME',
+    pseudo         : 'DR-DOS-Maniac',
+    role           : { code: 'CUST' } as any,
+    authProvider   : { code: 'LOCA' } as any,
+    settingsUser   : {},
+    rgpdConsent    : true,
     rgpdConsentDate: new Date(),
-    createdAt: new Date()
+    createdAt      : new Date()
   }) as unknown as User;
 
 describe('AuthService', () => {
@@ -37,7 +37,7 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     l_oUserRepository = {
-      findByEmail: vi.fn(),
+      findByCourriel: vi.fn(),
       findByPseudo: vi.fn(),
       findById: vi.fn(),
       create: vi.fn(),
@@ -78,28 +78,28 @@ describe('AuthService', () => {
 
   describe('register', () => {
     it("lève une exception si l'adresse électronique est déjà réservée sur le disque", async () => {
-      vi.mocked(l_oUserRepository.findByEmail).mockResolvedValue(createMockUser());
+      vi.mocked(l_oUserRepository.findByCourriel).mockResolvedValue(createMockUser());
       const l_oDto = new CreateUserDto({
-        email: 'joel@memoria.fr',
+        courriel: 'joel@memoria.fr',
         password: 'PasswordV4!',
         pseudo: 'Joel',
-        gdprConsent: true
+        rgpdConsent: true
       });
 
       await expect(l_oAuthService.register(l_oDto)).rejects.toThrow();
     });
 
     it('persiste proprement le compte si le courriel et le pseudo sont vacants', async () => {
-      vi.mocked(l_oUserRepository.findByEmail).mockResolvedValue(null);
+      vi.mocked(l_oUserRepository.findByCourriel).mockResolvedValue(null);
       vi.mocked(l_oUserRepository.findByPseudo).mockResolvedValue(null);
       const l_oUser = createMockUser();
       vi.mocked(l_oUserRepository.create).mockResolvedValue(l_oUser);
 
       const l_oDto = new CreateUserDto({
-        email: 'joel@memoria.fr',
+        courriel: 'joel@memoria.fr',
         password: 'PasswordV4!',
         pseudo: 'Joel',
-        gdprConsent: true
+        rgpdConsent: true
       });
       const l_oResult = await l_oAuthService.register(l_oDto);
 
@@ -110,19 +110,19 @@ describe('AuthService', () => {
 
   describe('login', () => {
     it("rejette la connexion et lève une anomalie si le secret d'accès est invalide", async () => {
-      vi.mocked(l_oUserRepository.findByEmail).mockResolvedValue(createMockUser());
+      vi.mocked(l_oUserRepository.findByCourriel).mockResolvedValue(createMockUser());
       vi.mocked(l_oPasswordHasher.verify).mockResolvedValue(false);
 
-      const l_oDto = new LoginDto({ email: 'joel@memoria.fr', password: 'FauxPassword123' });
+      const l_oDto = new LoginDto({ courriel: 'joel@memoria.fr', password: 'FauxPassword123' });
       await expect(l_oAuthService.login(l_oDto)).rejects.toThrow();
     });
 
     it('signe et délivre les jetons de session si les secrets concordent à la frontière', async () => {
       const l_oUser = createMockUser();
-      vi.mocked(l_oUserRepository.findByEmail).mockResolvedValue(l_oUser);
+      vi.mocked(l_oUserRepository.findByCourriel).mockResolvedValue(l_oUser);
       vi.mocked(l_oPasswordHasher.verify).mockResolvedValue(true);
 
-      const l_oDto = new LoginDto({ email: 'joel@memoria.fr', password: 'SECRET_CONFORME_V4' });
+      const l_oDto = new LoginDto({ courriel: 'joel@memoria.fr', password: 'SECRET_CONFORME_V4' });
       const l_oResult = await l_oAuthService.login(l_oDto);
 
       expect(l_oResult.accessToken).toBe('access_jwt');

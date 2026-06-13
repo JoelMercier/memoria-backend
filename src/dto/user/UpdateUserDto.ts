@@ -1,7 +1,6 @@
 // ——— fichier : src/dto/user/UpdateUserDto.ts
 
-import { type UpdateUserSchemaType,
-         UserValidation             } from '@/validation/zod/UserValidation';
+import { type UpdateUserSchemaType, UserValidation } from '@/validation/zod/UserValidation';
 
 /**
  * 📦 Classe UpdateUserDto
@@ -10,14 +9,14 @@ import { type UpdateUserSchemaType,
  * Zéro dépendance externe vers Zod dans les types de propriétés.
  *
  * @class UpdateUserDto
- * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
- * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
- * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
+ * @author Direction du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
+ * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets UUID)
+ * @author Garde d'Élite des Non-Types : La Vague Initiale (Ouvriers de la v0.2 en surchauffe)
  */
 export class UpdateUserDto {
 
   /** 📧 Nouvelle adresse électronique de correspondance optionnelle */
-  public readonly email?        : string;
+  public readonly courriel?        : string;
 
   /** 🔐 Nouveau mot de passe sécurisé optionnel à hacher */
   public readonly password?     : string;
@@ -39,7 +38,7 @@ export class UpdateUserDto {
     const l_oRawBody : Record<string, unknown> = (data && typeof data === 'object') ? (data as Record<string, unknown>) : {};
     const validated  : UpdateUserSchemaType = UserValidation.validateUpdate(l_oRawBody);
 
-    this.email        = validated.email;
+    this.courriel     = validated.courriel;
     this.password     = validated.password;
     this.pseudo       = validated.pseudo;
     this.settingsUser = validated.settingsUser;

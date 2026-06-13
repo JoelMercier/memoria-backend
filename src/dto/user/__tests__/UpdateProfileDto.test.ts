@@ -6,7 +6,7 @@ import { UpdateProfileDto } from '../UpdateProfileDto'; // 🪓 IMPORT DE PROXIM
 describe('UpdateProfileDto', () => {
   const createValidPayload = () => ({
     pseudo: 'JojoLeSilex',
-    email: 'joel@memoria.internal',
+    courriel: 'joel@memoria.internal',
     settingsUser: { theme: 'dark', compactMode: true }
   });
 
@@ -15,12 +15,12 @@ describe('UpdateProfileDto', () => {
     const l_oDto = new UpdateProfileDto(l_oPayload);
 
     expect(l_oDto.pseudo).toBe(l_oPayload.pseudo);
-    expect(l_oDto.courriel).toBe(l_oPayload.email);
+    expect(l_oDto.courriel).toBe(l_oPayload.courriel);
     expect(l_oDto.settingsUser).toEqual(l_oPayload.settingsUser);
   });
 
   it("tolère la mise à jour partielle d'un profil (champs manquants ou optionnels)", () => {
-    const l_oPayload = { pseudo: 'GaïaLaGraveuse' }; // Email et préférences omis
+    const l_oPayload = { pseudo: 'GaïaLaGraveuse' }; // courriel et préférences omis
     const l_oDto = new UpdateProfileDto(l_oPayload);
 
     expect(l_oDto.pseudo).toBe('GaïaLaGraveuse');
@@ -30,7 +30,7 @@ describe('UpdateProfileDto', () => {
 
   it('jette une exception de soute si la douane de validation Zod refuse le format', () => {
     const l_oPayload = createValidPayload();
-    l_oPayload.email = 'ADRESSE_ELECTRONIQUE_CORROMPUE'; // Rejet attendu sur le format email
+    l_oPayload.courriel = 'ADRESSE_ELECTRONIQUE_CORROMPUE'; // Rejet attendu sur le format courriel
 
     expect(() => new UpdateProfileDto(l_oPayload)).toThrow();
   });

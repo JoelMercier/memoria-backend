@@ -18,17 +18,17 @@ import OrdreTriEnum from '@/constants/OrdreTriEnum';
  * Alignée au caractère près sur l'ordre physique décroissant anti-padding de la base.
  */
 interface IUserRow extends QueryResultRow {
-  usIdUser: Buffer; // 16 octets fixes tassés en RAM
-  usCourriel: string;
-  usPasswordHash: string;
-  usPseudo: string;
-  usIdRole: string; // Char(4) dictionnaire
-  usIdProvider: string; // Char(4) dictionnaire
-  usSettingsUser: Record<string, string>;
-  usGdprConsent: boolean;
-  usGdprDate: Date | null;
-  usCreatedAt: Date;
-  usUpdatedAt: Date | null;
+  usIdUser       : Buffer; // 16 octets fixes tassés en RAM
+  usCourriel     : string;
+  usPasswordHash : string;
+  usPseudo       : string;
+  usIdRole       : string; // Char(4) dictionnaire
+  usIdProvider   : string; // Char(4) dictionnaire
+  usSettingsUser : Record<string, string>;
+  usGdprConsent  : boolean;
+  usGdprDate     : Date | null;
+  usCreatedAt    : Date;
+  usUpdatedAt    : Date | null;
   rNbLignesTotal?: string; // Volumétrie calculée par le chateau
 }
 
@@ -65,17 +65,17 @@ export class UserRepository extends BaseRepository implements IUserRepository {
    */
   private LigneVersActeur(p_oRow: IUserRow): User {
     return new User({
-      idUser: new UserId(p_oRow.usIdUser), // Instanciation directe étanche [Mémoria]
-      courriel: p_oRow.usCourriel,
-      passwordHash: p_oRow.usPasswordHash,
-      pseudo: p_oRow.usPseudo,
-      roleId: new RoleId(p_oRow.usIdRole),
-      authProviderId: new ProviderId(p_oRow.usIdProvider),
-      settingsUser: p_oRow.usSettingsUser,
-      rgpdConsent: p_oRow.usGdprConsent,
+      idUser         : new UserId(p_oRow.usIdUser), // Instanciation directe étanche [Mémoria]
+      roleId         : new RoleId(p_oRow.usIdRole),
+      authProviderId : new ProviderId(p_oRow.usIdProvider),
+      courriel       : p_oRow.usCourriel,
+      passwordHash   : p_oRow.usPasswordHash,
+      pseudo         : p_oRow.usPseudo,
+      settingsUser   : p_oRow.usSettingsUser,
+      rgpdConsent    : p_oRow.usGdprConsent,
       rgpdConsentDate: p_oRow.usGdprDate ?? undefined,
-      createdAt: p_oRow.usCreatedAt,
-      updatedAt: p_oRow.usUpdatedAt ?? undefined
+      createdAt      : p_oRow.usCreatedAt,
+      updatedAt      : p_oRow.usUpdatedAt ?? undefined
     });
   }
 
@@ -98,16 +98,14 @@ export class UserRepository extends BaseRepository implements IUserRepository {
   /**
    * 🔍 Alignement nominal : Localise un acteur via son courriel normalisé 📧.
    */
-  public async findByEmail(p_sEmail: string): Promise<User | null> {
+  public async findByCourriel(p_sCourriel: string): Promise<User | null> {
     try {
       const l_oResult = await this.db.query<IUserRow>(
-        'Select * From public."Users" Where "usCourriel" = Lower(Trim($1));',
-        [p_sEmail]
-      );
+        'Select * From public."Users" Where "usCourriel" = Lower(Trim($1));', [p_sCourriel] );
       return l_oResult.rows ? this.LigneVersActeur(l_oResult.rows[0]) : null;
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
-      throw DatabaseErrorFactory.queryFailed('User.findByEmail', l_sMsg);
+      throw DatabaseErrorFactory.queryFailed('User.findByCourriel', l_sMsg);
     }
   }
 
@@ -130,16 +128,13 @@ export class UserRepository extends BaseRepository implements IUserRepository {
   /**
    * 📧 Vérification d'existence : Valide la présence d'un courriel.
    */
-  public async existsByEmail(p_sEmail: string): Promise<boolean> {
+  public async existsByCourriel(p_sCourriel: string): Promise<boolean> {
     try {
-      const l_oResult = await this.db.query(
-        'Select 1 From public."Users" Where "usCourriel" = Lower(Trim($1));',
-        [p_sEmail]
-      );
+      const l_oResult = await this.db.query('Select 1 From public."Users" Where "usCourriel" = Lower(Trim($1));', [p_sCourriel] );
       return (l_oResult.rowCount ?? 0) > 0;
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
-      throw DatabaseErrorFactory.queryFailed('User.existsByEmail', l_sMsg);
+      throw DatabaseErrorFactory.queryFailed('User.existsByCourriel', l_sMsg);
     }
   }
 
@@ -188,7 +183,7 @@ export class UserRepository extends BaseRepository implements IUserRepository {
       const l_sMessage = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
 
       if (l_sMessage.includes('Users_usCourriel_Udx'))
-        throw UserErrorFactory.emailExists(p_oData.courriel);
+        throw UserErrorFactory.courrielExists(p_oData.courriel);
       throw UserErrorFactory.creation(l_sMessage);
     }
   }

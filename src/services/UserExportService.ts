@@ -1,21 +1,25 @@
 // ——— fichier : src/services/UserExportService.ts
 
-import type { UserId } from '@/domain/value-objects/ids';
-import { type IItemWithTags, UserExportDto } from '@/dto/user/UserExportDto';
-import type { Item } from '@/entities/Item';
-import type { Share } from '@/entities/Share';
-import type { Tag } from '@/entities/Tag';
-import type { User } from '@/entities/User';
-import { UserErrorFactory } from '@/exceptions/UserErrorFactory';
-import type { IItemRepository } from '@/interfaces/repositories/PostGres/IItemRepository';
+import type { IItemWithTags      } from '@/dto/user/UserExportDto';
+import type { IItemRepository    } from '@/interfaces/repositories/PostGres/IItemRepository';
 import type { IItemTagRepository } from '@/interfaces/repositories/PostGres/IItemTagRepository';
-import type { IShareRepository } from '@/interfaces/repositories/PostGres/IShareRepository';
-import type { ITagRepository } from '@/interfaces/repositories/PostGres/ITagRepository';
-import type { IUserRepository } from '@/interfaces/repositories/PostGres/IUserRepository';
+import type { IShareRepository   } from '@/interfaces/repositories/PostGres/IShareRepository';
+import type { IUserRepository    } from '@/interfaces/repositories/PostGres/IUserRepository';
+import type { ITagRepository     } from '@/interfaces/repositories/PostGres/ITagRepository';
 import type { IUserExportService } from '@/interfaces/services/IUserExportService';
+
+import type { UserId } from '@/domain/value-objects/ids';
+import type { User   } from '@/entities/User';
+import type { Share  } from '@/entities/Share';
+import type { Tag    } from '@/entities/Tag';
+import type { Item   } from '@/entities/Item';
+
 import type { IListResult } from '@/interfaces/shared/IListResult';
-import OrdreTriEnum from '@/constants/OrdreTriEnum';
 import type { IListOptions } from '@/interfaces/shared/IListOptions';
+
+import { UserExportDto    } from '@/dto/user/UserExportDto';
+import { UserErrorFactory } from '@/exceptions/UserErrorFactory';
+import { OrdreTriEnum     } from '@/constants/OrdreTriEnum';
 
 /** ⚖️ Seuil défensif limitant la volumétrie maximale de pépites admises lors d'une extraction */
 const EXPORT_ITEMS_LIMIT: number = 10000;
@@ -102,12 +106,12 @@ export class UserExportService implements IUserExportService {
       throw UserErrorFactory.notFound(p_axUserId);
     }
 
-    // 🪓 [SCELLÉ RÉALINÉ V4] Plus aucun any ! Typage dur strict au standard IListOptions d'écurie
+    // 🪓 [RÉPARÉ V4] Utilisation des identifiants techniques nominaux réels de la RAM ('DECR' et 'CROI')
     const l_oGabaritMax: IListOptions = {
-      NbLignes: EXPORT_ITEMS_LIMIT,
+      NbLignes:   EXPORT_ITEMS_LIMIT,
       LigneDebut: 0,
       ColonneTri: 'createdAt',
-      OrdreAff: OrdreTriEnum.DeCode<OrdreTriEnum>('DESC')
+      OrdreAff:   OrdreTriEnum.DeCode<OrdreTriEnum>('DECR') // 🪓 Remplacement de 'DESC' par 'DECR'
     };
 
     const [l_oItemPack, l_oTagPack, l_oSharePack]: [
@@ -119,7 +123,7 @@ export class UserExportService implements IUserExportService {
       this.tagRepository.findByUserId(p_axUserId, {
         ...l_oGabaritMax,
         ColonneTri: 'tgName',
-        OrdreAff: OrdreTriEnum.DeCode<OrdreTriEnum>('ASC')
+        OrdreAff:   OrdreTriEnum.DeCode<OrdreTriEnum>('CROI') // 🪓 Remplacement de 'ASC' par 'CROI'
       }),
       this.shareRepository.findByUserId(p_axUserId, { ...l_oGabaritMax, ColonneTri: 'shCreatedAt' })
     ]);

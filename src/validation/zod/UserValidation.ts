@@ -5,7 +5,7 @@ import { z } from 'zod';
 /**
  * 📧 Schéma de validation pour l'adresse e-mail utilisateur.
  */
-const emailSchema = z.string().trim().toLowerCase().email('Email invalide').max(255);
+const courrielSchema = z.string().trim().toLowerCase().email('Courriel invalide').max(255);
 
 /**
  * 🔑 Schéma de validation strict pour la robustesse des mots de passe système.
@@ -20,22 +20,24 @@ const passwordSchema = z
 
 /**
  * 👤 Schéma de validation pour le pseudonyme public.
+ * [SCELLÉ RECOUVREMENT V4] Intègre constitutionnellement les trémas et caractères accentués franconiens !
  */
 const pseudoSchema = z
   .string()
   .trim()
   .min(3, 'Pseudo trop court (3 caractères min)')
   .max(30, 'Pseudo trop long (30 caractères max)')
-  .regex(/^[a-zA-Z0-9_-]+$/, 'Caractères autorisés : lettres, chiffres, _ et -');
+  // 🪓 ALIGNEMENT UNICODE : Le drapeau /u autorise les fiers trémas 'ë' et 'ï' sans ouvrir de faille SQL
+  .regex(/^[a-zA-Z0-9_\-\sàáâãäåçèéêëìíîïñòóôõöùúûüýÿæœÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝŸÆŒ]+$/u, 'Caractères autorisés : lettres (y compris accents et trémas), chiffres, _ et -');
 
 /**
  * 👥 Schéma de validation Zod pour l'inscription d'un nouvel utilisateur (RGPD inclus).
  */
 const createUserSchema = z.object({
-  email: emailSchema,
+  courriel: courrielSchema,
   password: passwordSchema,
   pseudo: pseudoSchema,
-  gdprConsent: z.boolean().refine((v): v is true => v === true, {
+  rgpdConsent: z.boolean().refine((v): v is true => v === true, {
     message: 'Le consentement RGPD est obligatoire'
   })
 });
@@ -44,10 +46,10 @@ const createUserSchema = z.object({
  * 👥 Schéma de validation Zod pour la modification globale (Administration).
  */
 const updateUserSchema = z.object({
-  email: emailSchema.optional(),
-  password: passwordSchema.optional(),
-  pseudo: pseudoSchema.optional(),
-  settingsUser: z.record(z.string(), z.unknown()).optional()
+  courriel     : courrielSchema.optional(),
+  password     : passwordSchema.optional(),
+  pseudo       : pseudoSchema.optional(),
+  settingsUser : z.record(z.string(), z.unknown()).optional()
 });
 
 /**
@@ -62,9 +64,9 @@ const deleteUserSchema = z.object({
  * 👥 Schéma de validation Zod pour la mise à jour autonome du profil.
  */
 const updateProfileSchema = z.object({
-  pseudo: z.string().trim().min(3).max(30).optional(),
-  courriel: z.string().email().max(255).optional(),
-  settingsUser: z.record(z.string(), z.unknown()).optional()
+  pseudo       : z.string().trim().min(3).max(30).optional(),
+  courriel     : z.string().email().max(255).optional(),
+  settingsUser : z.record(z.string(), z.unknown()).optional()
 });
 
 /**
@@ -90,12 +92,12 @@ const deleteAccountSchema = z.object({
 });
 
 /** 📋 Types inférés extraits des schémas d'accès et d'évolution du profil */
-export type UpdateProfileSchemaType = z.infer<typeof updateProfileSchema>;
+export type UpdateProfileSchemaType  = z.infer<typeof updateProfileSchema>;
 export type ChangePasswordSchemaType = z.infer<typeof changePasswordSchema>;
-export type DeleteAccountSchemaType = z.infer<typeof deleteAccountSchema>;
-export type CreateUserSchemaType = z.infer<typeof createUserSchema>;
-export type UpdateUserSchemaType = z.infer<typeof updateUserSchema>;
-export type DeleteUserSchemaType = z.infer<typeof deleteUserSchema>;
+export type DeleteAccountSchemaType  = z.infer<typeof deleteAccountSchema>;
+export type CreateUserSchemaType     = z.infer<typeof createUserSchema>;
+export type UpdateUserSchemaType     = z.infer<typeof updateUserSchema>;
+export type DeleteUserSchemaType     = z.infer<typeof deleteUserSchema>;
 
 /**
  * 🏛️ Classe UserValidation

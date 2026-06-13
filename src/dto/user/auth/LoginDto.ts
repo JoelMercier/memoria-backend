@@ -17,7 +17,7 @@ import { type LoginSchemaType,
 export class LoginDto {
 
   /** 📧 Adresse électronique d'identification de l'utilisateur */
-  public readonly email    : string;
+  public readonly courriel    : string;
 
   /** 🔐 Mot de passe brut à soumettre à l'infrastructure de hachage */
   public readonly password : string;
@@ -33,7 +33,7 @@ export class LoginDto {
     const l_oRawBody : Record<string, unknown> = (data && typeof data === 'object') ? (data as Record<string, unknown>) : {};
     const validated  : LoginSchemaType = AuthValidation.validateLogin(l_oRawBody);
 
-    this.email    = validated.email;
+    this.courriel = validated.courriel;
     this.password = validated.password;
   }
 }

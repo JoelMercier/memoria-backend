@@ -5,7 +5,7 @@ import { z } from 'zod';
 /**
  * 📧 Schéma de validation pour l'adresse e-mail du destinataire.
  */
-const recipientEmailSchema = z.string().email().max(255).nullable().optional();
+const recipientCourrielSchema = z.string().email().max(255).nullable().optional();
 
 /**
  * ⏱️ Schéma de validation pour l'horodatage d'expiration du lien.
@@ -43,7 +43,7 @@ const createShareSchema = z.object({
   userId: userIdSchema,
   shareId: shareIdSchema,
   itemOwnerId: z.string().trim().optional(),
-  recipientEmail: recipientEmailSchema,
+  recipientCourriel: recipientCourrielSchema,
   accessConfig: accessConfigSchema
 });
 
@@ -51,7 +51,7 @@ const createShareSchema = z.object({
  * 🔗 Schéma de validation Zod pour la mise à jour d'un Partage (Share).
  */
 const updateShareSchema = z.object({
-  recipientEmail: recipientEmailSchema,
+  recipientCourriel: recipientCourrielSchema,
   accessConfig: accessConfigSchema.optional()
 });
 

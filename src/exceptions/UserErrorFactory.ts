@@ -42,15 +42,15 @@ export class UserErrorFactory extends ApiError {
    * 🏭 Fabrique statique : Signale une collision d'adresse de correspondance sur le réseau.
    *
    * @static
-   * @function emailExists
-   * @param {string} email - L'adresse électronique en doublon
+   * @function courrielExists
+   * @param {string} Courriel - L'adresse électronique en doublon
    * @returns {UserErrorFactory} L'instance vivante de l'exception configurée
    */
-  public static emailExists(email: string): UserErrorFactory {
-    return new UserErrorFactory(`L'email « ${email} » est déjà utilisé.`, 409, {
-      code  : 'USER_EMAIL_EXISTS',
-      field : 'email',
-      value : email
+  public static courrielExists(p_sCourriel : string): UserErrorFactory {
+    return new UserErrorFactory(`Le Courriel « ${p_sCourriel} » est déjà utilisé.`, 409, {
+      code  : 'USER_COURRIEL_EXISTS',
+      field : 'courriel',
+      value : p_sCourriel
     });
   }
 
@@ -62,7 +62,7 @@ export class UserErrorFactory extends ApiError {
    * @returns {UserErrorFactory} L'instance vivante de l'exception configurée
    */
   public static invalidCredentials(): UserErrorFactory {
-    return new UserErrorFactory('Email ou mot de passe incorrect.', 401, {
+    return new UserErrorFactory('Courriel ou mot de passe incorrect.', 401, {
       code : 'INVALID_CREDENTIALS'
     });
   }

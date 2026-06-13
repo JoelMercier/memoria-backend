@@ -1,9 +1,10 @@
 // ——— fichier : src/services/http/HandlerService.ts
 
 import type { NextFunction, Request, Response } from 'express';
-import { LoggerSingleton } from '@/config/LoggerSingleton';
-import { ApiError } from '@/exceptions/ApiError';
-import type { IHandlerService } from '@/interfaces/http/IHandlerService';
+import type { IHandlerService                } from '@/interfaces/http/IHandlerService';
+
+import { LoggerSingleton    } from '@/config/LoggerSingleton';
+import { ApiError           } from '@/exceptions/ApiError';
 import { ApiResponseFactory } from '@/utils/ApiResponseFactory';
 import { RequestIdGenerator } from '@/utils/RequestIdGenerator';
 

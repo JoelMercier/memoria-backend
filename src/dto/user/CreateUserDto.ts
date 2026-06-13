@@ -17,7 +17,7 @@ import { type CreateUserSchemaType,
 export class CreateUserDto {
 
   /** 📧 Adresse électronique d'identification de l'utilisateur */
-  public readonly email       : string;
+  public readonly courriel    : string;
 
   /** 🔐 Mot de passe brut à hacher par l'infrastructure */
   public readonly password    : string;
@@ -39,9 +39,9 @@ export class CreateUserDto {
     const l_oRawBody : Record<string, unknown> = (data && typeof data === 'object') ? (data as Record<string, unknown>) : {};
     const validated  : CreateUserSchemaType = UserValidation.validateCreate(l_oRawBody);
 
-    this.email       = validated.email;
+    this.courriel    = validated.courriel;
     this.password    = validated.password;
     this.pseudo      = validated.pseudo;
-    this.rgpdConsent = validated.gdprConsent; // 🪓 ALIGNEMENT NOMINAL : Raccordement étanche GDPR -> RGPD
+    this.rgpdConsent = validated.rgpdConsent;
   }
 }
