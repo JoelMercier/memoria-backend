@@ -1,7 +1,7 @@
 // ——— fichier : src/domain/value-objects/ids/ContentTypeId.ts
 
-import { IdChoupy }   from '@/domain/base/idCore/IdChoupy';
-import { ChoupyEnum } from '@/domain/base/idCore/ChoupyEnum';
+import { IdChoupy   } from '@/constants/Choupy/IdChoupy';
+import { ChoupyEnum } from '@/constants/Choupy/ChoupyEnum';
 
 /**
  * 📦 Classe ContentTypeId 💎

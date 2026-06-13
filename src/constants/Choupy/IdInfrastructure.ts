@@ -1,4 +1,4 @@
-// ——— fichier : src/domain/base/IdInfrastructure.ts
+// ——— fichier : src\constants\Choupy\IdInfrastructure.ts
 
 /**
  * 🧱 Classe Abstraite IdInfrastructure 🧪 (L'Ancêtre Suprême des Clés Disque)

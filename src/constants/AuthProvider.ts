@@ -1,6 +1,6 @@
 // ——— fichier : src/constants/AuthProvider.ts
 
-import { SmartEnum } from './base/SmartEnum';
+import { SmartEnum } from './Choupy/SmartEnum';
 
 /**
  * 🔐 Classe AuthProvider 🧮 (Le Verrouilleur de Protocoles SSO 🤖)

@@ -1,6 +1,6 @@
 // ——— fichier : src/constants/Role.ts
 
-import { SmartEnum } from '@/constants/base/SmartEnum';
+import { SmartEnum } from '@/constants/Choupy/SmartEnum';
 
 /**
  * 👥 Classe Role 🧮 (Le Régulateur des Rangs Applicatifs 🤖)

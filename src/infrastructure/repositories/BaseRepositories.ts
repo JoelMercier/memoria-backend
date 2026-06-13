@@ -1,7 +1,7 @@
 // ——— fichier : src/infrastructure/repositories/BaseRepository.ts
 
 import { Pool, PoolClient } from 'pg';
-import { IdBinaire } from '@/domain/base/IdBinaire';
+import { IdBinaire } from '@/constants/Choupy/IdBinaire';
 import { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
 
 
@@ -90,7 +90,7 @@ export abstract class BaseRepository {
       if (l_oClient) {
         l_oClient.release();
       }
-      
+
     }
   }
 }

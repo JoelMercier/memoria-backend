@@ -1,6 +1,6 @@
 // ——— fichier : src/constants/AppEventCategory.ts
 
-import { SmartEnum } from './base/SmartEnum';
+import { SmartEnum } from './Choupy/SmartEnum';
 
 /**
  * 🏛️ Classe AppEventCategory 🗄️ (Le Sécuriseur de Domaines d Audit 🤖)

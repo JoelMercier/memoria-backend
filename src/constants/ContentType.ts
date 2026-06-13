@@ -1,6 +1,6 @@
 // ——— fichier : src/constants/ContentType.ts
 
-import { SmartEnum } from './base/SmartEnum';
+import { SmartEnum } from './Choupy/SmartEnum';
 
 /**
  * 📦 Classe ContentType 🧮 (Le Calibreur de Formats Médias 🤖)

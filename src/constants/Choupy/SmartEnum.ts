@@ -1,4 +1,5 @@
-// ——— fichier : src/constants/base/SmartEnum.ts
+// ——— fichier : src\constants\Choupy\SmartEnum.ts
+
 
 /**
  * 🤖 Classe Abstraite SmartEnum 🧮 (Le Calibreur de Quadrigrammes Système 🔌)

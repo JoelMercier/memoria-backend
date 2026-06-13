@@ -1,4 +1,4 @@
-import { SmartEnum } from '@/constants/base/SmartEnum';
+import { SmartEnum } from '@/constants/Choupy/SmartEnum';
 
 /**
  * 🏛️ Classe EventSecteur 🗄️ (Le Sécuriseur de Secteurs d'Audit 🤖)

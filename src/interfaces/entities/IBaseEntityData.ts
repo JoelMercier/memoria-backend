@@ -1,9 +1,9 @@
 // ——— fichier : src/interfaces/entities/IBaseEntityData.ts
 
 import      { Buffer           } from 'node:buffer';
-import type { IdInfrastructure } from '@/domain/base/IdInfrastructure';
-import type { IdBinaire        } from '@/domain/base/IdBinaire';
-import { IdChoupy } from '@/domain/base/idCore/IdChoupy';
+import type { IdInfrastructure } from '@/constants/Choupy/IdInfrastructure';
+import type { IdBinaire        } from '@/constants/Choupy/IdBinaire';
+import { IdChoupy } from '@/constants/Choupy/IdChoupy';
 
 
 /**

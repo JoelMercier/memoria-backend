@@ -1,4 +1,5 @@
-// ——— fichier : src\domain\base\idCore\IdChoupy.ts
+// ——— fichier : src\constants\Choupy\IdChoupy.ts
+
 
 // 🗲 [Choupy'Doctrine] Importation relative pour garantir l'autonomie (pas de '@/...')
 // absolue et la portabilité universelle du bloc idCore dans mes futurs projets.

@@ -1,4 +1,4 @@
-import { SmartEnum } from '@/constants/base/SmartEnum';
+import { SmartEnum } from '@/constants/Choupy/SmartEnum';
 
 /**
  * 🏛️ Classe EventAction 🗄️ (Le Calibreur d'Actions d'Audit 🤖)

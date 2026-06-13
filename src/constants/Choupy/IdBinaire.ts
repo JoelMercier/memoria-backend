@@ -1,4 +1,4 @@
-// ——— fichier : src/domain/base/IdBinaire.ts
+// ——— fichier : src\constants\Choupy\IdBinaire.ts
 
 import { Buffer } from 'node:buffer';
 

@@ -1,6 +1,6 @@
 // ——— fichier : src/constants/OrdreTriEnum.ts
 
-import { SmartEnum } from '@/constants/base/SmartEnum';
+import { SmartEnum } from '@/constants/Choupy/SmartEnum';
 
 /**
  * 🎛️ Classe OrdreTriEnum 🧮 (Le Régulateur de Directives SQL 🤖)
