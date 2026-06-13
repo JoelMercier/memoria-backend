@@ -1,14 +1,12 @@
 // ——— fichier : src/entities/User.ts
 
-import type { IUser     } from '@/interfaces/entities/user/IUser';
+import type { IUser } from '@/interfaces/entities/user/IUser';
 import type { IUserData } from '@/interfaces/entities/user/IUserData';
-import type { UserId    } from '@/domain/value-objects/ids';
+import { ProviderId, RoleId, type UserId } from '@/domain/value-objects/ids';
 
-import { BaseEntity   } from '@/entities/BaseEntity';
-import { Role         } from '@/constants/Role';
+import { BaseEntity } from '@/entities/BaseEntity';
+import { Role } from '@/constants/Role';
 import { AuthProvider } from '@/constants/AuthProvider';
-import { RoleId,
-         ProviderId   } from '@/domain/value-objects/ids';
 
 /**
  * 🏛️ Classe User 👥 (Le Modèle Métier Immuable de l'Acteur)
@@ -16,43 +14,40 @@ import { RoleId,
  * Représente un utilisateur authentifié au sein du Domaine de Mémoria.
  * Protégé nominalement par la notation hongroise et piloté par les Smart Enums.
  *
- * SOLID :
- *  - SRP 📐 : Unique responsabilité de piloter le cycle de vie et les droits de l'acteur.
- *
  * @class User
  * @extends {BaseEntity<'user', IUserData, UserId>}
  * @implements {IUser}
  * @author Conception & Vision : Joël (Purement infonctionnel et Void capillaire)
  * @author Rabotage du Code : Gaïa (Au burin, alignée sur le standard sans parenthèses V4)
+ * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers en surchauffe de la V4)
  */
 export class User extends BaseEntity<'user', IUserData, UserId> implements IUser {
-
   /** 🔔 Caillou de couleur : Identifiant unique immuable de l'utilisateur (idUser) */
-  private readonly m_idUser           : UserId;
+  private readonly m_idUser: UserId;
 
   /** 📧 Adresse électronique unique servant d'identifiant de connexion (email) */
-  private readonly m_sCourriel        : string;
+  private readonly m_sCourriel: string;
 
   /** 🔐 Empreinte cryptographique du mot de passe haché (passwordHash) */
-  private readonly m_sPasswordHash    : string;
+  private readonly m_sPasswordHash: string;
 
   /** 👤 Pseudonyme public d'affichage de l'utilisateur (pseudo) */
-  private readonly m_sPseudo          : string;
+  private readonly m_sPseudo: string;
 
   /** 🗂️ Instance de Smart Enum gérant les privilèges de sécurité hiérarchiques (role) */
-  private readonly m_eRole            : Role;
+  private readonly m_eRole: Role;
 
   /** 🌐 Instance de Smart Enum fixant le fournisseur d'identité d'origine (authProvider) */
-  private readonly m_eAuthProvider    : AuthProvider;
+  private readonly m_eAuthProvider: AuthProvider;
 
   /** 🗄️ Dictionnaire de configuration des préférences de l'interface utilisateur (settingsUser) */
-  private readonly m_rSettingsUser    : Record<string, any>;
+  private readonly m_rSettingsUser: Record<string, unknown>; // 🪓 [RÉPARÉ V4] Fin du any lâche !
 
   /** 🛡️ Indicateur légal d'approbation des conditions d'utilisation (rgpdConsent) */
-  private readonly m_bRgpdConsent     : boolean;
+  private readonly m_bRgpdConsent: boolean;
 
   /** ⏱️ Horodatage précis du scellage du consentement aux règles RGPD (rgpdConsentDate) */
-  private readonly m_dRgpdConsentDate : Date | null;
+  private readonly m_dRgpdConsentDate: Date | null;
 
   /**
    * Instancie un utilisateur immuable à partir de son contrat de données.
@@ -62,17 +57,23 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
    */
   public constructor(p_oData: IUserData) {
     super(p_oData);
-    this.m_idUser           = p_oData.idUser;
-    this.m_sCourriel        = p_oData.email;
-    this.m_sPasswordHash    = p_oData.passwordHash;
-    this.m_sPseudo          = p_oData.pseudo;
+    this.m_idUser = p_oData.idUser;
+    this.m_sCourriel = p_oData.courriel;
+    this.m_sPasswordHash = p_oData.passwordHash;
+    this.m_sPseudo = p_oData.pseudo;
 
-    // 🪓 TRADUCTION CHIRURGICALE : Conversion des nouveaux IDs d'infrastructure en SmartEnums vivants
-    this.m_eRole            = Role.fromSql ? Role.fromSql(p_oData.roleId.valeur) : (p_oData as any).role;
-    this.m_eAuthProvider    = AuthProvider.fromSql(p_oData.authProviderId.valeur);
+    // 🪓 TRADUCTION INDUSTRIELLE : Extraction via le Smart Enum avec fallback sécurisé sans aucun "any" menteur !
+    const l_oPotentialRole = Role.fromSql ? Role.fromSql(p_oData.roleId.valeur) : null;
+    if (!l_oPotentialRole) {
+      throw new Error(
+        `[Erreur Silicium 🚨] Impossible de résoudre le rôle d'infrastructure pour l'utilisateur.`
+      );
+    }
+    this.m_eRole = l_oPotentialRole;
+    this.m_eAuthProvider = AuthProvider.fromSql(p_oData.authProviderId.valeur);
 
-    this.m_rSettingsUser    = p_oData.settingsUser || {};
-    this.m_bRgpdConsent     = p_oData.rgpdConsent;
+    this.m_rSettingsUser = p_oData.settingsUser || {};
+    this.m_bRgpdConsent = p_oData.rgpdConsent;
     this.m_dRgpdConsentDate = p_oData.rgpdConsentDate ?? null;
   }
 
@@ -83,7 +84,6 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
    * @returns {UserId} Le Value Object de l'identifiant utilisateur
    */
   public get idUser(): UserId {
-    // 🪓 [RÉPARÉ V4] Passage en propriété de surface pure
     return this.m_idUser;
   }
 
@@ -141,9 +141,10 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
    * 🗄️ VRAI GETTER : Dictionnaire des préférences d'interface.
    *
    * @public
-   * @returns {Record<string, any>} Bloc JSON contenant la configuration utilisateur
+   * @returns {Record<string, unknown>} Bloc JSON contenant la configuration utilisateur
    */
-  public get settingsUser(): Record<string, any> {
+  public get settingsUser(): Record<string, unknown> {
+    // 🪓 [RÉPARÉ V4] Aligné sur unknown
     return this.m_rSettingsUser;
   }
 
@@ -177,7 +178,6 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
   public aLeDroitAccederA(p_oRoleMinimalRequis: Role): boolean {
     return this.m_eRole.estSuperieurOuEgalA(p_oRoleMinimalRequis);
   }
-
   /**
    * 📦 Extrait le sac de données passif correspondant à l'état vivant de l'entité.
    * [SCELLÉ RECOUVREMENT] Interrogation constitutionnelle et exclusive des variables hongroises.
@@ -187,17 +187,17 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
    */
   public toData(): IUserData {
     return {
-      idUser          : this.idUser,
-      email           : this.courriel,
-      passwordHash    : this.passwordHash,
-      pseudo          : this.pseudo,
-      roleId          : new RoleId(this.role.code.toString()),
-      authProviderId  : new ProviderId(this.authProvider.code.toString()),
-      settingsUser    : this.settingsUser,
-      rgpdConsent     : this.rgpdConsent,
-      rgpdConsentDate : this.rgpdConsentDate ?? new Date(),
-      createdAt       : this.createdAt,
-      updatedAt       : this.updatedAt
+      idUser: this.idUser,
+      courriel: this.courriel,
+      passwordHash: this.passwordHash,
+      pseudo: this.pseudo,
+      roleId: new RoleId(this.role.code.toString()),
+      authProviderId: new ProviderId(this.authProvider.code.toString()),
+      settingsUser: this.settingsUser,
+      rgpdConsent: this.rgpdConsent,
+      rgpdConsentDate: this.rgpdConsentDate ?? new Date(),
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt
     };
   }
 

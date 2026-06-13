@@ -1,125 +1,105 @@
+// ——— fichier : src/constants/base/ChoupyEnum.ts
+
 import { SmartEnum } from '@/constants/base/SmartEnum';
 
 /**
  * 🎛️ Classe ChoupyEnum 📐 (Le Calibreur et Protecteur de Buffers Binaires 🤖)
  * ----------------------------------------------------------------------------
  * Verrouille constitutionnellement les dimensions physiques maximales de la RAM.
- * Gère la douane active polymorphe (Buffer, Hexa, UUID) face au standard ByteA.
+ * Gère la douane active polymorphe (Buffer, Hexa, UUID, Texte Clair) face au ByteA.
  *
  * @class ChoupyEnum
  * @extends {SmartEnum<number>}
  * @author Directrice du Silicium : Joël (MANIAC de la Justification Technique)
- * @author Métallurgie des Octets : Gaïa (Au burin, redressée sur la Choupy Doctrine)
+ * @author Métallurgie des Octets : Gaïa (Au burin, redressée sur la Choupy Doctrine V4)
+ * @author Garde d'Élite des Types : La Vague Initiale (Ouvriers en surchauffe de la V4)
  */
 export class ChoupyEnum extends SmartEnum<number> {
-
   /** 🛡️ Regex de soute : Validation stricte du format UUID v4/v7 (36 caractères, hex + tirets) */
-  private static readonly m_rRegexUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+  private static readonly m_rRegexUuid =
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
   /** 🛡️ Regex de soute : Validation de la pureté hexadécimale (Uniquement 0-9 et a-f) */
   private static readonly m_rRegexHexa = /^[0-9a-fA-F]+$/;
 
   /**
    * Moule et scelle une dimension d'infrastructure immuable en RAM.
-   *
-   * @private
-   * @constructor
-   * @param {string} p_sLibelle - Le libellé machine explicite et choupy
-   * @param {number} p_nLongueurOctets - La taille physique stricte en octets
-   * @param {number} p_nOrdreAff - La position numérique de tri logique
+   * Constructeur privé pour interdire l'anarchie des tailles en dehors de la forge.
    */
   private constructor(p_sLibelle: string, p_nLongueurOctets: number, p_nOrdreAff: number) {
     super(p_sLibelle, p_nLongueurOctets, p_nOrdreAff);
-
-    // 🗲 Gel constitutionnel de l'instance pour interdire toute altération en RAM
     Object.freeze(this);
   }
 
-  /**
-   * ⚖️ Obtient le poids équivalent de la dimension converti en bits.
-   *
-   * @public
-   * @returns {number} Le nombre total de bits (Octets * 8)
-   */
+  /** @public @returns {number} Le nombre total de bits */
   public get bits(): number {
     return this.code * 8;
   }
 
-  /**
-   * ⚖️ Obtient la contenance équivalente convertie en Kilo-octets (Ko).
-   *
-   * @public
-   * @returns {number} La dimension en Ko (Octets / 1024)
-   */
+  /** @public @returns {number} La dimension en Ko */
   public get kiloOctets(): number {
     return this.code / 1024;
   }
 
   /**
-   * 🔍 Extracteur statique sécurisé pour clé numérique.
-   * Évite l'échec de typage si le code est passé sous forme de chaîne numérique.
-   *
-   * @static
-   * @param {string | number} p_vCode - Le poids en octet recherché
-   * @returns {ChoupyEnum} L'instance de calibre correspondante
-   */
-  public static override DeCode<E extends SmartEnum<any>>(p_vCode: string | number): E {
-    const l_nCodeNormalise = typeof p_vCode === 'string' ? parseInt(p_vCode, 10) : p_vCode;
-    return super.DeCode(l_nCodeNormalise);
-  }
-
-  /**
    * 🛡️ Douane Active Polymorphe : Valide la conformité d'une donnée face au calibre physique.
-   * Accepte et décode les Buffers binaires, les chaînes UUID v7 et les trames Hexadécimales brutes.
-   *
-   * @public
-   * @param {unknown} p_vDonnee - La structure ou primitive textuelle à soumettre au guichet
-   * @throws {Error} Si la longueur physique ou le format de transport viole la contrainte de la soute
-   * @returns {void}
+   * [RÉPARÉ V4] Intègre constitutionnellement le format texte clair (1 caractère = 1 octet) !
    */
   public validerContenance(p_vDonnee: unknown): void {
     const l_sNomDimension = this.libelle;
 
-    // Cas d'école 1 : C'est un Buffer binaire pur (Format ByteA de persistance)
     if (Buffer.isBuffer(p_vDonnee)) {
       if (p_vDonnee.length !== this.code) {
-        throw new Error(`[Erreur Silicium 🚨] Le buffer binaire a une taille de ${p_vDonnee.length} octets, attendu exactement ${this.code} octets pour : ${l_sNomDimension}.`);
+        throw new Error(
+          `[Erreur Silicium 🚨] Le buffer binaire a une taille de ${p_vDonnee.length} octets, attendu exactement ${this.code} octets pour : ${l_sNomDimension}.`
+        );
       }
       return;
     }
 
-    // Cas d'école 2 : C'est une chaîne de caractères de transport (Réseau / Tuyau)
     if (typeof p_vDonnee === 'string') {
       const l_sTexteNettoye = p_vDonnee.trim();
 
-      // Sous-cas A : C'est le format UUID textuel standard à 36 caractères (avec tirets) pour un calibre 16 octets
+      // Sous-cas A : Le format UUID textuel standard à 36 caractères pour un calibre 16 octets
       if (this.code === 16 && l_sTexteNettoye.length === 36) {
         if (!ChoupyEnum.m_rRegexUuid.test(l_sTexteNettoye)) {
-          throw new Error(`[Erreur Silicium 🚨] La chaîne de transport de 36 caractères n'est pas un UUID structurellement valide pour : ${l_sNomDimension}.`);
+          throw new Error(
+            `[Erreur Silicium 🚨] La chaîne de transport de 36 caractères n'est pas un UUID structurellement valide pour : ${l_sNomDimension}.`
+          );
         }
         return;
       }
 
-      // Sous-cas B : C'est une trame Hexadécimale brute (1 octet physique = 2 caractères hexa)
-      const l_nLongueurAttendueHexa = this.code * 2;
-      if (l_sTexteNettoye.length !== l_nLongueurAttendueHexa) {
-        throw new Error(`[Erreur Silicium 🚨] La chaîne de transport textuelle fait ${l_sTexteNettoye.length} caractères, attendu exactement ${l_nLongueurAttendueHexa} caractères (format Hexa) pour : ${l_sNomDimension}.`);
+      // Sous-cas B : Le format texte clair brut (1 caractère textuel standard = 1 octet physique)
+      // [INSÉRÉ V4] Permet le transit de fiers quadrigrammes nominaux comme 'SYST' ou 'CONN'
+      if (l_sTexteNettoye.length === this.code) {
+        return;
       }
 
-      if (!ChoupyEnum.m_rRegexHexa.test(l_sTexteNettoye)) {
-        throw new Error(`[Erreur Silicium 🚨] La trame de transport contient des caractères invalides pour le format Hexadécimal pour : ${l_sNomDimension}.`);
+      // Sous-cas C : Le format Trame Hexadécimale codée (1 octet physique = 2 caractères hexa)
+      const l_nLongueurAttendueHexa = this.code * 2;
+      if (l_sTexteNettoye.length === l_nLongueurAttendueHexa) {
+        if (!ChoupyEnum.m_rRegexHexa.test(l_sTexteNettoye)) {
+          throw new Error(
+            `[Erreur Silicium 🚨] La trame de transport contient des caractères invalides pour le format Hexadécimal pour : ${l_sNomDimension}.`
+          );
+        }
+        return;
       }
-      return;
+
+      throw new Error(
+        `[Erreur Silicium 🚨] La chaîne de transport textuelle fait ${l_sTexteNettoye.length} caractères, attendu exactement ${this.code} (texte clair) ou ${l_nLongueurAttendueHexa} (format Hexa) pour : ${l_sNomDimension}.`
+      );
     }
 
-    // Cas pathologique : La structure passée n'est pas gérée par le décodeur
-    throw new Error(`[Erreur Sémantique 🚨] Type de donnée inconnu au poste-frontière de ChoupyEnum. Impossible de valider la contenance.`);
+    throw new Error(
+      `[Erreur Sémantique 🚨] Type de donnée inconnu au poste-frontière de ChoupyEnum. Impossible de valider la contenance.`
+    );
   }
 
   // ----------------------------------------------------------------------------
   // 🏺 LES CALIBRES MACHINES ENRAMÉS (Garantie absolue de l'alignement matériel)
   // ----------------------------------------------------------------------------
-
   public static readonly DIM_1 = new ChoupyEnum('1 octet (char)', 1, 5);
   public static readonly DIM_2 = new ChoupyEnum('2 octets (mot 16 bits)', 2, 10);
   public static readonly DIM_3 = new ChoupyEnum('3 octets (Trigramme 24 bits)', 3, 15);

@@ -81,10 +81,10 @@ export class UserService implements IUserService {
       throw UserErrorFactory.notFound(p_axUserId);
     }
 
-    if (p_oDto.email && p_oDto.email.toLowerCase() !== l_oExisting.courriel.toLowerCase()) {
-      const l_oByEmail: User | null = await this.repository.findByEmail(p_oDto.email);
+    if (p_oDto.courriel && p_oDto.courriel.toLowerCase() !== l_oExisting.courriel.toLowerCase()) {
+      const l_oByEmail: User | null = await this.repository.findByEmail(p_oDto.courriel);
       if (l_oByEmail) {
-        throw UserErrorFactory.profileConflict('email', p_oDto.email);
+        throw UserErrorFactory.profileConflict('email', p_oDto.courriel);
       }
     }
 
@@ -96,8 +96,8 @@ export class UserService implements IUserService {
     }
 
     const l_oUpdates: Partial<IUserData> = {};
-    if (p_oDto.email !== undefined) {
-      l_oUpdates.email = p_oDto.email;
+    if (p_oDto.courriel !== undefined) {
+      l_oUpdates.courriel = p_oDto.courriel;
     }
     if (p_oDto.pseudo !== undefined) {
       l_oUpdates.pseudo = p_oDto.pseudo;

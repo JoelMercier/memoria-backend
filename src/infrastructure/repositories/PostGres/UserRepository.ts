@@ -1,35 +1,35 @@
 // ——— fichier : src/infrastructure/repositories/PostGres/UserRepository.ts
 
-import type { QueryResultRow }        from 'pg';
-import { BaseRepository }       from '@/infrastructure/repositories/BaseRepositories';
+import type { QueryResultRow } from 'pg';
+import { BaseRepository } from '@/infrastructure/repositories/BaseRepositories';
 import { UserId, RoleId, ProviderId } from '@/domain/value-objects/ids';
-import { User }                 from '@/entities/User';
+import { User } from '@/entities/User';
 import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
-import { UserErrorFactory }     from '@/exceptions/UserErrorFactory';
-import type { IUserData }        from '@/interfaces/entities/user/IUserData';
-import type { IUserRepository }  from '@/interfaces/repositories/PostGres/IUserRepository';
-import { IDatabaseConnection }  from '@/interfaces/database/IDatabaseConnection';
-import type { IListOptions }         from '@/interfaces/shared/IListOptions';
-import type { IListResult }          from '@/interfaces/shared/IListResult';
-import OrdreTriEnum                 from '@/constants/OrdreTriEnum';
+import { UserErrorFactory } from '@/exceptions/UserErrorFactory';
+import type { IUserData } from '@/interfaces/entities/user/IUserData';
+import type { IUserRepository } from '@/interfaces/repositories/PostGres/IUserRepository';
+import type { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
+import type { IListOptions } from '@/interfaces/shared/IListOptions';
+import type { IListResult } from '@/interfaces/shared/IListResult';
+import OrdreTriEnum from '@/constants/OrdreTriEnum';
 
 /**
  * 🗄️ Interface IUserRow (Miroir Physique Jojo-Style des Acteurs 🔌)
  * Alignée au caractère près sur l'ordre physique décroissant anti-padding de la base.
  */
 interface IUserRow extends QueryResultRow {
-  usIdUser        : Buffer;    // 16 octets fixes tassés en RAM
-  usCourriel      : string;
-  usPasswordHash  : string;
-  usPseudo        : string;
-  usIdRole        : string;    // Char(4) dictionnaire
-  usIdProvider    : string;    // Char(4) dictionnaire
-  usSettingsUser  : Record<string, any>;
-  usGdprConsent   : boolean;
-  usGdprDate      : Date | null;
-  usCreatedAt     : Date;
-  usUpdatedAt     : Date | null;
-  rNbLignesTotal? : string;    // Volumétrie calculée par le chateau
+  usIdUser: Buffer; // 16 octets fixes tassés en RAM
+  usCourriel: string;
+  usPasswordHash: string;
+  usPseudo: string;
+  usIdRole: string; // Char(4) dictionnaire
+  usIdProvider: string; // Char(4) dictionnaire
+  usSettingsUser: Record<string, string>;
+  usGdprConsent: boolean;
+  usGdprDate: Date | null;
+  usCreatedAt: Date;
+  usUpdatedAt: Date | null;
+  rNbLignesTotal?: string; // Volumétrie calculée par le chateau
 }
 
 /**
@@ -45,7 +45,6 @@ interface IUserRow extends QueryResultRow {
  * @author Rabotage du Code : Gaïa (Au burin, nettoyée de ses écarts de soute V4)
  */
 export class UserRepository extends BaseRepository implements IUserRepository {
-
   /**
    * Initialise le dépôt des profils via le pool global d'infrastructure 🔌.
    *
@@ -66,18 +65,18 @@ export class UserRepository extends BaseRepository implements IUserRepository {
    */
   private LigneVersActeur(p_oRow: IUserRow): User {
     return new User({
-      idUser          : new UserId(p_oRow.usIdUser), // Instanciation directe étanche [Mémoria]
-      email           : p_oRow.usCourriel,
-      passwordHash    : p_oRow.usPasswordHash,
-      pseudo          : p_oRow.usPseudo,
-      roleId          : new RoleId(p_oRow.usIdRole),
-      authProviderId  : new ProviderId(p_oRow.usIdProvider),
-      settingsUser    : p_oRow.usSettingsUser,
-      rgpdConsent     : p_oRow.usGdprConsent,
-      rgpdConsentDate : p_oRow.usGdprDate ?? undefined,
-      createdAt       : p_oRow.usCreatedAt,
-      updatedAt       : p_oRow.usUpdatedAt ?? undefined
-    } as any);
+      idUser: new UserId(p_oRow.usIdUser), // Instanciation directe étanche [Mémoria]
+      courriel: p_oRow.usCourriel,
+      passwordHash: p_oRow.usPasswordHash,
+      pseudo: p_oRow.usPseudo,
+      roleId: new RoleId(p_oRow.usIdRole),
+      authProviderId: new ProviderId(p_oRow.usIdProvider),
+      settingsUser: p_oRow.usSettingsUser,
+      rgpdConsent: p_oRow.usGdprConsent,
+      rgpdConsentDate: p_oRow.usGdprDate ?? undefined,
+      createdAt: p_oRow.usCreatedAt,
+      updatedAt: p_oRow.usUpdatedAt ?? undefined
+    });
   }
 
   /**
@@ -149,10 +148,9 @@ export class UserRepository extends BaseRepository implements IUserRepository {
    */
   public async existsByPseudo(p_sPseudo: string): Promise<boolean> {
     try {
-      const l_oResult = await this.db.query(
-        'Select 1 From "Users" Where "usPseudo" = Trim($1);',
-        [p_sPseudo]
-      );
+      const l_oResult = await this.db.query('Select 1 From "Users" Where "usPseudo" = Trim($1);', [
+        p_sPseudo
+      ]);
       return (l_oResult.rowCount ?? 0) > 0;
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
@@ -169,7 +167,7 @@ export class UserRepository extends BaseRepository implements IUserRepository {
         'Select * From "CreerActeur"($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);',
         [
           p_oData.idUser,
-          p_oData.email,
+          p_oData.courriel,
           p_oData.passwordHash,
           p_oData.pseudo,
           p_oData.roleId.valeur,
@@ -189,7 +187,8 @@ export class UserRepository extends BaseRepository implements IUserRepository {
       if (l_oErreur instanceof UserErrorFactory) throw l_oErreur;
       const l_sMessage = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
 
-      if (l_sMessage.includes('Users_usCourriel_Udx')) throw UserErrorFactory.emailExists(p_oData.email);
+      if (l_sMessage.includes('Users_usCourriel_Udx'))
+        throw UserErrorFactory.emailExists(p_oData.courriel);
       throw UserErrorFactory.creation(l_sMessage);
     }
   }
@@ -203,7 +202,7 @@ export class UserRepository extends BaseRepository implements IUserRepository {
         'Select * From "ModifierActeur"($1, $2, $3, $4, $5, $6, $7, $8, $9);',
         [
           p_oIdUser,
-          p_oData.email ?? null,
+          p_oData.courriel ?? null,
           p_oData.passwordHash ?? null,
           p_oData.pseudo ?? null,
           p_oData.settingsUser ?? null,
@@ -214,7 +213,8 @@ export class UserRepository extends BaseRepository implements IUserRepository {
         ]
       );
 
-      if (!l_oResult.rows || l_oResult.rows.length === 0) throw UserErrorFactory.notFound(p_oIdUser);
+      if (!l_oResult.rows || l_oResult.rows.length === 0)
+        throw UserErrorFactory.notFound(p_oIdUser);
       return this.LigneVersActeur(l_oResult.rows[0]);
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
@@ -227,7 +227,10 @@ export class UserRepository extends BaseRepository implements IUserRepository {
    */
   public async delete(p_oIdUser: UserId): Promise<boolean> {
     try {
-      const l_oResult = await this.db.query('Delete From public."Users" Where "usIdUser" = "Bin-UUID"($1);', [p_oIdUser]);
+      const l_oResult = await this.db.query(
+        'Delete From public."Users" Where "usIdUser" = "Bin-UUID"($1);',
+        [p_oIdUser]
+      );
       return (l_oResult.rowCount ?? 0) > 0;
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
@@ -249,9 +252,10 @@ export class UserRepository extends BaseRepository implements IUserRepository {
    */
   public async findAll(p_oOptions: IListOptions): Promise<IListResult<User>> {
     try {
-      const l_nLimit    = p_oOptions.NbLignes ?? 50;
-      const l_nOffset   = p_oOptions.LigneDebut ?? 0;
-      const l_sOrdreTri = p_oOptions.OrdreAff instanceof OrdreTriEnum ? p_oOptions.OrdreAff.code : 'DESC';
+      const l_nLimit = p_oOptions.NbLignes ?? 50;
+      const l_nOffset = p_oOptions.LigneDebut ?? 0;
+      const l_sOrdreTri =
+        p_oOptions.OrdreAff instanceof OrdreTriEnum ? p_oOptions.OrdreAff.code : 'DESC';
 
       // 🗲 Appel de l'extracteur global de soute sans un seul pixel de SQL volant !
       const l_oResult = await this.db.query<IUserRow>(
@@ -264,11 +268,11 @@ export class UserRepository extends BaseRepository implements IUserRepository {
       const l_aoLignes = l_oResult.rows.map((l_oRow) => this.LigneVersActeur(l_oRow));
 
       return {
-        LigneDebut:    l_nOffset,
-        NbLignesDem:   l_nLimit,
-        NbLignesRenv:  l_aoLignes.length,
+        LigneDebut: l_nOffset,
+        NbLignesDem: l_nLimit,
+        NbLignesRenv: l_aoLignes.length,
         NbLignesTotal: l_nTotal,
-        Lignes:        l_aoLignes
+        Lignes: l_aoLignes
       };
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';

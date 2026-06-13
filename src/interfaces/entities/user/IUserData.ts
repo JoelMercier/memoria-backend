@@ -1,6 +1,6 @@
 // ——— fichier : src/interfaces/entities/user/IUserData.ts
 
-import type { IBaseEntityData }            from '@/interfaces/entities/IBaseEntityData';
+import type { IBaseEntityData } from '@/interfaces/entities/IBaseEntityData';
 import type { UserId, RoleId, ProviderId } from '@/domain/value-objects/ids';
 
 /**
@@ -22,7 +22,7 @@ export interface IUserData extends IBaseEntityData<'user', UserId> {
   // L'identifiant "idUser: UserId" et "createdAt / updatedAt" sont hérités de IBaseEntityData !
 
   /** 📧 Adresse courriel unique et vérifiée de connexion réseau */
-  email: string;
+  courriel: string;
 
   /** 🔑 Empreinte cryptographique (Hachage d'acier) du secret d'accès */
   passwordHash: string;
@@ -37,7 +37,7 @@ export interface IUserData extends IBaseEntityData<'user', UserId> {
   authProviderId: ProviderId;
 
   /** ⚙️ Préférences locales d affichage et configurations système au format JSONB */
-  settingsUser: Record<string, any>;
+  settingsUser: Record<string, unknown>;
 
   /** 📜 Consentement explicite aux réglementations de protection des données (RGPD) */
   rgpdConsent: boolean;

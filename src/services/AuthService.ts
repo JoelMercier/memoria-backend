@@ -93,7 +93,7 @@ export class AuthService implements IAuthService {
 
     const l_oUserData: IUserData = {
       idUser: new UserId(IdForge.genererUuidV7()),
-      email: p_oDto.email,
+      courriel: p_oDto.email,
       passwordHash: l_sPasswordHash,
       pseudo: p_oDto.pseudo,
       roleId: new RoleId('CUST'),

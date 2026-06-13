@@ -20,7 +20,12 @@ const createMockUser = (): User =>
     courriel: 'joel@memoria.fr',
     passwordHash: 'SECRET_HACHE_CONFORME',
     pseudo: 'DR-DOS-Maniac',
-    role: { code: 'admin' } as any
+    role: { code: 'CUST' } as any,
+    authProvider: { code: 'LOCA' } as any,
+    settingsUser: {},
+    rgpdConsent: true,
+    rgpdConsentDate: new Date(),
+    createdAt: new Date()
   }) as unknown as User;
 
 describe('AuthService', () => {

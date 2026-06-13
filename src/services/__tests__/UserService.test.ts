@@ -9,14 +9,26 @@ import { ChangePasswordDto } from '@/dto/user/ChangePasswordDto';
 import type { IUserRepository } from '@/interfaces/repositories/PostGres/IUserRepository';
 import type { IPasswordHasher } from '@/interfaces/security/IPasswordHasher';
 
+// ——— À remplacer au début de : src/services/__tests__/AuthService.test.ts
+
 const ACTOR_ID = new UserId('018f3a3c-5000-7000-8000-000000000001');
 
+/**
+ * Fabrique d'une entité de simulation conforme aux exigences de surface de l'IUser.
+ * Utilise le double cast pour injecter les membres d'écurie requis sans boilerplate.
+ */
 const createMockUser = (): User =>
   ({
     idUser: ACTOR_ID,
     courriel: 'joel@memoria.fr',
-    passwordHash: 'MOT_DE_PASSE_CRYPTE_V4',
-    pseudo: 'DR-DOS-Maniac'
+    passwordHash: 'SECRET_HACHE_CONFORME',
+    pseudo: 'DR-DOS-Maniac',
+    role: { code: 'CUST' } as any,
+    authProvider: { code: 'LOCA' } as any,
+    settingsUser: {},
+    rgpdConsent: true,
+    rgpdConsentDate: new Date(),
+    createdAt: new Date()
   }) as unknown as User;
 
 describe('UserService', () => {

@@ -63,7 +63,7 @@ const deleteUserSchema = z.object({
  */
 const updateProfileSchema = z.object({
   pseudo: z.string().trim().min(3).max(30).optional(),
-  email: z.string().email().max(255).optional(),
+  courriel: z.string().email().max(255).optional(),
   settingsUser: z.record(z.string(), z.unknown()).optional()
 });
 
