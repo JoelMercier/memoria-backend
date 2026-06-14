@@ -1,10 +1,10 @@
 // ——— fichier : src/services/AppEventService.ts
 
 import type { IAppEventService } from '@/interfaces/services/IAppEventService';
-import { AppEventCategory } from '@/constants/AppEventCategory';
-import { AppEventSeverity } from '@/constants/AppEventSeverity';
-import { AppEventSecteur } from '@/constants/AppEventSecteur';
-import { AppEventAction } from '@/constants/AppEventAction';
+import { AppEventCategory } from '@/constants/Categories';
+import { AppEventSeverity } from '@/constants/Severity';
+import { AppEventSecteur } from '@/constants/Secteur';
+import { AppEventAction } from '@/constants/Actions';
 import type { UserId, ItemId, ShareId } from '@/domain/value-objects/ids';
 import type { AppEventRepository } from '@/infrastructure/repositories/PostGres/AppEventRepository';
 import type { AppEvent } from '@/entities/AppEvent';

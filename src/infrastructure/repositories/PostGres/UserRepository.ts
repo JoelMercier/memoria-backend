@@ -18,22 +18,22 @@ import OrdreTriEnum from '@/constants/OrdreTriEnum';
  * Alignée au caractère près sur l'ordre physique décroissant anti-padding de la base.
  */
 interface IUserRow extends QueryResultRow {
-  usIdUser       : Buffer; // 16 octets fixes tassés en RAM
+  usIdUser       : Buffer;                                              //-- 16 octets fixes tassés en RAM.
   usCourriel     : string;
   usPasswordHash : string;
   usPseudo       : string;
-  usIdRole       : string; // Char(4) dictionnaire
-  usIdProvider   : string; // Char(4) dictionnaire
+  usIdRole       : string;                                              // Char(4) dictionnaire.
+  usIdProvider   : string;                                              // Char(4) dictionnaire.
   usSettingsUser : Record<string, string>;
   usGdprConsent  : boolean;
   usGdprDate     : Date | null;
   usCreatedAt    : Date;
   usUpdatedAt    : Date | null;
-  rNbLignesTotal?: string; // Volumétrie calculée par le chateau
+  rNbLignesTotal?: string;                                              // Volumétrie calculée par le chateau.
 }
 
 /**
- * 🗄️ Classe PgUserRepository 👥 (Le Donjon de Persistance des Acteurs 🤖)
+ * 🗄️ Classe UserRepository 👥 (Le Donjon de Persistance des Acteurs 🤖)
  * ----------------------------------------------------------------------------
  * Implémentation PostgreSQL du stockage et du cycle de vie complet des Utilisateurs.
  * Purifiée du SQL volant de Phase 1 au profit des fonctions stockées exclusives.
@@ -65,7 +65,7 @@ export class UserRepository extends BaseRepository implements IUserRepository {
    */
   private LigneVersActeur(p_oRow: IUserRow): User {
     return new User({
-      idUser         : new UserId(p_oRow.usIdUser), // Instanciation directe étanche [Mémoria]
+      idUser         : new UserId(p_oRow.usIdUser),                     // Instanciation directe étanche [Mémoria]
       roleId         : new RoleId(p_oRow.usIdRole),
       authProviderId : new ProviderId(p_oRow.usIdProvider),
       courriel       : p_oRow.usCourriel,
@@ -80,7 +80,7 @@ export class UserRepository extends BaseRepository implements IUserRepository {
   }
 
   /**
-   * 🔍 Lecture chirurgicale : Localise un acteur via son identifiant nominal fort 🤖.
+   * 🔍 Lecture chirurgicale : Localise un actor via son identifiant nominal fort 🤖.
    */
   public async findById(p_oIdUser: UserId): Promise<User | null> {
     try {
@@ -88,7 +88,7 @@ export class UserRepository extends BaseRepository implements IUserRepository {
         'Select * From public."Users" Where "usIdUser" = "Bin-UUID"($1);',
         [p_oIdUser]
       );
-      return l_oResult.rows ? this.LigneVersActeur(l_oResult.rows[0]) : null;
+      return l_oResult.rows && l_oResult.rows.length > 0 ? this.LigneVersActeur(l_oResult.rows[0]) : null;
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
       throw DatabaseErrorFactory.queryFailed('User.findById', l_sMsg);
@@ -97,12 +97,15 @@ export class UserRepository extends BaseRepository implements IUserRepository {
 
   /**
    * 🔍 Alignement nominal : Localise un acteur via son courriel normalisé 📧.
+   * [SCELLÉ V4] Raccordement direct sur votre turbine User_Recherche_Par_Courriel.
    */
   public async findByCourriel(p_sCourriel: string): Promise<User | null> {
     try {
       const l_oResult = await this.db.query<IUserRow>(
-        'Select * From public."Users" Where "usCourriel" = Lower(Trim($1));', [p_sCourriel] );
-      return l_oResult.rows ? this.LigneVersActeur(l_oResult.rows[0]) : null;
+        'Select * From "User_Recherche_Par_Courriel"($1);',
+        [p_sCourriel]
+      );
+      return l_oResult.rows && l_oResult.rows.length > 0 ? this.LigneVersActeur(l_oResult.rows[0]) : null;
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
       throw DatabaseErrorFactory.queryFailed('User.findByCourriel', l_sMsg);
@@ -115,10 +118,10 @@ export class UserRepository extends BaseRepository implements IUserRepository {
   public async findByPseudo(p_sPseudo: string): Promise<User | null> {
     try {
       const l_oResult = await this.db.query<IUserRow>(
-        'Select * From public."Users" Where "usPseudo" = Trim($1);',
+        'Select * From "Users" Where "usPseudo" = Trim($1);',
         [p_sPseudo]
       );
-      return l_oResult.rows ? this.LigneVersActeur(l_oResult.rows[0]) : null;
+      return l_oResult.rows && l_oResult.rows.length > 0 ? this.LigneVersActeur(l_oResult.rows[0]) : null;
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
       throw DatabaseErrorFactory.queryFailed('User.findByPseudo', l_sMsg);
@@ -130,8 +133,11 @@ export class UserRepository extends BaseRepository implements IUserRepository {
    */
   public async existsByCourriel(p_sCourriel: string): Promise<boolean> {
     try {
-      const l_oResult = await this.db.query('Select 1 From public."Users" Where "usCourriel" = Lower(Trim($1));', [p_sCourriel] );
-      return (l_oResult.rowCount ?? 0) > 0;
+      const l_oResult = await this.db.query<{ exists: boolean }>(
+        'Select Exists(Select 1 From public."Users" Where "usCourriel" = Lower(Trim($1))) as "exists";',
+        [p_sCourriel]
+      );
+      return Boolean(l_oResult.rows?.[0]?.exists ?? false);
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
       throw DatabaseErrorFactory.queryFailed('User.existsByCourriel', l_sMsg);
@@ -140,13 +146,15 @@ export class UserRepository extends BaseRepository implements IUserRepository {
 
   /**
    * 👤 Vérification d'existence : Valide la présence d'un pseudonyme public.
+   * [SCELLÉ V4] Raccordement direct sur votre turbine binaire User_Verifie_Existence_Pseudo.
    */
   public async existsByPseudo(p_sPseudo: string): Promise<boolean> {
     try {
-      const l_oResult = await this.db.query('Select 1 From "Users" Where "usPseudo" = Trim($1);', [
-        p_sPseudo
-      ]);
-      return (l_oResult.rowCount ?? 0) > 0;
+      const l_oResult = await this.db.query<{ exists: boolean }>(
+        'Select "User_Verifie_Existence_Pseudo"($1) as "exists";',
+        [p_sPseudo]
+      );
+      return Boolean(l_oResult.rows?.[0]?.exists ?? false);
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
       throw DatabaseErrorFactory.queryFailed('User.existsByPseudo', l_sMsg);
@@ -247,10 +255,13 @@ export class UserRepository extends BaseRepository implements IUserRepository {
    */
   public async findAll(p_oOptions: IListOptions): Promise<IListResult<User>> {
     try {
-      const l_nLimit = p_oOptions.NbLignes ?? 50;
+      const l_nLimit  = p_oOptions.NbLignes  ?? 50;
       const l_nOffset = p_oOptions.LigneDebut ?? 0;
-      const l_sOrdreTri =
-        p_oOptions.OrdreAff instanceof OrdreTriEnum ? p_oOptions.OrdreAff.code : 'DESC';
+
+      // 🪓 ALIGNEMENT DIRECTIVE DE RAM : Remplacement du texte dur par la valeur SQL de l'écurie
+      const l_sOrdreTri = p_oOptions.OrdreAff instanceof OrdreTriEnum
+        ? (p_oOptions.OrdreAff as any).m_sValueSql
+        : 'DESC';
 
       // 🗲 Appel de l'extracteur global de soute sans un seul pixel de SQL volant !
       const l_oResult = await this.db.query<IUserRow>(
@@ -259,15 +270,15 @@ export class UserRepository extends BaseRepository implements IUserRepository {
       );
 
       // 🪓 [RÉPARÉ TS2339] Extraction de la volumétrie absolue calculée sur la première ligne du tableau !
-      const l_nTotal = Number(l_oResult.rows?.[0]?.rNbLignesTotal ?? 0);
+      const l_nTotal   = Number(l_oResult.rows?.[0]?.rNbLignesTotal ?? 0);
       const l_aoLignes = l_oResult.rows.map((l_oRow) => this.LigneVersActeur(l_oRow));
 
       return {
-        LigneDebut: l_nOffset,
-        NbLignesDem: l_nLimit,
-        NbLignesRenv: l_aoLignes.length,
+        LigneDebut:    l_nOffset,
+        NbLignesDem:   l_nLimit,
+        NbLignesRenv:  l_aoLignes.length,
         NbLignesTotal: l_nTotal,
-        Lignes: l_aoLignes
+        Lignes:        l_aoLignes
       };
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';

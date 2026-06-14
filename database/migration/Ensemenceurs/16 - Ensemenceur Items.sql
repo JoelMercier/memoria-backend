@@ -1,36 +1,31 @@
 -- ============================================================================
--- 📦 Mémoria - Ensemenceur Items
+-- 📦 Mémoria - Ensemenceur Items (Édition Finale du Soir)
 -- Fichier: database/seeders/16 - Ensemenceur Items.sql
--- Version: 4.5.0 (PostgreSQL 17+)
--- Description: Centralisation et injection exclusive des pépites de connaissances
+-- Version: 4.6.1 (PostgreSQL 17+ - Format Soviétique Strict 1960)
+-- Description: Injection exclusive des pépites de connaissances (1 à 18)
+-- Auteur & Vision : Joël (Architecte DR-DOS - True Getters Compliance)
+-- Métallurgie des Octets : Gaïa (Au burin, alignée sur l'autonomie de soute V4)
+-- Contexte: Alignement UUID natif pur et éradication de l''anglais volant
 -- ============================================================================
 
 Set search_path To Public;
 Set client_encoding To 'UTF8';
 
 -- ----------------------------------------------------------------------------
--- 📦 1. Injection des données de la table Items (Zéro padding)
+-- 📦 1. Injection des données de la table Items (Sophie à Lucas)
 -- ----------------------------------------------------------------------------
 Insert Into "Items" (
-    "itIdItem",
-    "itUserId",
-    "itCreatedAt",
-    "itUpdatedAt",
-    "itContentTypeId",
-    "itTitle",
-    "itSlug",
-    "itSourceAuthor",
-    "itThumbnailUrl",
-    "itMetadata",
-    "itContent"
+    "itIdItem", "itUserId", "itCreatedAt", "itUpdatedAt",
+    "itContentTypeId", "itLibelle", "itSlug", "itAuteurSource",
+    "itThumbnailUrl", "itMetadata", "itContent"
 ) Values
 -- Pépite 1 : Sophie (SOLID)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b001000000000001', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000001', 'hex')),
+    '018d5c8e-8001-7001-b001-000000000001'::uuid,                       -- ID unique de la pépite au format UUID natif.
+    '018d5c8e-5678-7001-9001-000000000001'::uuid,                       -- Référence usIdUser propriétaire (SophieDev).
     '2024-01-15 10:15:00',
-    Null,
-    'ARTI',
+    Null,                                                               -- La tôle de révision automatique démarre à blanc.
+    'ARTI',                                                             -- Format de ressource (Article).
     'Les principes SOLID en JavaScript',
     'les-principes-solid-en-javascript',
     'Robert C. Martin',
@@ -41,8 +36,8 @@ Insert Into "Items" (
 
 -- Pépite 2 : Sophie (React RSC)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b001000000000002', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000001', 'hex')),
+    '018d5c8e-8001-7001-b001-000000000002'::uuid,
+    '018d5c8e-5678-7001-9001-000000000001'::uuid,
     '2024-01-15 10:20:00',
     Null,
     'ARTI',
@@ -56,11 +51,11 @@ Insert Into "Items" (
 
 -- Pépite 3 : Marc (Scrum Guide)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b002000000000001', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000002', 'hex')),
+    '018d5c8e-8001-7001-b002-000000000001'::uuid,
+    '018d5c8e-5678-7001-9001-000000000002'::uuid,                       -- Référence usIdUser propriétaire (MarcPM).
     '2024-01-15 10:40:00',
     Null,
-    'BOOK',
+    'BOOK',                                                             -- Format de ressource (Livre).
     'Le Guide du Scrum Officiel 2024',
     'le-guide-du-scrum-officiel-2024',
     'Ken Schwaber',
@@ -71,8 +66,8 @@ Insert Into "Items" (
 
 -- Pépite 4 : Emma (Daniel Kahneman)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b003000000000001', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000003', 'hex')),
+    '018d5c8e-8001-7001-b003-000000000001'::uuid,
+    '018d5c8e-5678-7001-9001-000000000003'::uuid,                       -- Référence usIdUser propriétaire (EmmaPsy).
     '2024-01-15 11:10:00',
     Null,
     'BOOK',
@@ -86,8 +81,8 @@ Insert Into "Items" (
 
 -- Pépite 5 : Lucas (Atomic Design)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b004000000000001', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000004', 'hex')),
+    '018d5c8e-8001-7001-b004-000000000001'::uuid,
+    '018d5c8e-5678-7001-9001-000000000004'::uuid,                       -- Référence usIdUser propriétaire (LucasDesign).
     '2024-01-15 11:35:00',
     Null,
     'ARTI',
@@ -96,16 +91,16 @@ Insert Into "Items" (
     'Brad Frost',
     'https://unsplash.com',
     '{"reading_time": "10 min", "difficulty": "intermediate", "language": "fr", "source_url": "https://bradfrost.com"}'::jsonb,
-    'L''Atomic Design est une méthodologie qui permet de créer des systèmes de conception de manière hiérarchique. Les cinq niveaux : atomes, molécules, organismes, modèles et pages.'
+    'L''Atomic Design is une méthodologie qui permet de créer des systèmes de conception de manière hiérarchique. Les cinq niveaux : atomes, molécules, organismes, modèles et pages.'
 ),
 
 -- Pépite 6 : Lucas (Figma AutoLayout)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b004000000000002', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000004', 'hex')),
+    '018d5c8e-8001-7001-b004-000000000002'::uuid,
+    '018d5c8e-5678-7001-9001-000000000004'::uuid,
     '2024-01-15 11:40:00',
     Null,
-    'VIDE',
+    'VIDE',                                                             -- Format de ressource (Vidéo).
     'Figma : Auto Layout et Variants avancés',
     'figma-auto-layout-et-variants-avances',
     'Figma Official',
@@ -116,8 +111,8 @@ Insert Into "Items" (
 
 -- Pépite 7 : Lucas (Steve Krug)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b004000000000003', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000004', 'hex')),
+    '018d5c8e-8001-7001-b004-000000000003'::uuid,
+    '018d5c8e-5678-7001-9001-000000000004'::uuid,
     '2024-01-15 11:45:00',
     Null,
     'BOOK',
@@ -131,23 +126,23 @@ Insert Into "Items" (
 
 -- Pépite 8 : Lucas (WCAG Accessibilité)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b004000000000004', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000004', 'hex')),
+    '018d5c8e-8001-7001-b004-000000000004'::uuid,
+    '018d5c8e-5678-7001-9001-000000000004'::uuid,
     '2024-01-15 11:50:00',
     Null,
-    'NOTE',
+    'NOTE',                                                             -- Format de ressource (Note).
     'Règles d accessibilité WCAG cruciales',
     'regles-d-accessibilite-wcag-cruciales',
     'N.C',
-    Null,
+    Null,                                                               -- Pas d''illustration pour cette capture rapide.
     '{"tool": "Obsidian", "critical": true}'::jsonb,
     'Checklist WCAG 2.2 : 1) Contraste de texte minimum 4.5:1. 2) Navigation au clavier fonctionnelle sans piège. 3) Balises ''alt'' obligatoires sur toutes les images informatives.'
 ),
 
 -- Pépite 9 : Lucas (Framer Design System)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b004000000000005', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000004', 'hex')),
+    '018d5c8e-8001-7001-b004-000000000005'::uuid,
+    '018d5c8e-5678-7001-9001-000000000004'::uuid,
     '2024-01-15 11:55:00',
     Null,
     'VIDE',
@@ -161,8 +156,8 @@ Insert Into "Items" (
 
 -- Pépite 10 : Lucas (Checklist UX)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b004000000000006', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000004', 'hex')),
+    '018d5c8e-8001-7001-b004-000000000006'::uuid,
+    '018d5c8e-5678-7001-9001-000000000004'::uuid,
     '2024-01-15 12:00:00',
     Null,
     'NOTE',
@@ -176,8 +171,8 @@ Insert Into "Items" (
 
 -- Pépite 11 : Lucas (Loi de Fitts)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b004000000000007', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000004', 'hex')),
+    '018d5c8e-8001-7001-b004-000000000007'::uuid,
+    '018d5c8e-5678-7001-9001-000000000004'::uuid,
     '2024-01-15 12:05:00',
     Null,
     'ARTI',
@@ -191,8 +186,8 @@ Insert Into "Items" (
 
 -- Pépite 12 : Lucas (Animation Framer)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b004000000000008', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000004', 'hex')),
+    '018d5c8e-8001-7001-b004-000000000008'::uuid,                       -- ID unique de la pépite au format UUID natif.
+    '018d5c8e-5678-7001-9001-000000000004'::uuid,                       -- Référence usIdUser propriétaire (LucasDesign).
     '2024-01-15 12:10:00',
     Null,
     'VIDE',
@@ -206,8 +201,8 @@ Insert Into "Items" (
 
 -- Pépite 13 : Alice (The Lean Startup)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b005000000000001', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000005', 'hex')),
+    '018d5c8e-8001-7001-b005-000000000001'::uuid,
+    '018d5c8e-5678-7001-9001-000000000005'::uuid,                       -- Référence usIdUser propriétaire (AliceCEO).
     '2024-01-15 12:15:00',
     Null,
     'BOOK',
@@ -221,8 +216,8 @@ Insert Into "Items" (
 
 -- Pépite 14 : Alice (Growth Hacking - Octet final muté à 0002 pour isoler le doublon d'équipe)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b005000000000002', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000005', 'hex')),
+    '018d5c8e-8001-7001-b005-000000000002'::uuid,
+    '018d5c8e-5678-7001-9001-000000000005'::uuid,
     '2024-01-15 12:15:00',
     Null,
     'ARTI',
@@ -233,10 +228,11 @@ Insert Into "Items" (
     '{"reading_time": "9 min", "difficulty": "intermediate", "language": "fr", "source_url": "https://andrewchen.com"}'::jsonb,
     'Le growth hacking repose sur le framework AARRR : Acquisition, Activation, Rétention, Recommandation, Revenu. La rétention est la clé absolue. Si les utilisateurs partent, l''acquisition ne sert à rien.'
 ),
+
 -- Pépite 15 : Paul (Descartes)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b006000000000001', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000006', 'hex')),
+    '018d5c8e-8001-7001-b006-000000000001'::uuid,
+    '018d5c8e-5678-7001-9001-000000000006'::uuid,                       -- Référence usIdUser propriétaire (PaulPhilo).
     '2024-01-15 12:45:00',
     Null,
     'BOOK',
@@ -250,8 +246,8 @@ Insert Into "Items" (
 
 -- Pépite 16 : Julie (Presse IA)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b007000000000001', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000007', 'hex')),
+    '018d5c8e-8001-7001-b007-000000000001'::uuid,
+    '018d5c8e-5678-7001-9001-000000000007'::uuid,                       -- Référence usIdUser propriétaire (JulieTech).
     '2024-01-15 13:15:00',
     Null,
     'ARTI',
@@ -265,8 +261,8 @@ Insert Into "Items" (
 
 -- Pépite 17 : Thomas (Cuisine Basse Température)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b008000000000001', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000008', 'hex')),
+    '018d5c8e-8001-7001-b008-000000000001'::uuid,
+    '018d5c8e-5678-7001-9001-000000000008'::uuid,                       -- Référence usIdUser propriétaire (ChefThomas).
     '2024-01-15 13:45:00',
     Null,
     'VIDE',
@@ -280,8 +276,8 @@ Insert Into "Items" (
 
 -- Pépite 18 : Camille (Le Corbusier)
 (
-    "Bin-UUID"(decode('018d5c8e80017001b009000000000001', 'hex')),
-    "Bin-UUID"(decode('018d5c8e567870019001000000000009', 'hex')),
+    '018d5c8e-8001-7001-b009-000000000001'::uuid,
+    '018d5c8e-5678-7001-9001-000000000009'::uuid,                       -- Référence usIdUser propriétaire (CamilleArchi).
     '2024-01-15 13:40:00',
     Null,
     'BOOK',
@@ -292,4 +288,4 @@ Insert Into "Items" (
     '{"isbn": "978-2081216570", "pages": 256, "year": 1923, "publisher": "Flammarion", "source_url": "https://amazon.fr"}'::jsonb,
     'L''architecture est le jeu savant, correct et magnificent des volumes assemblés sous la lumière. Les temps modernes imposent le plan libre.'
 )
-On Conflict do Nothing;
+On Conflict Do Nothing;

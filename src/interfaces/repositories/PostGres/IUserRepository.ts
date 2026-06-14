@@ -1,9 +1,10 @@
 // ——— fichier : src/interfaces/repositories/IUserRepository.ts
 
-import { UserId }         from '@/domain/value-objects/ids';
-import type { User }      from '@/entities/User';
-import type { IUserData } from '@/interfaces/entities/user/IUserData';
 import type { IPhysicalRW } from '@/interfaces/repositories/IPhysicalRW';
+import type { IUserData   } from '@/interfaces/entities/user/IUserData';
+import type { User        } from '@/entities/User';
+
+import { UserId } from '@/domain/value-objects/ids';
 
 
 /**

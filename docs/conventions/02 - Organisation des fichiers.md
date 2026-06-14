@@ -54,10 +54,10 @@ Arbre de décision :
 ```text
 Est-ce un gestionnaire de requête HTTP ?       → src/controllers/
 Est-ce une règle métier ?                      → src/services/
-Est-ce du SQL brut sur PostgreSQL ?            → src/repositories/Pg*.ts
-Est-ce une doublure de test en mémoire ?       → src/repositories/Mock*.ts
+Est-ce du SQL brut sur PostgreSQL ?            → src/repositories/PostGres/Pg*.ts
+Est-ce une doublure de test en mémoire ?       → src/repositories/Mocks/Mock*.ts
 Est-ce un objet du domaine ?                   → src/entities/
-Est-ce un schéma Zod ?                         → src/constants/zod/<domaine>/
+Est-ce un schéma Zod ?                         → src/validation/zod/<domaine>/
 Est-ce un type DTO dérivé ?                    → src/dto/<domaine>/
 Est-ce une erreur typée ?                      → src/exceptions/
 Est-ce une interface pour l'injection ?        → src/interfaces/<couche>/

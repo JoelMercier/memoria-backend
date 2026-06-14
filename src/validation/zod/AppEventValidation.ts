@@ -1,10 +1,10 @@
 // ——— fichier : src/validation/zod/AppEventValidation.ts
 
 import { z } from 'zod';
-import { AppEventCategory } from '@/constants/AppEventCategory';
-import { AppEventSeverity } from '@/constants/AppEventSeverity';
-import { AppEventSecteur } from '@/constants/AppEventSecteur';
-import { AppEventAction } from '@/constants/AppEventAction';
+import { AppEventCategory } from '@/constants/Categories';
+import { AppEventSeverity } from '@/constants/Severity';
+import { AppEventSecteur } from '@/constants/Secteur';
+import { AppEventAction } from '@/constants/Actions';
 
 /**
  * 🗂️ Schémas de validation Zod pour les codes des Smart Enums d'audit.

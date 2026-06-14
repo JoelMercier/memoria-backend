@@ -1,58 +1,73 @@
--- ============================================================================
--- 📦 Mémoria - EventCategories
+-- =============================================================================
+-- 📂 Mémoria - Categories
 -- Fichier: database/migrations/04 - Table Categories.sql
--- Version: 1.0.0 (PostgreSQL 17+)
--- Description: Dictionnaire des catégories d'exploitation et de sécurité
--- ============================================================================
+-- Version: 4.2.0 (PostgreSQL 17+ - Format Soviétique Strict 1960)
+-- Description: Dictionnaire des catégories d'audit - Alignement 'ca' et repli
+-- =============================================================================
 
 Set search_path To Public;
 Set CLIENT_ENCODING to 'UTF8';
 
 -- ----------------------------------------------------------------------------
--- 🏛️ 1. La structure physique et l'alignement des blocs (Zéro bits vides)
+-- 🏛️ 1. La structure physique et l'alignement des blocs (Zéro padding)
 -- ----------------------------------------------------------------------------
-Drop Table if Exists "EventCategories";
+Drop Table if exists "Categories" Cascade;
 
-Create Table "EventCategories" ( -- Ordre physique des zones optimisé pour réduire le «padding»
-    "ecCreatedAt"  Timestamp Not Null Default Current_Timestamp, -- 8 octets fixes
-    "ecUpdatedAt"  Timestamp,                                    -- 8 octets fixes
-    "ecIdCategory" Char(4) Not Null,                             -- 4 octets fixes (Quadrigramme unique)
-    "ecOrdreAff"   Smallint Not Null,                            -- 2 octets fixes (Affichage humain)
-    "ecName"       Varchar(50) Not Null,                         -- Variable (Ferme la marche)
+Create Table "Categories" (
+    "caCreatedAt"  Timestamp Not Null Default Current_Timestamp, -- 8 octets fixes (Horodatage de création)
+    "caUpdatedAt"  Timestamp,                                    -- 8 octets fixes (Géré par notre trigger)
+    "caIdCategory" Char(4) Not Null,                             -- 4 octets fixes (Quadrigramme unique)
+    "caOrdreAff"   Smallint Not Null,                            -- 2 octets fixes (Affichage humain)
+    "caDefaut"     Boolean Not Null Default False,               -- 1 octet  fixe  (Drapeau de repli nominal V4 Pro)
+    "caLibelle"    Varchar(50) Not Null,                         -- Taille variable (Substitue l''ancien ecName)
 
-    Constraint "EventCategories_ecIdCategory_Pkey" Primary Key ("ecIdCategory"),
-    Constraint "EventCategories_ecName_Udx"      Unique ("ecName"),
-    Constraint "EventCategories_ecOrdreAff_Udx"  Unique ("ecOrdreAff"), -- Tri ergonomique exclusif [Mémoria]
-    Constraint "EventCategories_ecIdCategory_Chk" Check ("ecIdCategory" = Upper("ecIdCategory")),
-    Constraint "EventCategories_ecOrdreAff_Chk"   Check ("ecOrdreAff" >= 0)
+    Constraint "Categories_caIdCategory_Pkey" Primary Key ("caIdCategory"),
+    Constraint "Categories_caLibelle_Udx"     Unique ("caLibelle"),
+    Constraint "Categories_caOrdreAff_Udx"    Unique ("caOrdreAff"),
+
+    Constraint "Categories_caIdCategory_Chk"  Check ("caIdCategory" = Upper("caIdCategory")),
+    Constraint "Categories_caOrdreAff_Chk"   Check ("caOrdreAff" >= 0)
 );
 
 -- ----------------------------------------------------------------------------
--- ⚡ 2. Le déclencheur universel dynamique
+-- ⚡ 2. Indexations et déclencheurs stratégiques
 -- ----------------------------------------------------------------------------
-Create Trigger "EventCategories_TraceModifs_Trg"
-Before Update on "EventCategories"
-For Each Row Execute Function "TraceModif"('ecUpdatedAt');
+-- Index unique partiel : Interdiction physique d'avoir deux catégories par défaut
+Create Unique Index "Categories_caDefaut_Udx" On "Categories" ("caDefaut") Where "caDefaut" = True;
+
+-- Trigger 1 : Traçage automatique des horodatages de révision
+Create Trigger "Categories_TraceModifs_Trg"
+Before Update on "Categories"
+For Each Row Execute Function "TraceModif"('caUpdatedAt');
+
+-- Trigger 2 : Protection absolue de la ligne par défaut face au sabotage et à la désactivation
+Create Trigger "Categories_ProtegeDefaut_Trg"
+Before Update Or Delete on "Categories"
+For Each Row Execute Function "VerifieLigneDefaut"('caDefaut');
 
 -- ----------------------------------------------------------------------------
--- 📝 3. La documentation du dictionnaire (Alignement esthétique vertical)
+-- 📝 3. La documentation du dictionnaire
 -- ----------------------------------------------------------------------------
-Comment On Table "EventCategories" is 'Dictionnaire centralisé des catégories opérationnelles pour la journalisation des événements.';
+Comment On Table "Categories" is 'Dictionnaire centralisé des catégories opérationnelles pour la journalisation des événements.';
 
-Comment On Column "EventCategories"."ecCreatedAt"  is 'Horodatage système automatique de la création de la catégorie en base.';
-Comment On Column "EventCategories"."ecUpdatedAt"  is 'Horodatage système automatique de la modification via le trigger TraceModif().';
-Comment On Column "EventCategories"."ecIdCategory" is 'Quadrigramme fixe unique et en majuscules servant de clé primaire (ex: ''MONI'', ''AUDI'').';
-Comment On Column "EventCategories"."ecOrdreAff"   is 'Position numérique unique pour le tri logique des listes déroulantes de l''interface graphique.';
-Comment On Column "EventCategories"."ecName"       is 'Libellé descriptif complet de la catégorie d''audit (ex: Audits de sécurité).';
+Comment On Column "Categories"."caCreatedAt"  is 'Horodatage système automatique de la création de la catégorie en base.';
+Comment On Column "Categories"."caUpdatedAt"  is 'Horodatage système automatique de la modification via le déclencheur TraceModif.';
+Comment On Column "Categories"."caIdCategory" is 'Quadrigramme fixe unique et en majuscules servant de clé primaire (ex: ''GENE'', ''SECU'').';
+Comment On Column "Categories"."caOrdreAff"   is 'Position numérique unique pour le tri logique des listes déroulantes de l''interface graphique.';
+Comment On Column "Categories"."caDefaut"     is 'Drapeau de sécurité désignant l''unique catégorie de repli automatique.';
+Comment On Column "Categories"."caLibelle"    is 'Libellé descriptif complet de la catégorie d''audit en français d''élite.';
 
 -- ----------------------------------------------------------------------------
--- 🏺 4. Script d'ensemencement initial (Les quatre piliers de l'exploitation)
+-- 🏺 4. Script d'ensemencement initial (Balisage de GENE par défaut)
 -- ----------------------------------------------------------------------------
-Insert Into "EventCategories" ("ecOrdreAff", "ecIdCategory", "ecName") Values
-(10, 'MONI', 'Monitoring et performances'    ),
-(20, 'ANAL', 'Analyses d''utilisation'       ),
-(30, 'AUDI', 'Audits de sécurité'            ),
-(40, 'RGPD', 'Protection des données privées')
-On Conflict ("ecIdCategory") Do Update Set
-    "ecOrdreAff" = Excluded."ecOrdreAff",
-    "ecName"     = Excluded."ecName";
+Insert Into "Categories" ("caOrdreAff", "caIdCategory", "caDefaut", "caLibelle") Values
+(1,  'GENE', true,  'Générique'                  ),             -- Choix de soute : Le pilier amortisseur par défaut.
+(10, 'MONI', false, 'Monitoring et performances' ),
+(20, 'ANAL', false, 'Analyses d''utilisation'    ),
+(30, 'SECU', false, 'Sécurité et accès'          ),             -- Purification nominale du vieux code AUDI
+(40, 'RGPD', false, 'Protection des données'     )              -- Correction orthographique française complète
+
+On Conflict ("caIdCategory") Do Update Set
+    "caOrdreAff" = Excluded."caOrdreAff",
+    "caDefaut"   = Excluded."caDefaut",
+    "caLibelle"  = Excluded."caLibelle";

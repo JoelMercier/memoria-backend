@@ -20,7 +20,7 @@ export class OrdreTriEnum extends SmartEnum<string> {
   private readonly m_sValueSql: string;
 
   /**
-   * Constructeur d'élite scellant l'armure nominale à 4 paramètres.
+   * Constructeur d'élite scellant l'armure nominale à 5 paramètres.
    *
    * @public
    * @constructor
@@ -28,9 +28,10 @@ export class OrdreTriEnum extends SmartEnum<string> {
    * @param {string} p_sCodeTechnique - L'identifiant immuable unique en RAM (ex: 'NATU')
    * @param {string} p_sValueSql - La chaîne physique s'engouffrant dans SQL (ex: '' ou 'ASC')
    * @param {number} p_nOrdreAff - Indice technique de tri pour l'affichage graphique
+   * @param {boolean} p_bDefaut - Drapeau de repli nominal V4 Pro pour la base locale
    */
-  public constructor(p_sLibelle: string, p_sCodeTechnique: string, p_sValueSql: string, p_nOrdreAff: number) {
-    super(p_sLibelle, p_sCodeTechnique, p_nOrdreAff);
+  public constructor(p_sLibelle: string, p_sCodeTechnique: string, p_sValueSql: string, p_nOrdreAff: number, p_bDefaut: boolean = false) {
+    super(p_sLibelle, p_sCodeTechnique, p_nOrdreAff, p_bDefaut);
     this.m_sValueSql = p_sValueSql;
   }
 
@@ -47,13 +48,13 @@ export class OrdreTriEnum extends SmartEnum<string> {
   // ----------------------------------------------------------------------------
 
   /** 🪙 ASC - Tri par ordre arithmétique ou alphabétique croissant */
-  public static readonly oCroissant = new OrdreTriEnum('Croissant', 'CROI', 'ASC', 1);
+  public static readonly oCroissant = new OrdreTriEnum('Croissant', 'CROI', 'ASC', 1, false);
 
   /** 💾 NATU - Absence de tri explicite (Ordre naturel de stockage physique Heap) */
-  public static readonly oNonTrie = new OrdreTriEnum('Naturel', 'NATU', '', 2);
+  public static readonly oNonTrie = new OrdreTriEnum('Naturel', 'NATU', '', 2, false);
 
-  /** 💽 DESC - Tri par ordre arithmétique ou alphabétique décroissant */
-  public static readonly oDecroissant = new OrdreTriEnum('Décroissant', 'DECR', 'DESC', 3);
+  /** 💽 DESC - Tri par ordre arithmétique ou alphabétique décroissant (Le Choupy de repli !) */
+  public static readonly oDecroissant = new OrdreTriEnum('Décroissant', 'DECR', 'DESC', 3, true); // 🔒 Bit True nominal !
 
   /** 🚀 Passerelle rétrocompatible pour l'infrastructure */
   public static values(): OrdreTriEnum[] {
@@ -72,10 +73,9 @@ export class OrdreTriEnum extends SmartEnum<string> {
       (l_oEnum) => l_oEnum.clauseSql === l_sCodeNettoye
     );
 
-    // Si on trouve la tôle exacte (ex: 'ASC' ou ''), on la renvoie, sinon repli vers le tri Naturel
-    return l_oInstanceTrouvee ?? this.DeCode<OrdreTriEnum>('NATU');
+    // Si on trouve la tôle exacte (ex: 'ASC' ou ''), on la renvoie, sinon repli vers le tri Naturel casté proprement
+    return l_oInstanceTrouvee ?? (this.DeCode<OrdreTriEnum>('NATU') as any);
   }
-
 }
 
 export default OrdreTriEnum;

@@ -69,6 +69,17 @@ La nomenclature des variables locales, des paramètres et des résultats au sein
 
 ---
 
+### 4. Être explicite dans les noms
+#### 4.1 Les «UUID's»
+Ça donnerait `p_axId`. Mais Id de quoi ? Donc `p_axIdUtilisateur`, `p_axIdPepite`, `p_axIdPartage`.
+
+#### 4.2 Les «Quadrigrammes»
+* `p_usRoleId` ou `l_usRoleId`
+* `p_shNiveauId` ou `l_shNiveauId`
+* `p_aeSeveriteId` ou `l_aeSeveriteId`
+
+---
+
 ## 🔠 Rule 5 : L'orthographe d'acier (Majuscules accentuées)
 Mémoria vit à l'ère de l'UTF-8 complet. Toutes les chaînes de caractères et tous les alias de sortie humaine doivent utiliser la typographie française correcte. **Les majuscules doivent être accentuées** (ex: `as 'Étiquette'`, `as 'Propriétaire'`). Les alias textuels contenant des apostrophes doivent être doublés de manière polie (ex: `as 'Statistiques de l''Éléphant'`).
 

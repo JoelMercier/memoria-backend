@@ -1,7 +1,7 @@
 -- ============================================================================
 -- 👥 Mémoria - Users
 -- Fichier: database/migrations/08 - Table Users.sql
--- Version: 3.2.0 (PostgreSQL 17+)
+-- Version: 4.2.0 (PostgreSQL 17+ - Format Soviétique Strict 1960)
 -- Description: Coffre-fort d'identification des acteurs - Alignement binaire parfait
 -- ============================================================================
 
@@ -11,30 +11,30 @@ Set CLIENT_ENCODING to 'UTF8';
 -- -----------------------------------------------------------------------------
 -- 🏛️ 1. La structure physique et l'alignement des blocs (Zéro bits de padding)
 -- -----------------------------------------------------------------------------
-Drop Table if Exists "Users";
+Drop Table if exists "Users" Cascade;
 
-Create Table "Users" ( -- Alignement machine descendant strict pour éliminer le padding physique
-    "usIdUser"         Bytea Not Null,                               -- 16 octets bruts fixes (Value Object binaire)
-    "usCreatedAt"      Timestamp Not Null Default Current_Timestamp, --  8 octets fixes (Horodatage de création)
-    "usUpdatedAt"      Timestamp,                                    --  8 octets fixes (Géré par notre trigger universel)
-    "usRgpdDate"       Timestamp,                                    --  8 octets fixes (Horodatage de consentement UTC)
-    "usRoleId"         Char(4) Not Null Default 'CUST',              --  4 octets fixes (Zone clé étrangère liée à Roles)
-    "usProviderId"     Char(4) Not Null Default 'LOCA',              --  4 octets fixes (Zone clé étrangère liée à Providers)
-    "usRgpdConsent"    Boolean Not Null Default False,               --  1 octet  fixe  (Placé ici avant les variables pour 0% padding)
-    "usPseudo"         Varchar(50) Not Null,                         -- Taille variable
-    "usCourriel"       Varchar(254) Not Null,                        -- Taille variable (Normalisé en minuscules stricts)
-    "usPasswordHash"   Varchar(255) Not Null,                        -- Taille variable (Secret cryptographique Argon2id)
-    "usSettingsUser"   Jsonb Not Null Default '{}'::jsonb,           -- Sac variable lourd (Ferme la marche de la ligne)
+Create Table "Users" (
+    "usIdUser"       UUID Not Null,                                -- 16 octets bruts fixes (Value Object binaire).
+    "usCreatedAt"    Timestamp Not Null Default Current_Timestamp, --  8 octets fixes (Horodatage de création).
+    "usUpdatedAt"    Timestamp,                                    --  8 octets fixes (Géré par notre trigger universel).
+    "usRgpdDate"     Timestamp,                                    --  8 octets fixes (Horodatage de consentement UTC).
+    "usRoleId"       Char(4) Not Null Default 'CUST',              --  4 octets fixes (Zone clé étrangère liée à Roles).
+    "usProviderId"   Char(4) Not Null Default 'LOCA',              --  4 octets fixes (Zone clé étrangère liée à Providers).
+    "usRgpdConsent"  Boolean Not Null Default False,               --  1 octet  fixe  (Placé ici avant pour 0% padding).
+    "usPseudo"       Varchar(50) Not Null,                         -- Taille variable.
+    "usCourriel"     Varchar(254) Not Null,                        -- Taille variable (Normalisé en minuscules stricts).
+    "usPasswordHash" Varchar(255) Not Null,                        -- Taille variable (Secret cryptographique Argon2id).
+    "usSettingsUser" Jsonb Not Null Default '{}'::jsonb,           -- Sac variable lourd (Ferme la marche de la ligne).
 
     Constraint "Users_usIdUser_Pkey" Primary Key ("usIdUser"),
     Constraint "Users_usCourriel_Udx" Unique ("usCourriel"),
     Constraint "Users_usPseudo_Udx"   Unique ("usPseudo"),
 
-    Constraint "Users_usIdUser_Chk"        Check (octet_length("usIdUser") = 16), -- Validation de la taille physique 128 bits
+    Constraint "Users_usIdUser_Chk"        Check (octet_length("UUID-Bin"("usIdUser")) = 16),
     Constraint "Users_usCourriel_Lower_Chk" Check ("usCourriel" = Lower("usCourriel")),
 
     Constraint "Users_usRoleId_Fkey"     Foreign Key ("usRoleId")     References "Roles"("roIdRole"),
-    Constraint "Users_usProviderId_Fkey" Foreign Key ("usProviderId") References "Providers"("apIdProvider")
+    Constraint "Users_usProviderId_Fkey" Foreign Key ("usProviderId") References "Providers"("prIdProvider") -- 🪓 ALIGNÉ SUR prIdProvider !
 );
 
 -- ----------------------------------------------------------------------------

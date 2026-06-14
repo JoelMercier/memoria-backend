@@ -1,7 +1,7 @@
 -- ============================================================================
 -- 🔗 Mémoria - ItemTags.sql
 -- Fichier: database/migrations/11 - Table ItemTags.sql
--- Version: 3.2.1 (PostgreSQL 17+)
+-- Version: 4.2.0 (PostgreSQL 17+ - Format Soviétique Strict 1960)
 -- Description: Association Many-to-Many compacte avec traçabilité temporelle
 -- ============================================================================
 
@@ -11,12 +11,12 @@ Set CLIENT_ENCODING to 'UTF8';
 -- ----------------------------------------------------------------------------
 -- 🏛️ 1. La structure physique et l'alignement des blocs (Padding = 0%)
 -- ----------------------------------------------------------------------------
-Drop Table if Exists "ItemTags";
+Drop Table if exists "ItemTags" Cascade;
 
-Create Table "ItemTags" ( -- Alignement machine descendant strict pour éliminer le padding physique
-    "tiItemId"    UUID Not Null,                                -- 16 octets fixes (Zone clé étrangère liée à Items)
-    "tiTagId"     UUID Not Null,                                -- 16 octets fixes (Zone clé étrangère liée à Tags)
-    "tiCreatedAt" Timestamp Not Null Default Current_Timestamp, --  8 octets fixes (Zone de traçabilité temporelle immuable)
+Create Table "ItemTags" (
+    "tiItemId"    UUID Not Null,                                -- 16 octets fixes (Zone clé étrangère liée à Items).
+    "tiTagId"     UUID Not Null,                                -- 16 octets fixes (Zone clé étrangère liée à Tags).
+    "tiCreatedAt" Timestamp Not Null Default Current_Timestamp, --  8 octets fixes (Zone de traçabilité temporelle immuable).
 
     Constraint "ItemTags_tiItemId_tiTagId_Pkey" Primary Key ("tiItemId", "tiTagId"),
 

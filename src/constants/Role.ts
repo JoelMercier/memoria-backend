@@ -27,9 +27,10 @@ export class Role extends SmartEnum<string> {
    * @param {string} p_sCode - Le quadrigramme d'infrastructure immuable (4 majuscules) [Mémoria]
    * @param {number} p_nNiveau - Poids hiérarchique pour le contrôle machine [Mémoria]
    * @param {number} p_nOrdreAff - Position numérique unique pour le tri logique visuel [Mémoria]
+   * @param {boolean} p_bDefaut - Drapeau de repli nominal V4 Pro pour la base locale
    */
-  private constructor(p_sLibelle: string, p_sCode: string, p_nNiveau: number, p_nOrdreAff: number) {
-    super(p_sLibelle, p_sCode, p_nOrdreAff);
+  private constructor(p_sLibelle: string, p_sCode: string, p_nNiveau: number, p_nOrdreAff: number, p_bDefaut: boolean = false) {
+    super(p_sLibelle, p_sCode, p_nOrdreAff, p_bDefaut);
     this.m_nNiveau = Math.floor(p_nNiveau);
   }
 
@@ -71,8 +72,8 @@ export class Role extends SmartEnum<string> {
   // 🏺 ENSEMENCEMENT DE LA RAM (Les trois piliers du contrôle d'accès - Format 4 lettres)
   // ----------------------------------------------------------------------------
 
-  /** 🪙 CUST - Rôle Utilisateur : Droits de capture sémantique de base */
-  public static readonly CUST = new Role('Utilisateur', 'CUST', 10, 10);
+  /** 🪙 CUST - Rôle Utilisateur : Droits de capture sémantique de base (Le Choupy de repli !) */
+  public static readonly CUST = new Role('Utilisateur', 'CUST', 10, 10, true); // 🔒 Bit True nominal !
 
   /** 💾 ADMN - Rôle Administrateur : Pouvoirs de supervision et modération [Mémoria] */
   public static readonly ADMN = new Role('Administrateur', 'ADMN', 20, 20);

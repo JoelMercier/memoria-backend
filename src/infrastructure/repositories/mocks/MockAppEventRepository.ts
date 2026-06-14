@@ -2,8 +2,8 @@
 
 import { AppEvent }             from '@/entities/AppEvent';
 import { AppEventId, UserId }   from '@/domain/value-objects/ids';
-import { AppEventSeverity }     from '@/constants/AppEventSeverity';
-import { AppEventCategory }     from '@/constants/AppEventCategory';
+import { AppEventSeverity }     from '@/constants/Severity';
+import { AppEventCategory }     from '@/constants/Categories';
 import type { IAppEventData, IAppEventRepository, IAppEventListOptions, IAppEventListResult } from '@/interfaces/repositories/PostGres/IAppEventRepository';
 import type { IListOptions }         from '@/interfaces/shared/IListOptions';
 import type { IListResult }          from '@/interfaces/shared/IListResult';

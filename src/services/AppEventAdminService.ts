@@ -3,10 +3,10 @@
 import type { AppEvent } from '@/entities/AppEvent';
 import type { IAppEventAdminService } from '@/interfaces/services/IAppEventAdminService';
 import type { IAppEventService } from '@/interfaces/services/IAppEventService';
-import { AppEventCategory } from '@/constants/AppEventCategory';
-import { AppEventSeverity } from '@/constants/AppEventSeverity';
-import { AppEventSecteur } from '@/constants/AppEventSecteur';
-import { AppEventAction } from '@/constants/AppEventAction';
+import { AppEventCategory } from '@/constants/Categories';
+import { AppEventSeverity } from '@/constants/Severity';
+import { AppEventSecteur } from '@/constants/Secteur';
+import { AppEventAction } from '@/constants/Actions';
 import type { AppEventId } from '@/domain/value-objects/ids';
 import type { IAppEventRepository } from '@/interfaces/repositories/PostGres/IAppEventRepository';
 import { OrdreTriEnum } from '@/constants/OrdreTriEnum';

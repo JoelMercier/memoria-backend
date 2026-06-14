@@ -1,10 +1,10 @@
 // ——— fichier : src/interfaces/services/IAppEventService.ts
 
 import { IBaseEventService } from '@/interfaces/services/IBaseEventService';
-import { AppEventCategory }  from '@/constants/AppEventCategory';
-import { AppEventSeverity }  from '@/constants/AppEventSeverity';
-import { AppEventSecteur }   from '@/constants/AppEventSecteur';
-import { AppEventAction }    from '@/constants/AppEventAction';
+import { AppEventCategory }  from '@/constants/Categories';
+import { AppEventSeverity }  from '@/constants/Severity';
+import { AppEventSecteur }   from '@/constants/Secteur';
+import { AppEventAction }    from '@/constants/Actions';
 import { UserId, ItemId, ShareId } from '@/domain/value-objects/ids';
 
 /**

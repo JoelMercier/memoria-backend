@@ -3,12 +3,12 @@
 import type { DatabaseConnection } from '@/config/DatabaseConnection';
 
 import { Role }              from '@/constants/Role';
-import { AppEventCategory }  from '@/constants/AppEventCategory';
+import { AppEventCategory }  from '@/constants/Categories';
 import { ContentType }       from '@/constants/ContentType';
 import { AuthProvider }      from '@/constants/AuthProvider';
-import { AppEventSeverity }  from '@/constants/AppEventSeverity';
-import { AppEventSecteur }   from '@/constants/AppEventSecteur';
-import { AppEventAction }    from '@/constants/AppEventAction';
+import { AppEventSeverity }  from '@/constants/Severity';
+import { AppEventSecteur }   from '@/constants/Secteur';
+import { AppEventAction }    from '@/constants/Actions';
 
 /**
  * 🗄️ Classe WarmupCache 🔥 (La Chaudière Initiale Élite & Résiliente 🤖)

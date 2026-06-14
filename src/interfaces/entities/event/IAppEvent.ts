@@ -1,9 +1,9 @@
 // ——— fichier : src/interfaces/entities/event/IAppEvent.ts
 
-import { AppEventAction } from '@/constants/AppEventAction';
-import { AppEventCategory } from '@/constants/AppEventCategory';
-import { AppEventSecteur } from '@/constants/AppEventSecteur';
-import { AppEventSeverity } from '@/constants/AppEventSeverity';
+import { AppEventAction } from '@/constants/Actions';
+import { AppEventCategory } from '@/constants/Categories';
+import { AppEventSecteur } from '@/constants/Secteur';
+import { AppEventSeverity } from '@/constants/Severity';
 import type { UserId,
               AppEventId  } from '@/domain/value-objects/ids';
 import type { IEntity      } from '@/interfaces/entities/IEntity';

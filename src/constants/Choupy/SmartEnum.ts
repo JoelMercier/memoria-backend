@@ -28,13 +28,18 @@ export abstract class SmartEnum<TCode extends string | number> {
   /** 🛂 Position numérique d'indexation pour le tri automatique dans les composants IHM */
   private readonly m_nOrdreAff: number;
 
+  /** 🛡️ Drapeau de repli nominal : indique si l'instance est le Choupy de secours en base de données */
+  private readonly m_bDefaut: boolean;
+
   /**
    * Orchestre l'initialisation immuable du Smart Enum et gère l'auto-enregistrement en RAM.
+   * [RACCORD V4 PRO] p_bDefaut = false préserve à 100% l'intégralité des 7 classes filles actuelles.
    */
-  protected constructor(p_sLibelle: string, p_code: TCode, p_nOrdreAff: number) {
-    this.m_sLibelle = p_sLibelle;
-    this.m_code = typeof p_code === 'string' ? (p_code.toUpperCase() as TCode) : p_code;
+  protected constructor(p_sLibelle: string, p_code: TCode, p_nOrdreAff: number, p_bDefaut: boolean = false) {
+    this.m_sLibelle  = p_sLibelle;
+    this.m_code      = typeof p_code === 'string' ? (p_code.toUpperCase() as TCode) : p_code;
     this.m_nOrdreAff = Math.floor(p_nOrdreAff);
+    this.m_bDefaut   = p_bDefaut;
 
     const l_sNomClasse = this.constructor.name;
 
@@ -63,6 +68,11 @@ export abstract class SmartEnum<TCode extends string | number> {
   /** @public @returns {number} L'index numérique d'ordonnancement graphique */
   public get ordreAff(): number {
     return this.m_nOrdreAff;
+  }
+
+  /** 🛡️ True Getters Compliance : Accesseur souverain du bit de repli nominal */
+  public get isDefaut(): boolean {
+    return this.m_bDefaut;
   }
 
   /**
