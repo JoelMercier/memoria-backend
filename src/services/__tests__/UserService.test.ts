@@ -39,7 +39,7 @@ describe('UserService', () => {
   beforeEach(() => {
     l_oUserRepository = {
       findById: vi.fn(),
-      findByEmail: vi.fn(),
+      findByCourriel: vi.fn(),
       findByPseudo: vi.fn(),
       update: vi.fn(),
       delete: vi.fn()
