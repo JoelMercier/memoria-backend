@@ -82,9 +82,9 @@ export class UserService implements IUserService {
     }
 
     if (p_oDto.courriel && p_oDto.courriel.toLowerCase() !== l_oExisting.courriel.toLowerCase()) {
-      const l_oByEmail: User | null = await this.repository.findByEmail(p_oDto.courriel);
+      const l_oByEmail: User | null = await this.repository.findByCourriel(p_oDto.courriel);
       if (l_oByEmail) {
-        throw UserErrorFactory.profileConflict('email', p_oDto.courriel);
+        throw UserErrorFactory.profileConflict('courriel', p_oDto.courriel);
       }
     }
 

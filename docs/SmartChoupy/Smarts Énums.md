@@ -1,38 +1,30 @@
-# 🏛️ RAPPORT D'ARCHITECTURE : LES `SMARTENUM`
+# 📜 Document de soute : L'architecture des Smart Enums V4
 
-> **Auteur** : Conception : Joël (C++ Nostalgic' & Matrix 4D Survivor)
-> **Auteur** : Code : Gaïa (Experte du Burin & Maîtresse de la forge)
-> **Auteur** : Assistant Code : Joël (Mutable entre Any->Abstract & Void->Capilaire)
-> **Statut** : Scellé, validé
-> **Design Patterns** : Multiton, Registry, Value Object, Specification Scan.
+## 🏛️ 1. Le problème constitutionnel (L'Ancien Régime)
 
----
-
-## 🏛️ 1. LE PROBLÈME CONSTITUTIONNEL (L'Ancien Régime)
-
-En ingénierie logicielle, les énumérations natives ou les dictionnaires passifs souffrent d'une tare congénitale : **l'anarchie sémantique par couplage lâche**.
+En ingénierie logicielle classique, les énumérations natives (comme les `enum` TypeScript sauvage ou les dictionnaires passifs) souffrent d'une tare congénitale : **l'anarchie sémantique par couplage lâche**. Ce ne sont que des structures passives indexant des couples clés/valeurs primitifs.
 
 ### 🚨 Les trois failles de sécurité de la Vague Alpha :
 
-1. **L'illusion du typage** : Un enum natif accepte n'importe quelle primitive volante au runtime, ouvrant la porte aux corruptions de mémoire vive.
-2. **La béquille algorithmique** : Pour associer un comportement (un libellé IHM, un index graphique, ou une directive SQL) à un code brut, les développeurs écrivent des tunnels de `if` artificiels. **C’est une violation du principe Ouvert/Fermé (SOLID - OCP).**
+1. **L'illusion du typage** : Un enum natif accepte n'importe quelle primitive volante au runtime, ouvrant la porte aux injections réseau et à la corruption de mémoire vive.
+2. **La béquille algorithmique** : Pour associer un comportement (un libellé IHM, un index de tri graphique, ou une directive SQL) à un code brut, les développeurs écrivent des structures `switch/case` ou des tunnels de `if` artificiels. **C’est une violation du principe Ouvert/Fermé (SOLID - OCP).**
 3. **Le viol d'encapsulation** : La soute basse (PostgreSQL) et la surface (IHM) s'échangent des chaînes textuelles lourdes à ré-allouer en boucle, provoquant une fatigue inutile du microprocesseur.
 
 ---
 
-## 🗜️ 2. LA MANŒUVRE SOUVERAINE : LE PATTERN `MULTITON` CENTRALISÉ
+## 🗜️ 2. La manœuvre souveraine : Le pattern multiton centralisé
 
 Pour résoudre cette équation, nous avons implémenté une convergence de trois _Design Patterns_ majeurs du Gang des Quatre (GoF), appliqués au niveau matériel de la RAM.
 
-Le cœur du système repose sur une classe abstraite universelle. Contrairement aux objets volants, le framework s'auto-enregistre et se fige de manière déterministe dès l'allumage du serveur.
+Le cœur du système repose sur la classe abstraite **`SmartEnum<TCode>`**. Contrairement aux objets volants, le framework s'auto-enregistre et se fige de manière déterministe dès l'allumage du serveur.
 
-### 🛰️ Cartographie de la Matrice 2D en RAM :
+### 🛰️ Cartographie de la matrice 2D en RAM :
 
 L'accès à une instance riche ne souffre d'aucun algorithme de recherche séquentiel lourd. C'est une résolution mathématique directe en complexité temporelle \(O(1)\) :
 
 `SmartEnum.registre[NomDeLaClasse][CodeTechnique] = Pointeur Instance Vivante Immuable`
 
-### 🧠 Le Fonctionnement de l'Ancêtre (Pseudo-Code)
+### 🧠 Le fonctionnement de l'ancêtre (Pseudo-code)
 
 ```text
 Classe Abstraite SmartEnum
@@ -70,14 +62,14 @@ FinClasse
 
 ---
 
-## 🏺 3. LA FLOTTE DES QUADRIGRAMMES MÉTIERS (Exemples d'Écurie)
+## 🏺 3. La flotte des quadrigrammes métiers (Exemples d'écurie)
 
-Grâce à la décorrélative totale imposée, la signature du constructeur d'une classe fille est totalement libre. Chaque énumération encapsule ses propres métadonnées sans polluer la maman.
+Grâce à la décorrélative totale imposée en V4, la signature du constructeur d'une classe fille est totalement libre. Chaque énumération encapsule ses propres métadonnées sans polluer la maman.
 
-### 🎛️ A. Le Régulateur de Directives : `OrdreTriEnum`
+### 🎛️ A. Le régulateur de directives : `OrdreTriEnum`
 
-- **Mission** : Sécuriser les clauses `ORDER BY` face aux injections SQL.
-- **Mécanisme** : Porte un 4ème paramètre (`m_sValueSql`).
+- **Mission** : Sécuriser les clauses `ORDER BY` face aux injections SQL [Mémoria].
+- **Mécanisme** : Porte un 4ème paramètre (`m_sValueSql`) pour éliminer les anciens codes "caches-misère" textuels.
 
 ```text
 Classe OrdreTriEnum Hérite SmartEnum
@@ -105,7 +97,7 @@ Classe OrdreTriEnum Hérite SmartEnum
 FinClasse
 ```
 
-### 🛡️ B. Le Calibreur Matériel : `ChoupyEnum`
+### 🛡️ B. Le calibreur matériel : `ChoupyEnum`
 
 - **Mission** : Verrouiller les dimensions physiques maximales des Buffers en RAM face au standard SQL `ByteA`.
 - **Mécanisme** : Le code technique de base sert à stocker le poids exact en octets.
@@ -113,8 +105,8 @@ FinClasse
 ```text
 Classe ChoupyEnum Hérite SmartEnum<Nombre>
     // Ensemencement des dimensions mémoires
-    Constante Statique DIM_1  = ChoupyEnum('1 octet (char)'           ,  1,  5)
-    Constante Statique DIM_4  = ChoupyEnum('4 octets (Quadrigramme)'  ,  4, 10)
+    Constante Statique DIM_1  = ChoupyEnum('1 octet (char)',           1, 5)
+    Constante Statique DIM_4  = ChoupyEnum('4 octets (Quadrigramme)',  4, 10)
     Constante Statique DIM_16 = ChoupyEnum('16 octets (UUID 128 bits)', 16, 15)
 
     // Douane Active Polymorphe
@@ -132,28 +124,28 @@ Classe ChoupyEnum Hérite SmartEnum<Nombre>
 FinClasse
 ```
 
-### 🔔 C. Les Portiers des Traces d'Audit : `AppEventSecteur` & `AppEventAction`
+### 🔔 C. Les portiers des traces d'audit : `AppEventSecteur` & `AppEventAction`
 
-- **Mission** : Standardiser et distribuer les index nominaux d'audit (ex: Secteurs `'AUTH'`, `'PEPI'` / Actions `'CONN'`, `'CREA'`) directly dans les caches processeurs.
+- **Mission** : Standardiser et distribuer les index nominaux d'audit (ex: Secteurs `'AUTH'`, `'PEPI'` / Actions `'CONN'`, `'CREA'`) directement dans les caches processeurs.
 
 ---
 
-## 🏛️ 4. LA DÉFENSE DES PATTERNS
+## 🏛️ 4. Argumentaire devant le jury : La défense des patterns
 
-Voici pourquoi cette implémentation surclasse les standards du marché :
+Messieurs les membres du jury, voici pourquoi cette implémentation surclasse les standards du marché :
 
-### 1️⃣ Le Pattern Multiton (GoF) vs Singleton Unique
+### 1️⃣ Le pattern multiton (GoF) vs singleton unique
 
-Nous n'avons pas instancié dix singletons distincts pour polluer l'espace global. Nous avons implémenté une **structure de Multiton centralisée**. La classe mère contrôle de manière hermétique l'accès aux casiers de la RAM. Un seul tableau associatif global gère l'univers des constantes de l'application.
+Nous n'avons pas instancié dix singletons distincts pour polluer l'espace global. Nous avons implémenté une **structure de multiton centralisée**. La classe mère contrôle de manière hermétique l'accès aux casiers de la RAM. Un seul tableau associatif global gère l'univers des constantes de l'application.
 
-### 2️⃣ Le Pattern Value Object (DDD) par l'Immuabilité Absolue
+### 2️⃣ Le pattern value object (DDD) par l'immuabilité absolue
 
-À la fin de chaque constructeur, les instances riches sont instantanément coulées dans du silicium armé. Elles n'ont pas d'identité changeante, elles sont définies uniquement par la valeur immuable de leurs propriétés. Elles sont interchangeables par copie de pointeurs.
+À la fin de chaque constructeur, les instances riches sont instantanément coulées dans le béton armé du silicium. Elles n'ont pas d'identité changeante, elles sont définies uniquement par la valeur immuable de leurs propriétés. Elles sont interchangeables par copie de pointeurs.
 
-### 3️⃣ Le Respect Absolu du Principe Ouvert/Fermé (SOLID - OCP)
+### 3️⃣ Le respect absolu du principe ouvert/fermé (SOLID - OCP)
 
 Dans l'Ancien Régime, ajouter un critère de tri exigeait de modifier la méthode `fromSql`. **Aujourd'hui, l'algorithme est fermé à la modification mais ouvert à l'extension.** Si nous décidons demain d'ajouter un tri aléatoire, la méthode `fromSql` le découvrira **toute seule par scan dynamique par prédicat**, sans altérer un seul octet de logique interne !
 
-### 4️⃣ Performance brute : Zéro allocation, Zéro Garbage Collector
+### 4️⃣ Performance brute : Zéro allocation, zéro garbage collector
 
 Dans les boucles de traitement intensives, notre API ne passe plus son temps à instancier, détruire, ou comparer des chaînes de caractères complexes. Les couches logicielles s'échangent de fiers **pointeurs mémoire machines natifs (64 bits)**. La comparaison d'égalité redevient une simple confrontation d'adresses en mémoire vive. C'est l'héritage direct des performances du C++ appliqué au Web.

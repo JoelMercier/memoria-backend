@@ -82,7 +82,6 @@ export class AuthService implements IAuthService {
    * 📝 Inscription d'un nouvel utilisateur (Fail-fast unitaire inclus).
    */
   public async register(p_oDto: CreateUserDto): Promise<IUser> {
-    // 🪓 ALIGNEMENT SOUVERAIN V4 : Interrogation obligatoire via l'accesseur this.repository
     const l_oExistingEmail: User | null = await this.repository.findByCourriel(p_oDto.courriel);
     if (l_oExistingEmail) throw UserErrorFactory.courrielExists(p_oDto.courriel);
 
@@ -92,16 +91,16 @@ export class AuthService implements IAuthService {
     const l_sPasswordHash: string = await this.hasher.hash(p_oDto.password);
 
     const l_oUserData: IUserData = {
-      idUser         : new UserId(IdForge.genererUuidV7()),
-      courriel       : p_oDto.courriel,
-      passwordHash   : l_sPasswordHash,
-      pseudo         : p_oDto.pseudo,
-      roleId         : new RoleId('CUST'),
-      authProviderId : new ProviderId('LOCA'),
-      settingsUser   : {},
-      rgpdConsent    : p_oDto.rgpdConsent,
+      idUser: new UserId(IdForge.genererUuidV7()),
+      courriel: p_oDto.courriel,
+      passwordHash: l_sPasswordHash,
+      pseudo: p_oDto.pseudo,
+      roleId: new RoleId('CUST'),
+      authProviderId: new ProviderId('LOCA'),
+      settingsUser: {},
+      rgpdConsent: p_oDto.rgpdConsent,
       rgpdConsentDate: new Date(),
-      createdAt      : new Date()
+      createdAt: new Date()
     };
 
     return await this.repository.create(l_oUserData);
@@ -111,7 +110,7 @@ export class AuthService implements IAuthService {
    * 🔐 Authentification initiale (Vérification des secrets et émission des jetons).
    */
   public async login(p_oDto: LoginDto): Promise<IAuthResult> {
-    const l_oUser: User | null = await this.repository.findByCourriel(p_oDto.email);
+    const l_oUser: User | null = await this.repository.findByCourriel(p_oDto.courriel);
     if (!l_oUser) throw UserErrorFactory.invalidCredentials();
 
     const l_bIsValid: boolean = await this.hasher.verify(p_oDto.password, l_oUser.passwordHash);

@@ -159,7 +159,7 @@ export class ShareService implements IShareService {
       idShare: new ShareId(IdForge.genererUuidV7()),
       itemOwnerId: p_oDto.idUser,
       itemId: p_oDto.idItem,
-      courrielDest: p_oDto.recipientEmail,
+      courrielDest: p_oDto.recipientCourriel,
       jeton: l_sToken,
       configuration: p_oDto.accessConfig,
       createdAt: new Date()
@@ -198,8 +198,8 @@ export class ShareService implements IShareService {
     await this.ensureOwnership(p_axUserId, p_axShareId);
 
     const l_oUpdates: Partial<IShareData> = {};
-    if (p_oDto.recipientEmail !== undefined) {
-      l_oUpdates.courrielDest = p_oDto.recipientEmail;
+    if (p_oDto.recipientCourriel !== undefined) {
+      l_oUpdates.courrielDest = p_oDto.recipientCourriel;
     }
     if (p_oDto.accessConfig !== undefined) {
       l_oUpdates.configuration = p_oDto.accessConfig;
