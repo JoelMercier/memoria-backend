@@ -57,7 +57,7 @@ describe('UserService', () => {
     it("lève une exception si un tiers utilise déjà l'adresse électronique demandée", async () => {
       vi.mocked(l_oUserRepository.findById).mockResolvedValue(createMockUser());
       // Simulation : un autre utilisateur possède déjà cet e-mail en base
-      vi.mocked(l_oUserRepository.findByEmail).mockResolvedValue({
+      vi.mocked(l_oUserRepository.findByCourriel).mockResolvedValue({
         idUser: new UserId('018f3a3c-5000-7000-8000-00000000000F')
       } as any);
 
