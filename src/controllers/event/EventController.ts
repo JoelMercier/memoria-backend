@@ -1,12 +1,13 @@
 // ——— fichier : src\controllers\event\AppEventController.ts
 
 import type { NextFunction, Request, Response } from 'express';
+
 import { IAppEventController } from '@/interfaces/controllers/IAppEventController';
-import { IAppEventService }    from '@/interfaces/services/IAppEventService';
-import { ApiResponseFactory }  from '@/utils/ApiResponseFactory';
-import { EventErrorFactory }   from '@/exceptions/EventErrorFactory';
-import { CreateEventDto }      from '@/dto/event/CreateEventDto';
-import { UserId }              from '@/domain/value-objects/ids';
+import { IAppEventService    } from '@/interfaces/services/IAppEventService';
+import { ApiResponseFactory  } from '@/utils/ApiResponseFactory';
+import { EventErrorFactory   } from '@/exceptions/EventErrorFactory';
+import { CreateEventDto      } from '@/dto/event/CreateEventDto';
+import { UserId              } from '@/domain/value-objects/ids';
 
 /**
  * 🏛️ Classe AppEventController 🛡️
@@ -80,12 +81,12 @@ export class AppEventController implements IAppEventController {
       // De-nullification sémantique pour le compilateur TypeScript
       const l_oPayloadSecurise = {
         userId: l_axUserId,
-        eventCategory: l_oDto.eventCategory,
-        eventSecteur: l_oDto.eventSecteur,
-        eventAction: l_oDto.eventAction,
-        severity: l_oDto.severity,
-        message: l_oDto.message.trim(),
-        metadata: l_oDto.metadata
+        eventCategorie : l_oDto.eventCategorie,
+        eventSecteur   : l_oDto.eventSecteur,
+        eventAction    : l_oDto.eventAction,
+        eventSeverite  : l_oDto.eventSeverite,
+        message        : l_oDto.message.trim(),
+        metadata       : l_oDto.metadata
       };
 
       const l_oEvent = await this.eventService.log(l_oPayloadSecurise);

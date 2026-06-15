@@ -1,8 +1,9 @@
 // ——— fichier : src/interfaces/services/IAppEventAdminService.ts
 
-import { IBaseEventService } from '@/interfaces/services/IBaseEventService';
-import { AppEventId }        from '@/domain/value-objects/ids';
 import type { AppEvent }     from '@/entities/AppEvent';
+
+import { IBaseEventService } from '@/interfaces/services/IBaseEventService';
+import { EventId           } from '@/domain/value-objects/ids';
 
 /**
  * 🏛️ Interface IAppEventAdminService 🚨
@@ -22,10 +23,10 @@ export interface IAppEventAdminService extends IBaseEventService {
    * 🔎 Récupère un log d'audit spécifique par son identifiant unique fort ("aeIdEvent").
    *
    * @async
-   * @param {AppEventId} p_axIdEvent - L'identifiant unique fort de l'événement recherché
+   * @param { EventId } p_axIdEvent - L'identifiant unique fort de l'événement recherché
    * @returns {Promise<AppEvent | null>} L'entité de l'événement d'audit hydratée ou null
    */
-  getById(p_axIdEvent: AppEventId): Promise<AppEvent | null>;
+  getById(p_axIdEvent: EventId): Promise<AppEvent | null>;
 
   /**
    * 🚨 Opération interdite : Les journaux d'audit ne peuvent pas être modifiés.

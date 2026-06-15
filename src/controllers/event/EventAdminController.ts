@@ -5,7 +5,7 @@ import { IAppEventAdminController } from '@/interfaces/controllers/IAppEventAdmi
 import { IAppEventAdminService }    from '@/interfaces/services/IAppEventAdminService';
 import { ApiResponseFactory }       from '@/utils/ApiResponseFactory';
 import { EventErrorFactory }        from '@/exceptions/EventErrorFactory';
-import { AppEventId }               from '@/domain/value-objects/ids';
+import { EventId    }               from '@/domain/value-objects/ids';
 
 /**
  * 🎛️ Classe AppEventAdminController 🚨
@@ -97,7 +97,7 @@ export class AppEventAdminController implements IAppEventAdminController {
   public async getById(p_oReq: Request, p_oRes: Response, p_oNext: NextFunction): Promise<void> {
     try {
       const l_sIdBrut: string          = this.getRequiredParam(p_oReq, 'id');
-      const l_axCibleEventId: AppEventId = new AppEventId(l_sIdBrut);
+      const l_axCibleEventId: EventId = new EventId(l_sIdBrut);
 
       // 🗲 RACCORDÉ V4 : Appel de getById() nominal du service d'administration
       const l_oEvent = await this.adminService.getById(l_axCibleEventId);

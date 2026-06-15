@@ -1,10 +1,10 @@
 // ——— fichier : src/interfaces/services/IAppEventService.ts
 
 import { IBaseEventService } from '@/interfaces/services/IBaseEventService';
-import { AppEventCategory }  from '@/constants/Categories';
-import { AppEventSeverity }  from '@/constants/Severites';
-import { AppEventSecteur }   from '@/constants/Secteurs';
-import { AppEventAction }    from '@/constants/Actions';
+import { Categorie }  from '@/constants/Categories';
+import { Severite  }  from '@/constants/Severites';
+import { Secteur   }   from '@/constants/Secteurs';
+import { Action    }    from '@/constants/Actions';
 import { UserId, ItemId, ShareId } from '@/domain/value-objects/ids';
 
 /**
@@ -38,10 +38,10 @@ export interface IAppEventService extends IBaseEventService {
    */
   log(data: {
     userId?        : UserId | null;
-    eventCategory  : AppEventCategory;
-    eventSecteur   : AppEventSecteur;
-    eventAction    : AppEventAction;
-    severity?      : AppEventSeverity;
+    eventCategorie : Categorie;
+    eventSecteur   : Secteur;
+    eventAction    : Action;
+    eventSeverite  : Severite;
     message        : string;
     metadata?      : Record<string, any>;
   }): Promise<any>;

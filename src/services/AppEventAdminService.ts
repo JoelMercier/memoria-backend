@@ -1,14 +1,15 @@
 // ——— fichier : src/services/AppEventAdminService.ts
 
-import type { AppEvent } from '@/entities/AppEvent';
+import type { AppEvent              } from '@/entities/AppEvent';
 import type { IAppEventAdminService } from '@/interfaces/services/IAppEventAdminService';
-import type { IAppEventService } from '@/interfaces/services/IAppEventService';
-import { AppEventCategory } from '@/constants/Categories';
-import { AppEventSeverity } from '@/constants/Severites';
-import { AppEventSecteur } from '@/constants/Secteurs';
-import { AppEventAction } from '@/constants/Actions';
-import type { AppEventId } from '@/domain/value-objects/ids';
-import type { IAppEventRepository } from '@/interfaces/repositories/PostGres/IAppEventRepository';
+import type { IAppEventService      } from '@/interfaces/services/IAppEventService';
+import type { IAppEventRepository   } from '@/interfaces/repositories/PostGres/IAppEventRepository';
+import type { EventId               } from '@/domain/value-objects/ids';
+
+import { Categorie    } from '@/constants/Categories';
+import { Severite     } from '@/constants/Severites';
+import { Secteur      } from '@/constants/Secteurs';
+import { Action       } from '@/constants/Actions';
 import { OrdreTriEnum } from '@/constants/OrdreTriEnum';
 
 /**
@@ -66,7 +67,7 @@ export class AppEventAdminService implements IAppEventAdminService {
   /**
    * 🔎 Récupère un log d'audit spécifique par son identifiant unique fort ("aeIdEvent").
    */
-  public async getById(p_axIdEvent: AppEventId): Promise<AppEvent | null> {
+  public async getById(p_axIdEvent: EventId): Promise<AppEvent | null> {
     // 🪓 ALIGNEMENT SOUVERAIN V4 : Utilisation du await direct requis par la règle require-await
     return await this.repository.findById(p_axIdEvent);
   }
@@ -122,11 +123,11 @@ export class AppEventAdminService implements IAppEventAdminService {
     }
 
     await this.eventService.log({
-      userId: null,
-      eventCategory: AppEventCategory.AUDI,
-      eventSecteur: AppEventSecteur.SYST,
-      eventAction: AppEventAction.PURG,
-      severity: AppEventSeverity.WARN,
+      userId         : null,
+      eventCategorie : Categorie.GENE,
+      eventSecteur   : Secteur  .SYST,
+      eventAction    : Action   .PURG,
+      eventSeverite  : Severite .WARN,
       message: `Ordre d'administration : Lancement de la purge réglementaire des logs antérieurs au ${p_dCutoffDate.toISOString()}.`
     });
 

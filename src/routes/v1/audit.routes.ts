@@ -1,7 +1,7 @@
 // ——— fichier : src/routes/v1/audit.routes.ts
 
 import { Router } from 'express';
-import { AppEventAdminController } from '@/controllers/event/AppEventAdminController';
+import { AppEventAdminController } from '@/controllers/event/EventAdminController';
 
 /**
  * 🛣️ Fonction de Forgeage du Routeur d'Audit Système

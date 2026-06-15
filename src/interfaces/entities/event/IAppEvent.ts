@@ -1,12 +1,12 @@
 // ——— fichier : src/interfaces/entities/event/IAppEvent.ts
 
-import { AppEventAction } from '@/constants/Actions';
-import { AppEventCategory } from '@/constants/Categories';
-import { AppEventSecteur } from '@/constants/Secteurs';
-import { AppEventSeverity } from '@/constants/Severites';
+import { Action    } from '@/constants/Actions';
+import { Categorie } from '@/constants/Categories';
+import { Secteur   } from '@/constants/Secteurs';
+import { Severite  } from '@/constants/Severites';
 import type { UserId,
-              AppEventId  } from '@/domain/value-objects/ids';
-import type { IEntity      } from '@/interfaces/entities/IEntity';
+              EventId       } from '@/domain/value-objects/ids';
+import type { IEntity       } from '@/interfaces/entities/IEntity';
 import type { IAppEventData } from '@/interfaces/entities/event/IAppEventData';
 
 /**
@@ -22,22 +22,22 @@ import type { IAppEventData } from '@/interfaces/entities/event/IAppEventData';
 export interface IAppEvent extends IEntity<IAppEventData> {
 
   /** 🔔 Signature sémantique vers l'identifiant unique et fort de l'événement */
-  get AppEventId(): AppEventId;
+  get EventId(): EventId;
 
   /** 👥 Signature sémantique vers l'identifiant fort de l'auteur de l'action ou NULL si système */
   get UserId(): UserId | null;
 
   /** 📂 Signature sémantique vers l'instance de Smart Enum représentant la catégorie */
-  get EventCategory(): AppEventCategory;
+  get Categorie(): Categorie;
 
   /** 🏷️ Signature sémantique vers l'instance de Smart Enum qualifiant le Secteur */
-  get EventAction(): AppEventAction;
+  get Action(): Action;
 
   /** 🏷️ Signature sémantique vers l'instance de Smart Enum qualifiant l'action */
-  get EventSecteur(): AppEventSecteur;
+  get Secteur(): Secteur;
 
   /** ⚠️ Signature sémantique vers l'instance de Smart Enum fixant le niveau de gravité */
-  get Severity(): AppEventSeverity;
+  get Severite(): Severite;
 
   /** 💬 Signature sémantique vers la description textuelle explicite stockée */
   get Message(): string;

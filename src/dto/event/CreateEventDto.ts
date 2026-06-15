@@ -1,11 +1,12 @@
 // ——— fichier : src/dto/event/CreateEventDto.ts
 
-import { AppEventAction     } from '@/constants/Actions';
-import { AppEventCategory   } from '@/constants/Categories';
-import { AppEventSecteur    } from '@/constants/Secteurs';
-import { AppEventSeverity   } from '@/constants/Severites';
-import { UserId, AppEventId } from '@/domain/value-objects/ids';
 import { type CreateAppEventSchemaType, AppEventValidation } from '@/validation/zod/AppEventValidation';
+
+import { Action     } from '@/constants/Actions';
+import { Categorie   } from '@/constants/Categories';
+import { Secteur    } from '@/constants/Secteurs';
+import { Severite   } from '@/constants/Severites';
+import { UserId, EventId } from '@/domain/value-objects/ids';
 
 /**
  * 📦 Classe CreateEventDto (Version Pure Hexagonale)
@@ -22,22 +23,22 @@ import { type CreateAppEventSchemaType, AppEventValidation } from '@/validation/
 export class CreateEventDto {
 
   /** 📂 Caillou de couleur : Catégorie générale de l'événement système */
-  public readonly eventCategory : AppEventCategory;
+  public readonly eventCategorie : Categorie;
 
   /** 🔔 Caillou de couleur : Identifiant unique et fort de l'événement */
-  public readonly idEvent       : AppEventId;
+  public readonly idEvent       : EventId;
 
   /** 👥 Caillou de couleur : Propriétaire rattaché à l'action d'audit */
   public readonly userId        : UserId | null;
 
   /** 💻 Caillou de couleur : Contexte fonctionnel de l'opération (Char(4)) */
-  public readonly eventSecteur  : AppEventSecteur;
+  public readonly eventSecteur  : Secteur;
 
   /** ⚙️ Caillou de couleur : Action technique précise exécutée (Char(4)) */
-  public readonly eventAction   : AppEventAction;
+  public readonly eventAction   : Action;
 
   /** ⚠️ Caillou de couleur : Niveau de criticité opérationnelle typé */
-  public readonly severity      : AppEventSeverity;
+  public readonly eventSeverite : Severite;
 
   /** 💬 Corps du message ou description descriptive */
   public readonly message       : string;
@@ -56,16 +57,16 @@ export class CreateEventDto {
     const l_oRawBody : Record<string, unknown> = (data && typeof data === 'object') ? (data as Record<string, unknown>) : {};
     const validated  : CreateAppEventSchemaType = AppEventValidation.validateCreate(l_oRawBody);
 
-    this.idEvent       = new AppEventId(validated.idAppEvent);
+    this.idEvent       = new EventId(validated.idAppEvent);
 
-    this.eventCategory = AppEventCategory.fromSql(validated.eventCategory);
-    this.eventSecteur  = AppEventSecteur .fromSql(validated.eventSecteur);
-    this.eventAction   = AppEventAction  .fromSql(validated.eventAction );
-    this.severity      = AppEventSeverity.fromSql(validated.severity ?? 'INFO');
+    this.eventCategorie = Categorie.fromSql(validated.eventCategorie);
+    this.eventSecteur   = Secteur  .fromSql(validated.eventSecteur  );
+    this.eventAction    = Action   .fromSql(validated.eventAction   );
+    this.eventSeverite  = Severite .fromSql(validated.eventSeverite ?? 'INFO');
 
-    this.userId        = validated.userId ? new UserId(validated.userId) : null;
-    this.message       = validated.message;
-    this.metadata      = validated.metadata as Record<string, any>;
+    this.userId   = validated.userId ? new UserId(validated.userId) : null;
+    this.message  = validated.message;
+    this.metadata = validated.metadata as Record<string, any>;
   }
 
 }

@@ -15,7 +15,7 @@ import { ChoupyEnum } from '@/constants/Choupy/ChoupyEnum';
  * @author Directrice du Silicium : Joël (C++ Framework Architect - Nominal Obsession)
  * @author Graveuse de Pépites : Gaïa (Au burin, raccordée sur la Choupy Doctrine)
  */
-export class EventSecteurId extends IdChoupy<'SECTEUR_ID', string> {
+export class SecteurId extends IdChoupy<'SECTEUR_ID', string> {
 
   /**
    * Moule une instance immuable d'identifiant de secteur d'audit.

@@ -1,11 +1,11 @@
 // ——— fichier : src/interfaces/services/IBaseEventService.ts
 
-import { IBaseService }         from '@/interfaces/services/IBaseService';
-import type { AppEvent }        from '@/entities/AppEvent';
-import type { AppEventId }      from '@/domain/value-objects/ids';
-import type { IAppEventData }   from '@/interfaces/repositories/PostGres/IAppEventRepository';
-import type { IAppEventRepository } from '@/interfaces/repositories/PostGres/IAppEventRepository'; // 🗲 [ALIGNÉ INTERFACE & CASSE]
+import type { AppEvent            } from '@/entities/AppEvent';
+import type { EventId             } from '@/domain/value-objects/ids';
+import type { IAppEventData       } from '@/interfaces/repositories/PostGres/IAppEventRepository';
+import type { IAppEventRepository } from '@/interfaces/repositories/PostGres/IAppEventRepository';
 
+import { IBaseService }         from '@/interfaces/services/IBaseService';
 /**
  * 🏛️ Interface IBaseEventService 🛡️
  * ----------------------------------------------------------------------------
@@ -19,7 +19,7 @@ import type { IAppEventRepository } from '@/interfaces/repositories/PostGres/IAp
  * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets)
  * @author Ouvriers du Code : La Vague Initiale (Contrebande de logs et traçabilité)
  */
-export interface IBaseEventService extends IBaseService<AppEvent, IAppEventData, AppEventId, IAppEventRepository> {
+export interface IBaseEventService extends IBaseService<AppEvent, IAppEventData, EventId, IAppEventRepository> {
   /**
    * Accesseur unique et immuable vers le dépôt d'infrastructure d'audit.
    * Centralise la souveraineté de l'accès à la table physique "Events" via le contrat générique.

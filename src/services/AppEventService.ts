@@ -1,13 +1,14 @@
 // ——— fichier : src/services/AppEventService.ts
 
 import type { IAppEventService } from '@/interfaces/services/IAppEventService';
-import { AppEventCategory } from '@/constants/Categories';
-import { AppEventSeverity } from '@/constants/Severites';
-import { AppEventSecteur } from '@/constants/Secteurs';
-import { AppEventAction } from '@/constants/Actions';
 import type { UserId, ItemId, ShareId } from '@/domain/value-objects/ids';
 import type { AppEventRepository } from '@/infrastructure/repositories/PostGres/AppEventRepository';
 import type { AppEvent } from '@/entities/AppEvent';
+
+import { Categorie } from '@/constants/Categories';
+import { Severite  } from '@/constants/Severites';
+import { Secteur   } from '@/constants/Secteurs';
+import { Action    } from '@/constants/Actions';
 
 /**
  * 🏛️ Classe AppEventService
@@ -51,28 +52,27 @@ export class AppEventService implements IAppEventService {
    * [SCELLÉ RÉALINÉ V4] Le type de retour lâche Promise<any> est balayé au profit de Promise<AppEvent> !
    */
   public async log(p_oData: {
-    userId?: UserId | null;
-    eventCategory: AppEventCategory;
-    eventSecteur: AppEventSecteur;
-    eventAction: AppEventAction;
-    severity?: AppEventSeverity;
-    message: string;
-    metadata?: Record<string, unknown>; // 🪓 [RÉPARÉ V4] Standard unknown strict
+    userId?        : UserId | null;
+    eventCategorie : Categorie;
+    eventSecteur   : Secteur;
+    eventAction    : Action;
+    eventSeverite  : Severite;
+    message        : string;
+    metadata?      : Record<string, unknown>; // 🪓 [RÉPARÉ V4] Standard unknown strict
   }): Promise<AppEvent> {
-    const { AppEventId, EventSecteurId, EventActionId } =
-      await import('@/domain/value-objects/ids');
+    const { EventId, SecteurId, ActionId } = await import('@/domain/value-objects/ids');
     const { IdForge } = await import('@/domain/utils/IdForge');
 
     return await this.repository.create({
-      aeIdAppEvent: new AppEventId(IdForge.genererUuidV7()),
-      aeUserId: p_oData.userId ?? null,
-      aeCategoryId: p_oData.eventCategory,
-      aeSecteurId: new EventSecteurId(p_oData.eventSecteur.code),
-      aeActionId: new EventActionId(p_oData.eventAction.code),
-      aeSeverityId: p_oData.severity || AppEventSeverity.INFO,
-      aeMessage: p_oData.message,
-      aeMetadata: p_oData.metadata || {}, // Câblage binaire natif
-      aeCreatedAt: new Date()
+      aeIdAppEvent  : new EventId(IdForge.genererUuidV7()),
+      aeUserId      : p_oData.userId ?? null,
+      aeCategorieId : p_oData.eventCategorie,
+      aeSecteurId   : new SecteurId(p_oData.eventSecteur.code),
+      aeActionId    : new ActionId(p_oData.eventAction.code),
+      aeSeveriteId  : p_oData.eventSeverite || Severite.INFO,
+      aeMessage     : p_oData.message,
+      aeMetadata    : p_oData.metadata || {}, // Câblage binaire natif
+      aeCreatedAt   : new Date()
     });
   }
 
@@ -82,9 +82,10 @@ export class AppEventService implements IAppEventService {
   public async authSuccess(p_axUserId: UserId): Promise<AppEvent> {
     return await this.log({
       userId: p_axUserId,
-      eventCategory: AppEventCategory.AUDI,
-      eventSecteur: AppEventSecteur.AUTH,
-      eventAction: AppEventAction.CONN,
+      eventCategorie : Categorie.SECU,
+      eventSecteur   : Secteur  .AUTH,
+      eventAction    : Action   .CONN,
+      eventSeverite  : Severite .INFO,
       message: 'Connexion réussie'
     });
   }
@@ -94,10 +95,10 @@ export class AppEventService implements IAppEventService {
    */
   public async authFailure(p_sEmail: string): Promise<AppEvent> {
     return await this.log({
-      eventCategory: AppEventCategory.AUDI,
-      eventSecteur: AppEventSecteur.AUTH,
-      eventAction: AppEventAction.ECHE,
-      severity: AppEventSeverity.WARN,
+      eventCategorie : Categorie.SECU,
+      eventSecteur   : Secteur  .AUTH,
+      eventAction    : Action   .ECHE,
+      eventSeverite  : Severite .WARN,
       message: 'Échec de connexion',
       metadata: { email: p_sEmail }
     });
@@ -108,10 +109,11 @@ export class AppEventService implements IAppEventService {
    */
   public async itemCreated(p_axUserId: UserId, p_axItemId: ItemId): Promise<AppEvent> {
     return await this.log({
-      userId: p_axUserId,
-      eventCategory: AppEventCategory.ANAL,
-      eventSecteur: AppEventSecteur.PEPI,
-      eventAction: AppEventAction.CREA,
+      userId         : p_axUserId,
+      eventCategorie : Categorie.ANAL,
+      eventSecteur   : Secteur.PEPI,
+      eventAction    : Action.CREA,
+      eventSeverite  : Severite.INFO,
       message: 'Pépite créée',
       metadata: { itemId: p_axItemId.valeur }
     });
@@ -122,12 +124,13 @@ export class AppEventService implements IAppEventService {
    */
   public async shareCreated(p_axUserId: UserId, p_axShareId: ShareId): Promise<AppEvent> {
     return await this.log({
-      userId: p_axUserId,
-      eventCategory: AppEventCategory.ANAL,
-      eventSecteur: AppEventSecteur.PEPI,
-      eventAction: AppEventAction.PART,
-      message: 'Pépite partagée',
-      metadata: { shareId: p_axShareId.valeur }
+      userId         : p_axUserId,
+      eventCategorie : Categorie.ANAL,
+      eventSecteur   : Secteur  .PEPI,
+      eventAction    : Action   .PART,
+      eventSeverite  : Severite .INFO,
+      message        : 'Pépite partagée',
+      metadata       : { shareId: p_axShareId.valeur }
     });
   }
 }

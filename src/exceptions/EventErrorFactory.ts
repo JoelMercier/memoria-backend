@@ -1,7 +1,7 @@
 // ——— fichier : src/exceptions/EventErrorFactory.ts
 
-import { ApiError     } from '@/exceptions/ApiError';
-import { AppEventId   } from '@/domain/value-objects/ids';
+import { ApiError  } from '@/exceptions/ApiError';
+import { EventId   } from '@/domain/value-objects/ids';
 
 /**
  * 🏛️ Classe EventErrorFactory
@@ -46,7 +46,7 @@ export class EventErrorFactory extends ApiError {
    * @param {EventId} eventId - L'identifiant fort de l'événement recherché
    * @returns {EventErrorFactory} L'instance vivante de l'exception configurée
    */
-  public static notFound(eventId: AppEventId ): EventErrorFactory {
+  public static notFound(eventId: EventId ): EventErrorFactory {
     return new EventErrorFactory(`Événement introuvable : ${eventId.valeur}`, 404, {
       code       : 'EVEN_NOT_FOUND',
       identifier : eventId.valeur

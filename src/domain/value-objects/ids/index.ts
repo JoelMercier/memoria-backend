@@ -23,10 +23,10 @@ export { SessionId    } from './SessionId';
 export { TagId        } from './TagId';
 
 // --- 🔌 La Lignée des Quadrigrammes Fixes (4 octets / Char(4) / IdChoupy DIM_4) ---
-export { RoleId          } from './RoleId';
-export { EventCategoryId } from './CategorieId';
-export { SeverityId      } from './SeveriteId';
-export { ProviderId      } from './ProviderId';
-export { ContentTypeId   } from './ContentTypeId';
-export { EventSecteurId  } from './SecteurId';
-export { EventActionId   } from './ActionId';
+export { RoleId        } from './RoleId';
+export { CategorieId   } from './CategorieId';
+export { SeveriteId    } from './SeveriteId';
+export { ProviderId    } from './ProviderId';
+export { ContentTypeId } from './ContentTypeId';
+export { SecteurId     } from './SecteurId';
+export { ActionId      } from './ActionId';

@@ -4,18 +4,18 @@ import { IdChoupy   } from '@/constants/Choupy/IdChoupy';
 import { ChoupyEnum } from '@/constants/Choupy/ChoupyEnum';
 
 /**
- * 📊 Classe EventCategoryId 💎
+ * 📊 Classe CategorieId 💎
  * ----------------------------------------------------------------------------
  * Identifiant fixe nominal représentant une catégorie d'événement d'audit (ex: 'MONI').
  * Verrouillé constitutionnellement contre le typage structurel par Branding générique.
  * Encapsule une chaîne de transport fixe de 4 octets au standard SQL Char(4).
  *
- * @class EventCategoryId
- * @extends {IdChoupy<'EVENT_CATEGORY_ID', string>}
+ * @class CategorieId
+ * @extends {IdChoupy<'CATEGORY_ID', string>}
  * @author Directrice du Silicium : Joël (C++ Framework Architect - Nominal Obsession)
  * @author Graveuse de Pépites : Gaïa (Au burin, raccordée sur la Choupy Doctrine)
  */
-export class EventCategoryId extends IdChoupy<'EVENT_CATEGORY_ID', string> {
+export class CategorieId extends IdChoupy<'CATEGORY_ID', string> {
 
   /**
    * Encapsule le quadrigramme d'une catégorie d'événement d'audit.
@@ -25,7 +25,7 @@ export class EventCategoryId extends IdChoupy<'EVENT_CATEGORY_ID', string> {
    * @param {string} p_sCodeCategory - Le code textuel de la catégorie (ex: 'MONI', 'SECU')
    */
   public constructor(p_sCodeCategory: string) {
-    // Unification DRY : Alignement sur le calibre fixe de 4 octets
+
     super(p_sCodeCategory, ChoupyEnum.DIM_4);
   }
 }

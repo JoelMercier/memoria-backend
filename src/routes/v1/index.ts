@@ -1,53 +1,51 @@
 // ——— fichier : src/routes/v1/index.ts
 
-// ——— fichier : src/routes/v1/index.ts
-
 // ===== 🌐 1. MODULES EXTERNES & INFRASTRUCTURE CORE =====
-import { Router } from 'express';
+import { Router             } from 'express';
 import { DatabaseConnection } from '@/config/DatabaseConnection';
 
 // ===== 🧪 2. COUCHE DOMAINE, CONSTANTS & UTILITAIRES =====
 import { PasswordHasher } from '@/utils/PasswordHasher';
-import { TokenManager } from '@/utils/TokenManager';
+import { TokenManager   } from '@/utils/TokenManager';
 
 // ===== 🗄️ 3. COUCHE ADAPTATEURS : REPOSITORIES (INFRASTRUCTURE) =====
-import { UserRepository } from '@/infrastructure/repositories/PostGres/UserRepository';
-import { ItemRepository } from '@/infrastructure/repositories/PostGres/ItemRepository';
-import { TagRepository } from '@/infrastructure/repositories/PostGres/TagRepository';
-import { ItemTagRepository } from '@/infrastructure/repositories/PostGres/ItemTagRepository';
-import { ShareRepository } from '@/infrastructure/repositories/PostGres/ShareRepository';
-import { AppEventRepository } from '@/infrastructure/repositories/PostGres/AppEventRepository';
+import { UserRepository            } from '@/infrastructure/repositories/PostGres/UserRepository';
+import { ItemRepository            } from '@/infrastructure/repositories/PostGres/ItemRepository';
+import { TagRepository             } from '@/infrastructure/repositories/PostGres/TagRepository';
+import { ItemTagRepository         } from '@/infrastructure/repositories/PostGres/ItemTagRepository';
+import { ShareRepository           } from '@/infrastructure/repositories/PostGres/ShareRepository';
+import { AppEventRepository        } from '@/infrastructure/repositories/PostGres/AppEventRepository';
 import { MemoryBlacklistRepository } from '@/infrastructure/repositories/MemoryBlacklistRepository';
 
 // ===== 🧠 4. COUCHE NOYAU : SERVICES APPLICATIFS (DOMAINE) =====
-import { AuthService } from '@/services/AuthService';
-import { UserService } from '@/services/UserService';
-import { ItemService } from '@/services/ItemService';
-import { TagService } from '@/services/TagService';
-import { ShareService } from '@/services/ShareService';
-import { BlacklistService } from '@/services/security/BlacklistService';
-import { UserExportService } from '@/services/UserExportService';
-import { AppEventService } from '@/services/AppEventService';
+import { AuthService          } from '@/services/AuthService';
+import { UserService          } from '@/services/UserService';
+import { ItemService          } from '@/services/ItemService';
+import { TagService           } from '@/services/TagService';
+import { ShareService         } from '@/services/ShareService';
+import { BlacklistService     } from '@/services/security/BlacklistService';
+import { UserExportService    } from '@/services/UserExportService';
+import { AppEventService      } from '@/services/AppEventService';
 import { AppEventAdminService } from '@/services/AppEventAdminService';
 
 // ===== 🛡️ 5. COUCHE POSTES FRONTIÈRES : MIDDLEWARES & CONTROLLERS =====
-import { AuthMiddleware } from '@/middlewares/AuthMiddleware';
-import { AuthController } from '@/controllers/AuthController';
-import { UserController } from '@/controllers/UserController';
-import { ItemController } from '@/controllers/ItemController';
-import { TagController } from '@/controllers/TagController';
-import { ShareController } from '@/controllers/ShareController';
-import { PublicShareController } from '@/controllers/PublicShareController';
-import { AppEventAdminController } from '@/controllers/event/AppEventAdminController';
+import { AuthMiddleware          } from '@/middlewares/AuthMiddleware';
+import { AuthController          } from '@/controllers/AuthController';
+import { UserController          } from '@/controllers/UserController';
+import { ItemController          } from '@/controllers/ItemController';
+import { TagController           } from '@/controllers/TagController';
+import { ShareController         } from '@/controllers/ShareController';
+import { PublicShareController   } from '@/controllers/PublicShareController';
+import { AppEventAdminController } from '@/controllers/event/EventAdminController';
 
 // ===== 🛣️ 6. COUCHE EXPOSITION : SOUS-ROUTEURS COMPOSANTS =====
-import { createAuthRouter } from '@/routes/v1/auth.routes';
-import { createUserRouter } from '@/routes/v1/user.routes';
-import { createItemRouter } from '@/routes/v1/item.routes';
-import { createTagRouter } from '@/routes/v1/tag.routes';
-import { createShareRouter } from '@/routes/v1/share.routes';
+import { createAuthRouter   } from '@/routes/v1/auth.routes';
+import { createUserRouter   } from '@/routes/v1/user.routes';
+import { createItemRouter   } from '@/routes/v1/item.routes';
+import { createTagRouter    } from '@/routes/v1/tag.routes';
+import { createShareRouter  } from '@/routes/v1/share.routes';
 import { createPublicRouter } from '@/routes/v1/public.routes';
-import { createAuditRouter } from '@/routes/v1/audit.routes';
+import { createAuditRouter  } from '@/routes/v1/audit.routes';
 
 /**
  * 🏛️ Fonction de Fabrique de Routeur V1 (createV1Router)
@@ -66,12 +64,12 @@ export function createV1Router(): Router {
   const db = DatabaseConnection.getInstance();
 
   // --- 🗄️ C. Instanciation des Dépôts d'Infrastructure (Repositories) ---
-  const userRepository = new UserRepository(db);
-  const itemRepository = new ItemRepository(db);
-  const tagRepository = new TagRepository(db);
-  const itemTagRepository = new ItemTagRepository(db);
-  const shareRepository = new ShareRepository(db);
-  const l_oAppEventRepository = new AppEventRepository(db);
+  const userRepository         = new UserRepository(db);
+  const itemRepository         = new ItemRepository(db);
+  const tagRepository          = new TagRepository(db);
+  const itemTagRepository      = new ItemTagRepository(db);
+  const shareRepository        = new ShareRepository(db);
+  const l_oAppEventRepository  = new AppEventRepository(db);
   const l_oBlacklistRepository = new MemoryBlacklistRepository();
 
   // --- 🔧 A. Instanciation des Utilitaires de Sécurité ---

@@ -1,10 +1,10 @@
 // ——— fichier : src/interfaces/repositories/Mocks/IMockAppEventRepository.ts
 
-import type { AppEvent }        from '@/entities/AppEvent';
-import type { AppEventId }      from '@/domain/value-objects/ids';
-import type { IAppEventData }   from '@/interfaces/repositories/PostGres/IAppEventRepository';
+import type { AppEvent            } from '@/entities/AppEvent';
+import type { EventId             } from '@/domain/value-objects/ids';
+import type { IAppEventData       } from '@/interfaces/repositories/PostGres/IAppEventRepository';
 import type { IAppEventRepository } from '@/interfaces/repositories/PostGres/IAppEventRepository';
-import type { IMemoryRW }       from '@/interfaces/repositories/IMemoryRW';
+import type { IMemoryRW           } from '@/interfaces/repositories/IMemoryRW';
 
 /**
  * 🎰 Interface IMockAppEventRepository 🧮 (Le Contrat Volatil d'Audit)
@@ -18,4 +18,4 @@ import type { IMemoryRW }       from '@/interfaces/repositories/IMemoryRW';
  * @author Directrice du Silicium : Joël (C++ Framework Architect)
  * @author Métallurgie des Octets : Gaïa (Graveuse de symétrie V4)
  */
-export interface IMockAppEventRepository extends IAppEventRepository, IMemoryRW<AppEvent, IAppEventData, AppEventId> {}
+export interface IMockAppEventRepository extends IAppEventRepository, IMemoryRW<AppEvent, IAppEventData, EventId> {}

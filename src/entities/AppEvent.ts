@@ -1,13 +1,13 @@
 // ——— fichier : src/entities/AppEvent.ts
 
-import { BaseEntity       } from '@/entities/BaseEntity';
-import { AppEventCategory } from '@/constants/Categories';
-import { AppEventSeverity } from '@/constants/Severites';
-import { IAppEvent        } from '@/interfaces/entities/event/IAppEvent';
-import { AppEventSecteur  } from '@/constants/Secteurs';
-import { AppEventAction   } from '@/constants/Actions';
+import { BaseEntity } from '@/entities/BaseEntity';
+import { Categorie  } from '@/constants/Categories';
+import { Severite   } from '@/constants/Severites';
+import { IAppEvent  } from '@/interfaces/entities/event/IAppEvent';
+import { Secteur    } from '@/constants/Secteurs';
+import { Action     } from '@/constants/Actions';
 
-import type { UserId, AppEventId } from '@/domain/value-objects/ids';
+import type { UserId, EventId } from '@/domain/value-objects/ids';
 import type { IAppEventData } from '@/interfaces/entities/event/IAppEventData';
 
 /**
@@ -21,25 +21,25 @@ import type { IAppEventData } from '@/interfaces/entities/event/IAppEventData';
  * @implements {IAppEvent}
  * @author Joël, Gaïa & Co
  */
-export class AppEvent extends BaseEntity<'appEvent', IAppEventData, AppEventId> implements IAppEvent {
+export class AppEvent extends BaseEntity<'Event', IAppEventData, EventId> implements IAppEvent {
 
   /** 🔔 Caillou de couleur : Identifiant technique unique de l'événement */
-  private readonly m_idEvent        : AppEventId;
+  private readonly m_idEvent        : EventId;
 
   /** 👥 Caillou de couleur : Identifiant de l'auteur de l'action ou NULL si système */
   private readonly m_sUserId        : UserId | null;
 
   /** 📂 Instance de Smart Enum représentant la catégorie de l'action */
-  private readonly m_eEventCategory : AppEventCategory;
+  private readonly m_eCategorie : Categorie;
 
   /** 🏷️ Instance de Smart Enum qualifiant le secteur de l'événement */
-  private readonly m_eEventSecteur  : AppEventSecteur;
+  private readonly m_eSecteur  : Secteur;
 
   /** 🏷️ Instance de Smart Enum qualifiant le type de l'événement */
-  private readonly m_eEventAction   : AppEventAction;
+  private readonly m_eAction   : Action;
 
   /** ⚠️ Instance de Smart Enum fixant le niveau de gravité opérationnelle */
-  private readonly m_eSeverity      : AppEventSeverity;
+  private readonly m_eSeverite      : Severite;
 
   /** 💬 Description textuelle explicite stockée dans la trace */
   private readonly m_sMessage       : string;
@@ -55,20 +55,20 @@ export class AppEvent extends BaseEntity<'appEvent', IAppEventData, AppEventId> 
    */
   public constructor(data: IAppEventData) {
     super(data);
-    this.m_idEvent        = data.idAppEvent;
-    this.m_sUserId        = data.userId;
-    this.m_eEventCategory = data.eventCategory;
-    this.m_eEventSecteur  = data.eventSecteur;
-    this.m_eEventAction   = data.eventAction;
-    this.m_eSeverity      = data.severity;
-    this.m_sMessage       = data.message;
-    this.m_rMetadata      = data.metadata || {};
+    this.m_idEvent    = data.idEvent;
+    this.m_sUserId    = data.userId;
+    this.m_eCategorie = data.categorie;
+    this.m_eSecteur   = data.secteur;
+    this.m_eAction    = data.action;
+    this.m_eSeverite  = data.severite;
+    this.m_sMessage   = data.message;
+    this.m_rMetadata  = data.metadata || {};
   }
 
   /**
    * 🆔 Identifiant unique et fortement typé de l'événement d'audit.
    */
-  public get AppEventId(): AppEventId {
+  public get EventId(): EventId {
     return this.m_idEvent;
   }
 
@@ -82,29 +82,29 @@ export class AppEvent extends BaseEntity<'appEvent', IAppEventData, AppEventId> 
   /**
    * 🗂️ Catégorie sémantique de l'événement (Smart Enum).
    */
-  public get EventCategory(): AppEventCategory {
-    return this.m_eEventCategory;
+  public get Categorie(): Categorie {
+    return this.m_eCategorie;
   }
 
   /**
    * 🎯 Type d'action précis et qualifié (Smart Enum).
    */
-  public get EventSecteur(): AppEventSecteur {
-    return this.m_eEventSecteur;
+  public get Secteur(): Secteur {
+    return this.m_eSecteur;
   }
 
   /**
    * 🎯 Type d'action précis et qualifié (Smart Enum).
    */
-  public get EventAction(): AppEventAction {
-    return this.m_eEventAction;
+  public get Action():Action {
+    return this.m_eAction;
   }
 
   /**
    * ⚠️ Niveau de gravité de la trace d'audit (Smart Enum).
    */
-  public get Severity(): AppEventSeverity {
-    return this.m_eSeverity;
+  public get Severite(): Severite {
+    return this.m_eSeverite;
   }
 
   /**
@@ -126,15 +126,15 @@ export class AppEvent extends BaseEntity<'appEvent', IAppEventData, AppEventId> 
    */
   public toData(): IAppEventData {
     return {
-      idAppEvent    : this.AppEventId,
-      userId        : this.UserId,
-      eventCategory : this.EventCategory,
-      eventSecteur  : this.EventSecteur,
-      eventAction   : this.EventAction,
-      severity      : this.Severity,
-      message       : this.Message,
-      metadata      : this.Metadata,
-      createdAt     : this.createdAt,
+      idEvent   : this.EventId,
+      userId    : this.UserId,
+      categorie : this.Categorie,
+      secteur   : this.Secteur,
+      action    : this.Action,
+      severite  : this.Severite,
+      message   : this.Message,
+      metadata  : this.Metadata,
+      createdAt : this.createdAt,
     };
   }
 

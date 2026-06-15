@@ -4,18 +4,18 @@ import { IdChoupy   } from '@/constants/Choupy/IdChoupy';
 import { ChoupyEnum } from '@/constants/Choupy/ChoupyEnum';
 
 /**
- * 👥 Classe EventActionId 💎
+ * 👥 Classe ActionId 💎
  * ----------------------------------------------------------------------------
  * Identifiant fixe nominal représentant l'action d'un événement d'audit (ex: 'CONN').
  * Verrouillé constitutionnellement contre le typage structurel par Branding générique.
  * Encapsule une chaîne de transport fixe de 4 octets au standard SQL Char(4).
  *
- * @class EventActionId
+ * @class ActionId
  * @extends {IdChoupy<'EVENT_ACTION_ID', string>}
  * @author Directrice du Silicium : Joël (C++ Framework Architect - Nominal Obsession)
  * @author Graveuse de Pépites : Gaïa (Au burin, raccordée sur la Choupy Doctrine)
  */
-export class EventActionId extends IdChoupy<'EVENT_ACTION_ID', string> {
+export class ActionId extends IdChoupy<'ACTION_ID', string> {
 
   /**
    * Encapsule le quadrigramme fixe de l'action d'un événement d'audit.

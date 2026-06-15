@@ -1,28 +1,28 @@
 // ——— fichier : src/validation/zod/AppEventValidation.ts
 
 import { z } from 'zod';
-import { AppEventCategory } from '@/constants/Categories';
-import { AppEventSeverity } from '@/constants/Severites';
-import { AppEventSecteur } from '@/constants/Secteurs';
-import { AppEventAction } from '@/constants/Actions';
+import { Categorie } from '@/constants/Categories';
+import { Severite  } from '@/constants/Severites';
+import { Secteur   } from '@/constants/Secteurs';
+import { Action    } from '@/constants/Actions';
 
 /**
  * 🗂️ Schémas de validation Zod pour les codes des Smart Enums d'audit.
  * Exploitent la validation statique .refine() héritée du socle SmartEnum.
  * Pas de .transform() aventureux si l'instance de classe n'expose pas de méthode d'usine.
  */
-const eventCategorySchema = z
+const eventCategorieSchema = z
   .string()
   .trim()
-  .refine((val) => AppEventCategory.isValidCode(val), {
+  .refine((val) => Categorie.isValidCode(val), {
     message: "Catégorie d'événement d'audit invalide"
   });
 
 /** [RÉPARÉ V4] Passé en optional() pour permettre le repli industriel vers 'INFO' dans le DTO */
-const severitySchema = z
+const eventSeveriteSchema = z
   .string()
   .trim()
-  .refine((val) => AppEventSeverity.isValidCode(val), {
+  .refine((val) => Severite.isValidCode(val), {
     message: "Niveau de gravité d'audit invalide"
   })
   .optional();
@@ -31,7 +31,7 @@ const severitySchema = z
 const eventSecteurSchema = z
   .string()
   .trim()
-  .refine((val) => AppEventSecteur.isValidCode(val), {
+  .refine((val) => Secteur.isValidCode(val), {
     message: "Secteur fonctionnel d'audit invalide"
   });
 
@@ -39,7 +39,7 @@ const eventSecteurSchema = z
 const eventActionSchema = z
   .string()
   .trim()
-  .refine((val) => AppEventAction.isValidCode(val), {
+  .refine((val) => Action.isValidCode(val), {
     message: "Opération technique d'audit invalide"
   });
 
@@ -64,28 +64,28 @@ const metadataSchema = z.record(z.string(), z.any()).default({});
  * 🔔 Schéma de validation Zod pour la création d'un événement d'audit.
  */
 const createAppEventSchema = z.object({
-  idAppEvent: idEventSchema,
-  userId: userIdSchema,
-  eventCategory: eventCategorySchema,
-  eventSecteur: eventSecteurSchema,
-  eventAction: eventActionSchema,
-  severity: severitySchema,
-  message: messageSchema,
-  metadata: metadataSchema
+  idAppEvent     : idEventSchema,
+  userId         : userIdSchema,
+  eventCategorie : eventCategorieSchema,
+  eventSecteur   : eventSecteurSchema,
+  eventAction    : eventActionSchema,
+  eventSeverite  : eventSeveriteSchema,
+  message        : messageSchema,
+  metadata       : metadataSchema
 });
 
 /**
  * 🔔 Schéma de validation Zod pour la mise à jour d'un événement d'audit.
  */
 const updateAppEventSchema = z.object({
-  idAppEvent: idEventSchema,
-  userId: userIdSchema,
-  eventCategory: eventCategorySchema,
-  eventSecteur: eventSecteurSchema,
-  eventAction: eventActionSchema,
-  severity: severitySchema,
-  message: messageSchema,
-  metadata: metadataSchema
+  idAppEvent     : idEventSchema,
+  userId         : userIdSchema,
+  eventCategorie : eventCategorieSchema,
+  eventSecteur   : eventSecteurSchema,
+  eventAction    : eventActionSchema,
+  eventSeverite  : eventSeveriteSchema,
+  message        : messageSchema,
+  metadata       : metadataSchema
 });
 
 export type CreateAppEventSchemaType = z.infer<typeof createAppEventSchema>;

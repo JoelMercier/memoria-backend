@@ -1,13 +1,13 @@
 // ——— fichier : src/interfaces/repositories/IAppEventRepository.ts
 
-import { AppEventCategory   } from '@/constants/Categories';
-import { AppEventSeverity   } from '@/constants/Severites';
-import { UserId, AppEventId,
-         EventSecteurId,
-         EventActionId      } from '@/domain/value-objects/ids';
-import { AppEvent           } from '@/entities/AppEvent';
-import { IListOptions       } from '@/interfaces/shared/IListOptions';
-import { IBaseRepository    } from '@/interfaces/repositories/IBaseRepository';
+import { Categorie       } from '@/constants/Categories';
+import { Severite        } from '@/constants/Severites';
+import { UserId, EventId,
+         SecteurId,
+         ActionId   } from '@/domain/value-objects/ids';
+import { AppEvent        } from '@/entities/AppEvent';
+import { IListOptions    } from '@/interfaces/shared/IListOptions';
+import { IBaseRepository } from '@/interfaces/repositories/IBaseRepository';
 
 
 
@@ -23,7 +23,7 @@ import { IBaseRepository    } from '@/interfaces/repositories/IBaseRepository';
  */
 export interface IAppEventData {
   /** 🤖 L'identifiant binaire fort obligatoire pour l'entité [Mémoria] */
-  aeIdAppEvent   : AppEventId;
+  aeIdAppEvent   : EventId;
 
   /** 👥 L'identifiant unique de l'acteur (Peut être null pour le système ou le RGPD) */
   aeUserId       : UserId | null;
@@ -32,16 +32,16 @@ export interface IAppEventData {
   aeCreatedAt    : Date;
 
   /** 📥 [RÉPARÉ V4] Le Secteur fonctionnel typé (Char(4) - ex: 'AUTH', 'PEPI') */
-  aeSecteurId    : EventSecteurId;
+  aeSecteurId    : SecteurId;
 
   /** ⚙️ [RÉPARÉ V4] L'action technique typée (Char(4) - ex: 'CONN', 'CREA') */
-  aeActionId     : EventActionId;
+  aeActionId     : ActionId;
 
   /** 📂 La catégorie fonctionnelle parente au format quadrigramme */
-  aeCategoryId   : AppEventCategory;
+  aeCategorieId   : Categorie;
 
   /** ⚠️ L'objet sévérité riche contenant le poids numérique machine */
-  aeSeverityId   : AppEventSeverity;
+  aeSeveriteId   : Severite;
 
   /** 📦 Libellé textuel ou message intelligible de l'événement pour l'écran */
   aeMessage      : string;
@@ -61,13 +61,13 @@ export interface IAppEventListOptions extends IListOptions {
   /** 👥 Filtre optionnel ciblant les traces d'un acteur spécifique */
   userId?        : UserId;
   /** 📥 Filtre optionnel sur le Secteur fonctionnel de soute */
-  secteurId?   : EventSecteurId;
+  secteurId?   : SecteurId;
   /** ⚙️ Filtre optionnel sur l'action technique unitaire */
-  actionId?    : EventActionId;
+  actionId?    : ActionId;
   /** 📂 Filtre optionnel sur la catégorie fonctionnelle parente */
-  categoryId?  : AppEventCategory;
+  categorieId?  : Categorie;
   /** ⚠️ Filtre optionnel sur le palier de sévérité critique minimal (Filtre incrémental) */
-  severityId?  : AppEventSeverity;
+  severiteId?  : Severite;
 }
 
 /**
@@ -93,15 +93,15 @@ export interface IAppEventListResult {
  * @interface IAppEventRepository
  * @extends {IBaseRepository<AppEvent, IAppEventData, AppEventId>}
  */
-export interface IAppEventRepository extends IBaseRepository<AppEvent, IAppEventData, AppEventId> {
+export interface IAppEventRepository extends IBaseRepository<AppEvent, IAppEventData, EventId> {
   /**
    * 🔎 Extrait un événement d'audit unique par son identifiant de soute.
    *
    * @async
-   * @param {AppEventId} p_axEventId - L'identifiant fort de l'événement recherché
+   * @param { EventId } p_axEventId - L'identifiant fort de l'événement recherché
    * @returns {Promise<AppEvent | null>} L'entité hydratée ou null si introuvable
    */
-  findById(p_axEventId: AppEventId): Promise<AppEvent | null>;
+  findById(p_axEventId: EventId): Promise<AppEvent | null>;
 
   /**
    * 📊 Calcule la volumétrie totale absolue de tous les journaux stockés sur le disque.
@@ -140,7 +140,7 @@ export interface IAppEventRepository extends IBaseRepository<AppEvent, IAppEvent
    * @param {number} [p_iNbLignesMax] - Le garde-fou optionnel de taille de tableau remonté
    * @returns {Promise<AppEvent[] | null>} La collection filtrée ou null
    */
-  findBySeverity(p_eSeverity: AppEventSeverity, p_iNbLignesMax?: number): Promise<AppEvent[] | null>;
+  findBySeverite(p_eSeverite: Severite, p_iNbLignesMax?: number): Promise<AppEvent[] | null>;
 
   /**
    * 🪙 Extraction historique filtrée par catégorie fonctionnelle avec limite physique.
@@ -150,7 +150,7 @@ export interface IAppEventRepository extends IBaseRepository<AppEvent, IAppEvent
    * @param {number} [p_iNbLignesMax] - Le garde-fou optionnel de taille de tableau remonté
    * @returns {Promise<AppEvent[] | null>} La collection filtrée ou null
    */
-  findByCategory(p_eCategory: AppEventCategory, p_iNbLignesMax?: number): Promise<AppEvent[] | null>;
+  findByCategorie(p_eCategory: Categorie, p_iNbLignesMax?: number): Promise<AppEvent[] | null>;
 
   /**
    * 🪙 Extrait les alertes d'incidents critiques du système dans la limite du gabarit.

@@ -32,7 +32,7 @@ export class MockEventRepository implements IAppEventRepository {
    * 🔍 Lecture chirurgicale : Localise un log via son identifiant unique binaire 🤖.
    */
   public async findById(p_axEventId: EventId): Promise<AppEvent | null> {
-    return this.m_aoEvents.find((l_oEvent: AppEvent): boolean => l_oEvent.AppEventId.estEgalA(p_axEventId)) ?? null;
+    return this.m_aoEvents.find((l_oEvent: AppEvent): boolean => l_oEvent.EventId.estEgalA(p_axEventId)) ?? null;
   }
 
   /**
@@ -52,9 +52,9 @@ export class MockEventRepository implements IAppEventRepository {
   /**
    * ⚠️ Extraction historique filtrée par sévérité stricte assortie d'une limite physique.
    */
-  public async findBySeverity(p_eSeverity: Severite, p_iNbLignesMax?: number): Promise<AppEvent[] | null> {
+  public async findBySeverite(p_eSeverite: Severite, p_iNbLignesMax?: number): Promise<AppEvent[] | null> {
     const l_nLimit = p_iNbLignesMax ?? 50;
-    const l_aoFiltres = this.m_aoEvents.filter((l_oEvent: AppEvent): boolean => l_oEvent.Severity === p_eSeverity);
+    const l_aoFiltres = this.m_aoEvents.filter((l_oEvent: AppEvent): boolean => l_oEvent.Severite === p_eSeverite);
 
     if (l_aoFiltres.length === 0) return null;
     return l_aoFiltres.slice(0, l_nLimit);
@@ -63,9 +63,9 @@ export class MockEventRepository implements IAppEventRepository {
   /**
    * 🗂️ Extraction historique filtrée par catégorie fonctionnelle avec limite physique.
    */
-  public async findByCategory(p_eCategory: Categorie, p_iNbLignesMax?: number): Promise<AppEvent[] | null> {
+  public async findByCategorie(p_eCategorie: Categorie, p_iNbLignesMax?: number): Promise<AppEvent[] | null> {
     const l_nLimit = p_iNbLignesMax ?? 50;
-    const l_aoFiltres = this.m_aoEvents.filter((l_oEvent: AppEvent): boolean => l_oEvent.EventCategory === p_eCategory);
+    const l_aoFiltres = this.m_aoEvents.filter((l_oEvent: AppEvent): boolean => l_oEvent.Categorie === p_eCategorie);
 
     if (l_aoFiltres.length === 0) return null;
     return l_aoFiltres.slice(0, l_nLimit);
@@ -76,7 +76,7 @@ export class MockEventRepository implements IAppEventRepository {
    */
   public async findCritical(p_iNbLignesMax?: number): Promise<AppEvent[] | null> {
     const l_nLimit = p_iNbLignesMax ?? 50;
-    const l_aoFiltres = this.m_aoEvents.filter((l_oEvent: AppEvent): boolean => l_oEvent.Severity.code === 'CRIT');
+    const l_aoFiltres = this.m_aoEvents.filter((l_oEvent: AppEvent): boolean => l_oEvent.Severite.code === 'CRIT');
 
     if (l_aoFiltres.length === 0) return null;
     return l_aoFiltres.slice(0, l_nLimit);
@@ -93,16 +93,16 @@ export class MockEventRepository implements IAppEventRepository {
       l_aoFiltres = l_aoFiltres.filter((l_oEvent) => l_oEvent.UserId !== null && l_oEvent.UserId.estEgalA(p_oOptions.userId!));
     }
     if (p_oOptions.secteurId) {
-      l_aoFiltres = l_aoFiltres.filter((l_oEvent) => l_oEvent.EventSecteur.code === p_oOptions.secteurId!.valeur);
+      l_aoFiltres = l_aoFiltres.filter((l_oEvent) => l_oEvent.Secteur.code === p_oOptions.secteurId!.valeur);
     }
     if (p_oOptions.actionId) {
-      l_aoFiltres = l_aoFiltres.filter((l_oEvent) => l_oEvent.EventAction.code === p_oOptions.actionId!.valeur);
+      l_aoFiltres = l_aoFiltres.filter((l_oEvent) => l_oEvent.Action.code === p_oOptions.actionId!.valeur);
     }
-    if (p_oOptions.categoryId) {
-      l_aoFiltres = l_aoFiltres.filter((l_oEvent) => l_oEvent.EventCategory === p_oOptions.categoryId);
+    if (p_oOptions.categorieId) {
+      l_aoFiltres = l_aoFiltres.filter((l_oEvent) => l_oEvent.Categorie === p_oOptions.categorieId);
     }
-    if (p_oOptions.severityId) {
-      l_aoFiltres = l_aoFiltres.filter((l_oEvent) => l_oEvent.Severity === p_oOptions.severityId);
+    if (p_oOptions.severiteId) {
+      l_aoFiltres = l_aoFiltres.filter((l_oEvent) => l_oEvent.Severite === p_oOptions.severiteId);
     }
 
     const l_nTotal = l_aoFiltres.length;
@@ -123,15 +123,15 @@ export class MockEventRepository implements IAppEventRepository {
    */
   public async create(p_oData: IAppEventData): Promise<AppEvent> {
     const l_oEvent = new AppEvent({
-      idAppEvent    : p_oData.aeIdAppEvent,
-      userId        : p_oData.aeUserId,
-      eventCategory : p_oData.aeCategoryId,
-      severity      : p_oData.aeSeverityId,
-      eventSecteur  : p_oData.aeSecteurId,
-      eventAction   : p_oData.aeActionId,
-      message       : p_oData.aeMessage,
-      metadata      : p_oData.aeMetadata,
-      createdAt     : p_oData.aeCreatedAt || new Date()
+      idAppEvent     : p_oData.aeIdAppEvent,
+      userId         : p_oData.aeUserId,
+      eventCategorie : p_oData.aeCategorieId,
+      eventseverite  : p_oData.aeSeveriteId,
+      eventSecteur   : p_oData.aeSecteurId,
+      eventAction    : p_oData.aeActionId,
+      message        : p_oData.aeMessage,
+      metadata       : p_oData.aeMetadata,
+      createdAt      : p_oData.aeCreatedAt || new Date()
     } as any);
     this.m_aoEvents.push(l_oEvent);
     return l_oEvent;
