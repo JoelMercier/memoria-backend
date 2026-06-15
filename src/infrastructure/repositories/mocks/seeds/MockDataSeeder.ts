@@ -6,9 +6,9 @@ import { MockItemRepository }    from '@/infrastructure/repositories/mocks/MockI
 import { MockItemTagRepository } from '@/infrastructure/repositories/mocks/MockItemTagRepository';
 import { MockShareRepository }   from '@/infrastructure/repositories/mocks/MockShareRepository';
 import { UserId, ItemId, TagId, ShareId } from '@/domain/value-objects/ids';
-import { ContentType }           from '@/constants/ContentType';
-import { Role }                  from '@/constants/Role';
-import { AuthProvider }          from '@/constants/AuthProvider';
+import { ContentType }           from '@/constants/ContentTypes';
+import { Role }                  from '@/constants/Roles';
+import { AuthProvider }          from '@/constants/AuthProviders';
 
 
 /**

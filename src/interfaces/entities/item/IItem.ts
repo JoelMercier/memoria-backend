@@ -1,6 +1,6 @@
 // ——— fichier : src/interfaces/entities/item/IItem.ts
 
-import type { ContentType } from '@/constants/ContentType';
+import type { ContentType } from '@/constants/ContentTypes';
 import { UserId,
          ItemId              } from '@/domain/value-objects/ids';
 import type { IEntity        } from '@/interfaces/entities/IEntity';

@@ -1,29 +1,38 @@
--- ——— fichier : database\fonctions\01_CalculerMetriquesActeur.sql
+-- ============================================================================
+-- 📊 INFRASTRUCTURE : CALCUL ISOLÉ DES COMPTEURS D'ACTIVITÉ D'UN ACTEUR
+-- Fichier: database/fonctions/01_CalculerMetriquesActeur.sql
+-- Version: 4.2.0 (PostgreSQL 17+ - Jojo-Style Compliant Strict)
+-- Description: Décompte chirurgical indexé sans aucun produit cartésien
+-- Auteur & Vision : Joël (Architecte DR-DOS - True Getters Compliance)
+-- Métallurgie des Octets : Gaïa (Au burin, alignée sur l'autonomie de soute V4)
+-- ============================================================================
 
--- 📊 LE SOUPIRAIL : Calcul isolé des compteurs d activité d un acteur
--- Reçoit un identifiant binaire de 16 octets et compte ses ressources à la vitesse de la RAM 🧠
-CREATE OR REPLACE FUNCTION "CalculerMetriquesActeur"(p_usIdUser BYTEA)
-RETURNS TABLE (
-    "usPseudo"        VARCHAR(50),
-    "TotalPepites"    BIGINT,
-    "TotalEtiquettes" BIGINT
-) AS $$
-BEGIN
-    -- 1. Verrouillage du cordon sanitaire de la clé binaire 🤖
-    IF octet_length(p_usIdUser) != 16 THEN
-        RAISE EXCEPTION 'Infrastructure 🚨 : l identifiant de l acteur doit comporter exactement 16 octets.';
-    END IF;
+Set search_path To Public;
+Set CLIENT_ENCODING to 'UTF8';
 
-    RETURN QUERY
-    SELECT
+Drop Function if exists public."CalculerMetriquesActeur"(p_usIdUser ByteA);
+Drop Function if exists public."CalculerMetriquesActeur"(p_usIdUser UUID);
+
+Create Or Replace Function public."CalculerMetriquesActeur"(p_usIdUser UUID)
+Returns Table (
+    "usPseudo"        Varchar(50),
+    "TotalPepites"    Bigint,
+    "TotalEtiquettes" Bigint
+) as $$
+Begin
+    -- [RÉPARÉ V4] Éradication complète de octet_length sur l''UUID natif.
+    -- Le typage fort du paramètre d''entrée garantit l''intégrité de la trame 128 bits.
+
+    Return Query
+    Select
         "usPseudo",
-        -- Sous-requête 1 : Décompte chirurgical sur l index de clé étrangère des pépites 💽
-        (SELECT COUNT(*) FROM "Items" WHERE "itUserId" = p_usIdUser),
-        -- Sous-requête 2 : Décompte chirurgical sur l index composite des étiquettes 💾
-        (SELECT COUNT(*) FROM "Tags" WHERE "tgUserId" = p_usIdUser)
-    FROM "Users"
-    WHERE "usIdUser" = p_usIdUser; -- Isolation immédiate sur la Clé Primaire Binaire ⛓️
-END;
-$$ LANGUAGE plpgsql STABLE STRICT;
+        -- Sous-requête 1 : Décompte chirurgical sur l''index de la table des pépites
+        (Select Count(*) From public."Items" Where "itUserId" = p_usIdUser),
+        -- Sous-requête 2 : Décompte chirurgical sur l''index de la table des étiquettes (tgLibelle réaligné)
+        (Select Count(*) From public."Tags" Where "tgUserId" = p_usIdUser)
+    From public."Users"
+    Where "usIdUser" = p_usIdUser;                              -- Isolation immédiate sur la clé primaire nominale.
+End;
+$$ Language plpgsql Stable Strict;
 
-COMMENT ON FUNCTION "CalculerMetriquesActeur"(BYTEA) IS '📊 API de Cour Basse calculant les totaux d un acteur via sous-requêtes indexées sans produit cartésien.';
+Comment On Function public."CalculerMetriquesActeur"(UUID) Is '📊 API de Cour Basse calculant de manière isolée les totaux d''un acteur via sous-requêtes indexées sans produit cartésien.';

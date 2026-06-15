@@ -1,48 +1,43 @@
--- ——— fichier : database\fonctions\Pépites-Étiquette\Fonction ÉtiquettesD'UnePépite.sql
-
 -- ============================================================================
 -- 🗄️ Mémoria - Fonction Stockée : EtiquettesDunePepite
--- Version: 4.5.0 (PostgreSQL 17+)
+-- Fichier: database/fonctions/Pépites-Étiquette/Fonction ÉtiquettesD'UnePépite.sql
+-- Version: 4.2.0 (PostgreSQL 17+ - Format Soviétique Strict 1960)
 -- Description: Extraction des instances de tags rattachées à une pépite
+-- Auteur & Vision : Joël (Architecte DR-DOS - True Getters Compliance)
+-- Métallurgie des Octets : Gaïa (Au burin, alignée sur l'autonomie de soute V4)
 -- ============================================================================
 
+Set search_path To Public;
+Set CLIENT_ENCODING to 'UTF8';
+
 -- 🪓 Destruction préventive de l'ancien moule pour éviter les conflits de soute
-Drop Function If Exists public."EtiquettesDunePepite"(UUID);
+Drop Function if exists public."EtiquettesDunePepite"(UUID);
 
 Create Or Replace Function public."EtiquettesDunePepite"(
-    p_axItemId UUID                  -- 🪓 Les colosses fixes 16 octets (Rule 1)
+    p_axItemId UUID                                             -- L'identifiant immuable 128 bits natif de la pépite.
 )
 Returns Table (
-    -- 1. Les colosses (16 octets fixes fixed-width Bytea/UUID) (Rule 1)
-    "tgIdTag"     Uuid,
-    "tgUserId"    Uuid,
-
-    -- 2. Les horodateurs (8 octets fixes fixed-width)
+    "tgIdTag"     Uuid,                                         -- [RÉPARÉ V4] UUID natif conforme à la table Tags.
+    "tgUserId"    Uuid,                                         -- [RÉPARÉ V4] UUID natif conforme à la table Tags.
     "tgCreatedAt" TimeStamp Without Time Zone,
     "tgUpdatedAt" TimeStamp Without Time Zone,
-
-    -- 3. Les variables et fin de tas (Rule 1)
-    "tgName"      Character Varying
+    "tgLibelle"   Character Varying                             -- [RÉPARÉ V4] Éradication définitive de tgName.
 )
 Language plpgsql
 as $$
 Begin
     Return Query
     Select
-        "tgIdTag",
-        "tgUserId",
-        "tgCreatedAt",
-        "tgUpdatedAt",
-        "tgName"
-    From
-        public."Tags"
-    Inner Join
-        public."ItemTags" on "tiTagId" = "tgIdTag"
-    Where
-        "tiItemId" = "Bin-UUID"(p_axItemId)
-    Order By
-        "tgName" Asc;
+        "Tags"."tgIdTag",
+        "Tags"."tgUserId",
+        "Tags"."tgCreatedAt",
+        "Tags"."tgIdTag",                                       -- [RÉPARÉ V4] Remplacement de l'ancien tgName anglo-saxon.
+        "Tags"."tgLibelle"
+    From public."Tags"
+    Inner Join public."ItemTags" on "ItemTags"."tiTagId" = "Tags"."tgIdTag"
+    Where "ItemTags"."tiItemId" = p_axItemId                   -- [RÉPARÉ V4] Liaison UUID directe sans "Bin-UUID".
+    Order By "Tags"."tgLibelle" Asc;                           -- Tri alphabétique unifié.
 End;
 $$;
 
-Comment On Function public."EtiquettesDunePepite" is 'Extracteur relationnel d''élite rapatriant les mots-clés d''une pépite, ordonnés par nom.';
+Comment On Function public."EtiquettesDunePepite"(UUID) Is 'Extracteur relationnel d''élite rapatriant les mots-clés d''une pépite, ordonnés par libellé franconien.';

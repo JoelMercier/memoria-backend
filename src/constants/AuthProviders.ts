@@ -1,4 +1,4 @@
-// ——— fichier : src/constants/AuthProvider.ts
+// ——— fichier : src/constants/AuthProviders.ts
 
 import { SmartEnum } from './Choupy/SmartEnum';
 

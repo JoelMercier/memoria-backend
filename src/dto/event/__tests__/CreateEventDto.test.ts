@@ -3,9 +3,9 @@
 import { describe, expect, it } from 'vitest';
 import { CreateEventDto }       from '../CreateEventDto';
 import { AppEventCategory }     from '@/constants/Categories';
-import { AppEventSecteur }      from '@/constants/Secteur';
+import { AppEventSecteur }      from '@/constants/Secteurs';
 import { AppEventAction }       from '@/constants/Actions';
-import { AppEventSeverity }     from '@/constants/Severity';
+import { AppEventSeverity }     from '@/constants/Severites';
 
 describe('CreateEventDto', () => {
 

@@ -1,6 +1,6 @@
 // ——— fichier : src/interfaces/security/ITokenPayload.ts
 
-import type { Role   } from '@/constants/Role';
+import type { Role   } from '@/constants/Roles';
 import type { UserId } from '@/domain/value-objects/ids';
 
 /**

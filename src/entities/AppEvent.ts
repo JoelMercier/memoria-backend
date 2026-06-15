@@ -2,9 +2,9 @@
 
 import { BaseEntity       } from '@/entities/BaseEntity';
 import { AppEventCategory } from '@/constants/Categories';
-import { AppEventSeverity } from '@/constants/Severity';
+import { AppEventSeverity } from '@/constants/Severites';
 import { IAppEvent        } from '@/interfaces/entities/event/IAppEvent';
-import { AppEventSecteur  } from '@/constants/Secteur';
+import { AppEventSecteur  } from '@/constants/Secteurs';
 import { AppEventAction   } from '@/constants/Actions';
 
 import type { UserId, AppEventId } from '@/domain/value-objects/ids';

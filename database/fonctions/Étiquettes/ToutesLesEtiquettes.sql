@@ -1,24 +1,29 @@
 -- ============================================================================
--- 🗄️ Mémoria - Fonctions Stockées d'Infrastructure : Étiquettes (Tags)
--- Fichier: database\Refonte\31 - Fonctions Tags Unifiees.sql
--- Version: 4.5.0 (PostgreSQL 17+)
--- Description: Éradication du SQL volant pour l'intégralité du pôle Tags
+-- 🏷️ Mémoria - Fonctions Stockées d'Infrastructure : Étiquettes (Tags)
+-- Fichier: database/functions/Tags/Fonctions Tags Unifiees.sql
+-- Version: 4.2.0 (PostgreSQL 17+ - Format Soviétique Strict 1960)
+-- Description: Éradication du SQL volant et alignement UUID natif - Pôle Tags
+-- Auteur & Vision : Joël (Architecte DR-DOS - True Getters Compliance)
+-- Métallurgie des Octets : Gaïa (Au burin, alignée sur l'autonomie de soute V4)
 -- ============================================================================
+
+Set search_path To Public;
+Set CLIENT_ENCODING to 'UTF8';
 
 -- ----------------------------------------------------------------------------
 -- 🏛️ 1. Création Idempotente : CreerTag
 -- ----------------------------------------------------------------------------
-Drop Function If Exists public."CreerTag"(UUID, UUID, Character Varying);
+Drop Function if exists public."CreerTag"(UUID, UUID, Character Varying);
 
 Create Or Replace Function public."CreerTag"(
-    p_axIdTag     UUID,              -- 🪓 Les colosses 16 octets fixes en tête (Rule 1)
-    p_axUserId    UUID,
-    p_sName       Character Varying   -- Les chaînes en fin de soute
+    p_axIdTag   UUID,                                           -- Identifiant 128 bits natif de l'étiquette.
+    p_axUserId  UUID,                                           -- Identifiant 128 bits natif de l'acteur propriétaire.
+    p_sLibelle  Character Varying                               -- Libellé textuel nettoyé de l'étiquette.
 )
 Returns Table (
     "tgIdTag"     Uuid,
     "tgUserId"    Uuid,
-    "tgName"      Character Varying,
+    "tgLibelle"   Character Varying,                            -- [RÉPARÉ V4] Alignement franconien.
     "tgCreatedAt" TimeStamp Without Time Zone,
     "tgUpdatedAt" TimeStamp Without Time Zone
 )
@@ -26,25 +31,32 @@ Language plpgsql
 as $$
 Begin
     Return Query
-    Insert Into public."Tags" ("tgIdTag", "tgUserId", "tgName")
-    Values ("Bin-UUID"(p_axIdTag), "Bin-UUID"(p_axUserId), p_sName)
-    Returning "tgIdTag", "tgUserId", "tgName", "tgCreatedAt", "tgUpdatedAt";
+    Insert Into public."Tags" ("tgIdTag", "tgUserId", "tgLibelle")
+    Values (
+        p_axIdTag,
+        p_axUserId,
+        Lower(Trim(p_sLibelle))                                 -- [RÉPARÉ V4] Normalisation stricte exigée par le check.
+    )
+    Returning "tgIdTag", "tgUserId", "tgLibelle", "tgCreatedAt", "tgUpdatedAt";
 End;
 $$;
+
+Comment On Function public."CreerTag"(UUID, UUID, Character Varying) Is 'Insertion unitaire stricte et normalisée en UUID natif pur.';
+
 
 -- ----------------------------------------------------------------------------
 -- 🏛️ 2. Mutation Partielle Sécurisée : ModifierTag
 -- ----------------------------------------------------------------------------
-Drop Function If Exists public."ModifierTag"(UUID, Character Varying);
+Drop Function if exists public."ModifierTag"(UUID, Character Varying);
 
 Create Or Replace Function public."ModifierTag"(
-    p_axIdTag     UUID,
-    p_sName       Character Varying
+    p_axIdTag  UUID,
+    p_sLibelle Character Varying
 )
 Returns Table (
     "tgIdTag"     Uuid,
     "tgUserId"    Uuid,
-    "tgName"      Character Varying,
+    "tgLibelle"   Character Varying,
     "tgCreatedAt" TimeStamp Without Time Zone,
     "tgUpdatedAt" TimeStamp Without Time Zone
 )
@@ -53,74 +65,100 @@ as $$
 Begin
     Return Query
     Update public."Tags"
-    Set "tgName" = Coalesce(p_sName, "tgName")
-    Where "tgIdTag" = "Bin-UUID"(p_axIdTag)
-    Returning "tgIdTag", "tgUserId", "tgName", "tgCreatedAt", "tgUpdatedAt";
+    Set "tgLibelle" = Coalesce(Lower(Trim(p_sLibelle)), "tgLibelle") -- Mutation nettoyée et sécurisée.
+    Where "tgIdTag" = p_axIdTag                                 -- [RÉPARÉ V4] UUID natif en ligne droite.
+    Returning "tgIdTag", "tgUserId", "tgLibelle", "tgCreatedAt", "tgUpdatedAt";
 End;
 $$;
+
+Comment On Function public."ModifierTag"(UUID, Character Varying) Is 'Applique des révisions normalisées sur le libellé d''une étiquette.';
+
 
 -- ----------------------------------------------------------------------------
 -- 🏛️ 3. Lecture Unitaire Directe : TrouverTagParId et TrouverTagParNom
 -- ----------------------------------------------------------------------------
-Drop Function If Exists public."TrouverTagParId"(UUID);
-Drop Function If Exists public."TrouverTagParNom"(UUID, Character Varying);
+Drop Function if exists public."TrouverTagParId"(UUID);
+Drop Function if exists public."TrouverTagParNom"(UUID, Character Varying);
 
 Create Or Replace Function public."TrouverTagParId"(p_axIdTag UUID)
-Returns Table ("tgIdTag" Uuid, "tgUserId" Uuid, "tgName" Character Varying, "tgCreatedAt" TimeStamp Without Time Zone, "tgUpdatedAt" TimeStamp Without Time Zone)
-Language plpgsql as $$ Begin Return Query Select "tgIdTag", "tgUserId", "tgName", "tgCreatedAt", "tgUpdatedAt" From public."Tags" Where "tgIdTag" = "Bin-UUID"(p_axIdTag); End; $$;
+Returns Table ("tgIdTag" Uuid, "tgUserId" Uuid, "tgLibelle" Character Varying, "tgCreatedAt" TimeStamp Without Time Zone, "tgUpdatedAt" TimeStamp Without Time Zone)
+Language plpgsql as $$
+Begin
+    Return Query
+    Select "tgIdTag", "tgUserId", "tgLibelle", "tgCreatedAt", "tgUpdatedAt"
+    From public."Tags"
+    Where "tgIdTag" = p_axIdTag;                                -- [RÉPARÉ V4] Indexation B-Tree directe.
+End; $$;
 
-Create Or Replace Function public."TrouverTagParNom"(p_axUserId UUID, p_sName Character Varying)
-Returns Table ("tgIdTag" Uuid, "tgUserId" Uuid, "tgName" Character Varying, "tgCreatedAt" TimeStamp Without Time Zone, "tgUpdatedAt" TimeStamp Without Time Zone)
-Language plpgsql as $$ Begin Return Query Select "tgIdTag", "tgUserId", "tgName", "tgCreatedAt", "tgUpdatedAt" From public."Tags" Where "tgUserId" = "Bin-UUID"(p_axUserId) and Lower("tgName") = Lower(p_sName); End; $$;
+Create Or Replace Function public."TrouverTagParNom"(p_axUserId UUID, p_sLibelle Character Varying)
+Returns Table ("tgIdTag" Uuid, "tgUserId" Uuid, "tgLibelle" Character Varying, "tgCreatedAt" TimeStamp Without Time Zone, "tgUpdatedAt" TimeStamp Without Time Zone)
+Language plpgsql as $$
+Begin
+    Return Query
+    Select "tgIdTag", "tgUserId", "tgLibelle", "tgCreatedAt", "tgUpdatedAt"
+    From public."Tags"
+    Where "tgUserId" = p_axUserId
+      And Lower("tgLibelle") = Lower(Trim(p_sLibelle));        -- Isolation propre sans "Bin-UUID".
+End; $$;
+
 
 -- ----------------------------------------------------------------------------
--- 🏛️ 4. Extractions Massives Paginées : ToutesLesEtiquettesDunActeur et ToutesLesEtiquettesDuChateau
+-- 🏛️ 4. Extractions Massives Paginées
 -- ----------------------------------------------------------------------------
-Drop Function If Exists public."ToutesLesEtiquettesDunActeur"(UUID, Integer, Integer, Character Varying, Character Varying);
-Drop Function If Exists public."ToutesLesEtiquettesDuChateau"(Integer, Integer, Character Varying, Character Varying);
+Drop Function if exists public."ToutesLesEtiquettesDunActeur"(UUID, Integer, Integer, Character Varying, Character Varying);
+Drop Function if exists public."ToutesLesEtiquettesDuChateau"(Integer, Integer, Character Varying, Character Varying);
 
 Create Or Replace Function public."ToutesLesEtiquettesDunActeur"(
-    p_axUserId        UUID,
-    p_iLimit          Integer,
-    p_iOffset         Integer,
-    p_sColonneTri     Character Varying,
-    p_sOrdreTri       Character Varying
+    p_axUserId    UUID,
+    p_iLimit      Integer,
+    p_iOffset     Integer,
+    p_sColonneTri Character Varying,
+    p_sOrdreTri   Character Varying
 )
-Returns Table ("tgIdTag" Uuid, "tgUserId" Uuid, "tgName" Character Varying, "tgCreatedAt" TimeStamp Without Time Zone, "tgUpdatedAt" TimeStamp Without Time Zone, "rNbLignesTotal" BigInt)
-Language plpgsql as $$ Declare l_sRequete Text; Begin
-    l_sRequete := 'Select "tgIdTag", "tgUserId", "tgName", "tgCreatedAt", "tgUpdatedAt", Count(*) Over() From public."Tags" Where "tgUserId" = "Bin-UUID"(\$1) Order By ' || quote_ident(p_sColonneTri) || ' ' || p_sOrdreTri || ' Limit \$2 Offset \$3';
+Returns Table ("tgIdTag" Uuid, "tgUserId" Uuid, "tgLibelle" Character Varying, "tgCreatedAt" TimeStamp Without Time Zone, "tgUpdatedAt" TimeStamp Without Time Zone, "rNbLignesTotal" BigInt)
+Language plpgsql as $$
+Declare
+    l_sRequete Text;
+Begin
+    l_sRequete := 'Select "tgIdTag", "tgUserId", "tgLibelle", "tgCreatedAt", "tgUpdatedAt", Count(*) Over() From public."Tags" Where "tgUserId" = \$1 Order By ' || quote_ident(p_sColonneTri) || ' ' || p_sOrdreTri || ' Limit \$2 Offset \$3';
     Return Query Execute l_sRequete Using p_axUserId, p_iLimit, p_iOffset;
 End; $$;
 
 Create Or Replace Function public."ToutesLesEtiquettesDuChateau"(
-    p_iLimit          Integer,
-    p_iOffset         Integer,
-    p_sColonneTri     Character Varying,
-    p_sOrdreTri       Character Varying
+    p_iLimit      Integer,
+    p_iOffset     Integer,
+    p_sColonneTri Character Varying,
+    p_sOrdreTri   Character Varying
 )
-Returns Table ("tgIdTag" Uuid, "tgUserId" Uuid, "tgName" Character Varying, "tgCreatedAt" TimeStamp Without Time Zone, "tgUpdatedAt" TimeStamp Without Time Zone, "rNbLignesTotal" BigInt)
-Language plpgsql as $$ Declare l_sRequete Text; Begin
-    l_sRequete := 'Select "tgIdTag", "tgUserId", "tgName", "tgCreatedAt", "tgUpdatedAt", Count(*) Over() From public."Tags" Order By ' || quote_ident(p_sColonneTri) || ' ' || p_sOrdreTri || ' Limit \$1 Offset \$2';
+Returns Table ("tgIdTag" Uuid, "tgUserId" Uuid, "tgLibelle" Character Varying, "tgCreatedAt" TimeStamp Without Time Zone, "tgUpdatedAt" TimeStamp Without Time Zone, "rNbLignesTotal" BigInt)
+Language plpgsql as $$
+Declare
+    l_sRequete Text;
+Begin
+    l_sRequete := 'Select "tgIdTag", "tgUserId", "tgLibelle", "tgCreatedAt", "tgUpdatedAt", Count(*) Over() From public."Tags" Order By ' || quote_ident(p_sColonneTri) || ' ' || p_sOrdreTri || ' Limit \$1 Offset \$2';
     Return Query Execute l_sRequete Using p_iLimit, p_iOffset;
 End; $$;
+
 
 -- ----------------------------------------------------------------------------
 -- 🏛️ 5. Lecture par Lot : ToutesLesEtiquettesParIds
 -- ----------------------------------------------------------------------------
-Drop Function If Exists public."ToutesLesEtiquettesParIds"(UUID[], Integer, Integer, Character Varying, Character Varying);
+Drop Function if exists public."ToutesLesEtiquettesParIds"(UUID[], Integer, Integer, Character Varying, Character Varying);
 
 Create Or Replace Function public."ToutesLesEtiquettesParIds"(
-    p_axIds           UUID[],
-    p_iLimit          Integer,
-    p_iOffset         Integer,
-    p_sColonneTri     Character Varying,
-    p_sOrdreTri       Character Varying
+    p_axIds       UUID[],
+    p_iLimit      Integer,
+    p_iOffset     Integer,
+    p_sColonneTri Character Varying,
+    p_sOrdreTri   Character Varying
 )
-Returns Table ("tgIdTag" Uuid, "tgUserId" Uuid, "tgName" Character Varying, "tgCreatedAt" TimeStamp Without Time Zone, "tgUpdatedAt" TimeStamp Without Time Zone, "rNbLignesTotal" BigInt)
-Language plpgsql as $$ Declare l_sRequete Text; Begin
-    l_sRequete := 'Select "tgIdTag", "tgUserId", "tgName", "tgCreatedAt", "tgUpdatedAt", Count(*) Over() From public."Tags" Where "tgIdTag" = Any(\$1) Order By ' || quote_ident(p_sColonneTri) || ' ' || p_sOrdreTri || ' Limit \$2 Offset \$3';
+Returns Table ("tgIdTag" Uuid, "tgUserId" Uuid, "tgLibelle" Character Varying, "tgCreatedAt" TimeStamp Without Time Zone, "tgUpdatedAt" TimeStamp Without Time Zone, "rNbLignesTotal" BigInt)
+Language plpgsql as $$
+Declare
+    l_sRequete Text;
+Begin
+    l_sRequete := 'Select "tgIdTag", "tgUserId", "tgLibelle", "tgCreatedAt", "tgUpdatedAt", Count(*) Over() From public."Tags" Where "tgIdTag" = Any(\$1) Order By ' || quote_ident(p_sColonneTri) || ' ' || p_sOrdreTri || ' Limit \$2 Offset \$3';
     Return Query Execute l_sRequete Using p_axIds, p_iLimit, p_iOffset;
 End; $$;
 
-COMMENT ON FUNCTION public."CreerTag" is 'Insertion unitaire stricte 128 bits sécurisée.';
-COMMENT ON FUNCTION public."ToutesLesEtiquettesDunActeur" is 'Extraction relationnelle filtrée, ordonnée et paginée en Cour Basse.';
+Comment On Function public."ToutesLesEtiquettesDunActeur"(UUID, Integer, Integer, Character Varying, Character Varying) Is 'Extraction relationnelle ordonnée et paginée par acteur en UUID natif pur.';

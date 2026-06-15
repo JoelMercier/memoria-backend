@@ -1,7 +1,7 @@
 // ——— fichier : src/interfaces/repositories/IAppEventRepository.ts
 
 import { AppEventCategory   } from '@/constants/Categories';
-import { AppEventSeverity   } from '@/constants/Severity';
+import { AppEventSeverity   } from '@/constants/Severites';
 import { UserId, AppEventId,
          EventSecteurId,
          EventActionId      } from '@/domain/value-objects/ids';

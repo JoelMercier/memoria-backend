@@ -1,6 +1,6 @@
 // ——— fichier : src/dto/share/PublicShareDto.ts
 
-import type { ContentType } from '@/constants/ContentType';
+import type { ContentType } from '@/constants/ContentTypes';
 import type { IItem       } from '@/interfaces/entities/item/IItem';
 
 /**

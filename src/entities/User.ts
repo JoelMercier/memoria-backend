@@ -5,8 +5,8 @@ import type { IUserData } from '@/interfaces/entities/user/IUserData';
 import { ProviderId, RoleId, type UserId } from '@/domain/value-objects/ids';
 
 import { BaseEntity } from '@/entities/BaseEntity';
-import { Role } from '@/constants/Role';
-import { AuthProvider } from '@/constants/AuthProvider';
+import { Role } from '@/constants/Roles';
+import { AuthProvider } from '@/constants/AuthProviders';
 
 /**
  * 🏛️ Classe User 👥 (Le Modèle Métier Immuable de l'Acteur)

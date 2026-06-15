@@ -1,6 +1,6 @@
 // ——— fichier : src/dto/item/ResponseItemDto.ts
 
-import type { ContentType } from '@/constants/ContentType';
+import type { ContentType } from '@/constants/ContentTypes';
 import { UserId, ItemId }   from '@/domain/value-objects/ids';
 import { ResponseTagDto }   from '@/dto/tag/ResponseTagDto';
 import { Item }             from '@/entities/Item'; // 🗲 [ALIGNÉ V4] Passage sur la classe concrète du Domaine !

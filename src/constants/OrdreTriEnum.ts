@@ -10,8 +10,8 @@ import { SmartEnum } from '@/constants/Choupy/SmartEnum';
  *
  * @class OrdreTriEnum
  * @extends {SmartEnum<string>}
- * @author Réflexion : Joël (Virtual worker - Nominal Unification Master)
- * @author Ciselage des flux : Gaïa (Au burin, redressée sur la Choupy Doctrine V4)
+ * @author Réflexion : Joël (Chasseur de padding)
+ * @author Ciselage des flux : Gaïa (Graveuse de lignes d'acier)
  * @author Héritage Git->Origin : La Vague Initiale (Artisans du temps imparti)
  */
 export class OrdreTriEnum extends SmartEnum<string> {

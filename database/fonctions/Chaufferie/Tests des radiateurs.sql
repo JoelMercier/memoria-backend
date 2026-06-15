@@ -1,29 +1,39 @@
 -- ============================================================================
--- 🏺 SCRIPT DE SÉCURITÉ : CRASH-TEST DES 7 GUICHETS DE DICTIONNAIRE [MÉMORIA]
+-- 🏺 SCRIPT DE SÉCURITÉ : CRASH-TEST DES 8 GUICHETS DE DICTIONNAIRE [MÉMORIA]
 -- Fichier: database/migrations/99 - Crash Test Guichets Dictionnaires.sql
--- Version: 4.2.0 (PostgreSQL 17+)
+-- Version: 4.2.1 (PostgreSQL 17+ - Format Soviétique Strict 1960)
 -- Description: Banc d'essai transactionnel pour la validation du WarmupCache
+-- Auteur & Vision : Joël (Architecte DR-DOS - True Getters Compliance)
+-- Métallurgie des Octets : Gaïa (Au burin, alignée sur l'autonomie de soute V4)
 -- ============================================================================
 
 Set search_path To Public;
+Set CLIENT_ENCODING to 'UTF8';
 
--- 👥 1. Test du placard des Rôles (Attendu : CUST, ADMN, SADM...)
-Select * From "TousLesRoles"();
+-- ----------------------------------------------------------------------------
+-- 🎛️ BATTERIE DE TESTS : EXTRATEURS ET VERROUS DE BOOT EN LIGNE DROITE
+-- ----------------------------------------------------------------------------
 
--- 📂 2. Test du placard des Catégories d'Événements (Attendu : MONI, ANAL, AUDI, RGPD...)
-Select * From "ToutesLesCategories"();
+-- 👥 1. Test du placard des Rôles (Attendu : roIdRole, roLibelle, roNiveau, roOrdreAff, roDefaut)
+Select * From public."TousLesRoles"();
 
--- 📦 3. Test du placard des Formats de Pépites (Attendu : NOTE, ARTI, BOOK, PODC, VIDE...)
-Select * From "TousLesFormats"();
+-- 📂 2. Test du placard des Catégories d'Événements (Attendu : caIdCategory, caLibelle, caOrdreAff, caDefaut)
+Select * From public."ToutesLesCategories"();
 
--- 🔌 4. Test du placard des Fournisseurs d'Accès (Attendu : LOCA, GOOG, AZUR, APPL...)
-Select * From "TousLesFournisseurs"();
+-- 📦 3. Test du placard des Formats de Pépites (Attendu : ctIdContentType, ctLibelle, ctOrdreAff, ctDefaut)
+Select * From public."TousLesFormats"();
 
--- ⚠️ 5. Test du placard des Sévérités d'Incidents (Attendu : INFO, WARN, ERRO, CRIT...)
-Select * From "ToutesLesSeverites"();
+-- 🔌 4. Test du placard des Fournisseurs d'Accès (Attendu : prIdProvider, prLibelle, prOrdreAff, prDefaut)
+Select * From public."TousLesFournisseurs"();
 
--- 💻 6. Test du placard des Contextes d'Audit V4 (Attendu : AUTH, PEPI, SYST, RGPD...) [NEW V4]
-Select * From "TousLesContextes"();
+-- ⚠️ 5. Test du placard des Sévérités d'Incidents (Attendu : seIdSeverity, seLibelle, seNiveau, seOrdreAff, seDefaut)
+Select * From public."ToutesLesSeverites"();
 
--- ⚙️ 7. Test du placard des Actions d'Audit V4 (Attendu : CONN, ECHE, CREA, PURG...) [NEW V4]
-Select * From "ToutesLesActions"();
+-- 💻 6. Test du placard des Secteurs Fonctionnels (Attendu : scIdSecteur, scLibelle, scOrdreAff, scDefaut) [RÉPARÉ V4]
+Select * From public."TousLesSecteurs"();
+
+-- ⚙️ 7. Test du placard des Actions d'Audit (Attendu : acIdAction, acLibelle, acOrdreAff, acDefaut) [RÉPARÉ V4]
+Select * From public."ToutesLesActions"();
+
+-- 🎛️ 8. Test du régulateur virtuel des Directives de Tri (Attendu : otIdCode, otLibelle, otClauseSql, otOrdreAff, otDefaut) [NEW V4]
+Select * From public."TousLesOrdresTri"();

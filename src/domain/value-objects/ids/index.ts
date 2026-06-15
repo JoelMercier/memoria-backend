@@ -15,18 +15,18 @@
  */
 
 // --- 💎 La Lignée des UUIDs Lourds (16 octets / ByteA / IdChoupy DIM_16) ---
-export { UserId          } from './UserId';
-export { ItemId          } from './ItemId';
-export { AppEventId      } from './AppEventId';
-export { ShareId         } from './ShareId';
-export { SessionId       } from './SessionId';
-export { TagId           } from './TagId';
+export { UserId       } from './UserId';
+export { ItemId       } from './ItemId';
+export { EventId      } from './EventId';
+export { ShareId      } from './ShareId';
+export { SessionId    } from './SessionId';
+export { TagId        } from './TagId';
 
 // --- 🔌 La Lignée des Quadrigrammes Fixes (4 octets / Char(4) / IdChoupy DIM_4) ---
 export { RoleId          } from './RoleId';
-export { EventCategoryId } from './EventCategoryId';
-export { SeverityId      } from './SeverityId';
+export { EventCategoryId } from './CategorieId';
+export { SeverityId      } from './SeveriteId';
 export { ProviderId      } from './ProviderId';
 export { ContentTypeId   } from './ContentTypeId';
-export { EventSecteurId  } from './EventSecteurId';
-export { EventActionId   } from './EventActionId';
+export { EventSecteurId  } from './SecteurId';
+export { EventActionId   } from './ActionId';

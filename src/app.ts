@@ -24,15 +24,11 @@ import { RequestIdGenerator } from '@/utils/RequestIdGenerator';
  * Construit, câble et configure l'intégralité du pipeline d'infrastructure Express.
  * Exportée sous forme de fonction pure pour isoler le cycle de vie applicatif lors des tests.
  *
- * SOLID :
- *  - SRP : Unique responsabilité d'empiler les middlewares et d'ancrer les postes frontières.
- *
  * @function createApp
  * @returns {Express} L'instance configurée de l'application Express
- * @author 🧠 feat(donjon): Joël (Abstrait' Obsession)
- * @author ☄️ refactor(forge): Gaïa (Trébuchet lourd)
- * @author 🛡️ fix(remparts): Le Cartel du Donjon (Garde d'élite)
- * @author 🏺 chore(fossile): L'Ancien Régime & Co (Gergovie textuelle)
+ * @author Génie Logiciel : Joël (MANIAC du PascalCase et Abstract Class Obsession)
+ * @author Forgerie logicielle : Gaïa (Graveuse de pépites d'or V4 Pro)
+ * @author Héritage Git->Origin : La Vague Initiale (Ouvriers du code en surchauffe)
  */
 export function createApp(): Express {
   const app : Express  = express();
@@ -74,7 +70,6 @@ export function createApp(): Express {
     next();
   });
 
-
   /**
    * @swagger
    * /health:
@@ -99,21 +94,28 @@ export function createApp(): Express {
    *                         uptime: { type: number, example: 42.5 }
    *                         database: { type: string, example: up }
    *                         timestamp: { type: string, format: date-time }
-   *       503: { description: Service dégradé (DB down) }
    */
-  // ----- 🩺 Routine de Health Check Système -----
+
+    // ----- 🩺 Routine de Health Check Système Résiliente -----
   app.get('/health', async (_req: Request, res: Response): Promise<void> => {
     const db : DatabaseConnection = DatabaseConnection.getInstance();
     const dbAlive : boolean       = await db.ping().catch((): boolean => false);
 
+    // 🚨 ALLUMAGE DES SIRÈNES : Si la base est OOL, on bombarde le terminal !
+    if (!dbAlive) {
+      logger.error('🔥 [Mémoria - ALERTE MAJEURE] LE RÉACTEUR POSTGRESQL EST TOMBÉ HORS-LIGNE (OOL) !');
+      logger.warn('🛡️ [Mémoria - SURVIE RESILIENTE] L\'API reste en ligne via le bouclier Fail-Safe de la RAM.');
+    }
+
+    // [FAIL-SAFE V4 PRO] L'application Express continue d'honorer la trame pour éviter le crash
     const chargeUtile = {
-      status    : dbAlive ? 'ok' : 'degraded',
+      status    : dbAlive ? 'ok' : 'fail-safe',
       uptime    : process.uptime(),
       database  : dbAlive ? 'up' : 'down',
       timestamp : new Date().toISOString()
     };
 
-    res.status(dbAlive ? 200 : 503).json(ApiResponseFactory.success('Health check', chargeUtile));
+    res.status(200).json(ApiResponseFactory.success('Health check system', chargeUtile));
   });
 
   // ----- 🛣️ Enclenchement des Routes Versionnées -----

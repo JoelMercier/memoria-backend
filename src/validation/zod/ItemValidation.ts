@@ -1,7 +1,7 @@
 // ——— fichier : src/validation/zod/ItemValidation.ts
 
 import { z } from 'zod';
-import { ContentType } from '@/constants/ContentType';
+import { ContentType } from '@/constants/ContentTypes';
 
 /**
  * 🏷️ Schéma de validation Zod pour le code du Smart Enum ContentType.

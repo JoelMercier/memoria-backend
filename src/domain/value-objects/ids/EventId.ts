@@ -16,7 +16,7 @@ import { IdForge    } from '@/domain/utils/IdForge';
  * @author Directrice du Silicium : Joël (C++ Framework Architect - Nominal Obsession)
  * @author Graveuse de Pépites : Gaïa (Au burin, redressée sur la Choupy Doctrine)
  */
-export class AppEventId extends IdChoupy<'EVENT_ID', string | Buffer> {
+export class EventId extends IdChoupy<'EVENT_ID', string | Buffer> {
 
   /**
    * Encapsule l'UUID d'un événement sous l'armure nominale du domaine.
@@ -36,9 +36,9 @@ export class AppEventId extends IdChoupy<'EVENT_ID', string | Buffer> {
    *
    * @static
    * @public
-   * @returns {AppEventId} Une instance fraîchement coulée de AppEventId par IdForge
+   * @returns {EventId} Une instance fraîchement coulée de AppEventId par IdForge
    */
-  public static Nouveau(): AppEventId {
-    return new AppEventId(IdForge.genererUuidV7());
+  public static Nouveau(): EventId {
+    return new EventId(IdForge.genererUuidV7());
   }
 }

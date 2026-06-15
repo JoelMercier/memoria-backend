@@ -2,8 +2,8 @@
 
 import { AppEventAction     } from '@/constants/Actions';
 import { AppEventCategory   } from '@/constants/Categories';
-import { AppEventSecteur    } from '@/constants/Secteur';
-import { AppEventSeverity   } from '@/constants/Severity';
+import { AppEventSecteur    } from '@/constants/Secteurs';
+import { AppEventSeverity   } from '@/constants/Severites';
 import { UserId, AppEventId } from '@/domain/value-objects/ids';
 import { type CreateAppEventSchemaType, AppEventValidation } from '@/validation/zod/AppEventValidation';
 

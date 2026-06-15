@@ -1,8 +1,8 @@
 // ——— fichier : src/interfaces/entities/user/IUser.ts
 
 import type { UserId }       from '@/domain/value-objects/ids';
-import type { Role }         from '@/constants/Role';
-import type { AuthProvider } from '@/constants/AuthProvider';
+import type { Role }         from '@/constants/Roles';
+import type { AuthProvider } from '@/constants/AuthProviders';
 import type { IEntity }      from '@/interfaces/entities/IEntity';
 import type { IUserData }    from '@/interfaces/entities/user/IUserData';
 

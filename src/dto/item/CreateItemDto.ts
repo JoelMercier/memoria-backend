@@ -1,6 +1,6 @@
 // ——— fichier : src/dto/item/CreateItemDto.ts
 
-import type { ContentType } from '@/constants/ContentType';
+import type { ContentType } from '@/constants/ContentTypes';
 import { TagId               } from '@/domain/value-objects/ids';
 import { type CreateItemSchemaType,
          ItemValidation       } from '@/validation/zod/ItemValidation';
@@ -51,7 +51,7 @@ export class CreateItemDto {
   public constructor(data: unknown) {
     const l_oRawBody : Record<string, unknown> = (data && typeof data === 'object') ? (data as Record<string, unknown>) : {};
     const validated  : CreateItemSchemaType = ItemValidation.validateCreate(l_oRawBody);
-    
+
     // Cast chirurgical d'alignement avec notre instance de SmartEnum
     this.contentType  = validated.contentType as unknown as ContentType;
     this.title        = validated.title;

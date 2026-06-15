@@ -1,78 +1,86 @@
 -- ============================================================================
--- 🏺 Mémoria - Fonctions d'Audit Systèmes V4
--- Version: 4.3.1 (PostgreSQL 17+)
--- Description: Extracteur universel paginé avec sévérité incrémentale stricte
+-- 🚨 INFRASTRUCTURE : EXTRACTEUR UNIVERSEL PAGINÉ DES JOURNAUX D'AUDIT
+-- Fichier: database/functions/FiltrerJournaux.sql
+-- Version: 4.2.0 (PostgreSQL 17+ - Format Soviétique Strict 1960)
+-- Description: Filtrage incrémental multicritère adossé aux index de soute
+-- Auteur & Vision : Joël (Architecte DR-DOS - True Getters Compliance)
+-- Métallurgie des Octets : Gaïa (Au burin, alignée sur l'autonomie de soute V4)
 -- ============================================================================
 
 Set search_path To Public;
+Set CLIENT_ENCODING to 'UTF8';
 
-Create Or Replace Function "FiltrerJournaux"(
-    "p_aeUserId" Bytea,
-    "p_aeContext" Char(4),
-    "p_aeAction" Char(4),
-    "p_aeCategory" Char(4),
-    "p_aeSeverity" Char(4),
-    "p_NbLignes" Integer,
-    "p_LigneDebut" Integer
+Drop Function if exists public."FiltrerJournaux"(ByteA, Char(4), Char(4), Char(4), Char(4), Integer, Integer);
+Drop Function if exists public."FiltrerJournaux"(UUID, Char(4), Char(4), Char(4), Char(4), Integer, Integer);
+
+Create Or Replace Function public."FiltrerJournaux"(
+    p_aeUserId    UUID,                                         -- [RÉPARÉ V4] Aligné sur le type UUID natif d'élite.
+    p_aeSecteurId Char(4),                                      -- [RÉPARÉ V4] Alignement sémantique sc.
+    p_aeActionId  Char(4),                                      -- [RÉPARÉ V4] Alignement sémantique ac.
+    p_aeCategorieId Char(4),                                    -- [RÉPARÉ V4] Alignement sémantique ca.
+    p_aeSeveriteId  Char(4),                                    -- [RÉPARÉ V4] Alignement sémantique se.
+    p_NbLignes    Integer,
+    p_LigneDebut  Integer
 )
 Returns Table (
-    "aeIdEvent" Bytea,
-    "aeUserId" Bytea,
-    "aeContext" Char(4),
-    "aeAction" Char(4),
-    "aeCategory" Char(4),
-    "aeSeverity" Char(4),
-    "aeMessage" Text,
-    "aeMetadata" Jsonb,
-    "aeCreatedAt" Timestamp,
-    "totalCount" Bigint
+    "aeIdEvent"     UUID,                                       -- [RÉPARÉ V4] Aligné sur l'UUID natif.
+    "aeUserId"      UUID,                                       -- [RÉPARÉ V4] Aligné sur l'UUID natif.
+    "aeCategorieId" Char(4),                                    -- [RÉPARÉ V4] Alignement nominal Rule 3.
+    "aeSeveriteId"  Char(4),                                    -- [RÉPARÉ V4] Alignement nominal Rule 3.
+    "aeSecteurId"   Char(4),                                    -- [RÉPARÉ V4] Alignement nominal Rule 3.
+    "aeActionId"    Char(4),                                    -- [RÉPARÉ V4] Alignement nominal Rule 3.
+    "aeMessage"     Varchar(255),
+    "aeMetadata"    Jsonb,
+    "aeCreatedAt"   Timestamp,
+    "totalCount"    Bigint
 ) As $$
 Declare
-    "l_nNiveauExige" Integer;
+    l_nNiveauExige Integer;                                     -- Variable locale : Arbitrage mathématique de la gravité.
 Begin
-    -- 1. Extraction rapide du poids numérique de criticité via la colonne seNiveau [Mémoria]
-    If "p_aeSeverity" Is Not Null Then
-        Select "Severites"."seNiveau" Into "l_nNiveauExige"
-        From "Severites"
-        Where "Severites"."seCode" = "p_aeSeverity";
+    -- 1. Extraction rapide du poids numérique de criticité via la colonne seNiveau
+    If p_aeSeveriteId Is Not Null Then
+        Select "seNiveau" Into l_nNiveauExige
+        From public."Severites"
+        Where "seIdSeverity" = p_aeSeveriteId;                  -- [RÉPARÉ V4] Aligné sur la clé primaire correcte.
     End If;
 
-    -- 2. Requête principale avec jointure de dictionnaire pour le filtre incrémental [Mémoria]
+    -- 2. Requête principale avec jointure de dictionnaire pour le filtre incrémental
     Return Query
     With "FiltreTotal" As (
         Select
             "Events"."aeIdEvent",
             "Events"."aeUserId",
-            "Events"."aeContext",
-            "Events"."aeAction",
-            "Events"."aeCategory",
-            "Events"."aeSeverity",
+            "Events"."aeCategorieId",
+            "Events"."aeSeveriteId",
+            "Events"."aeSecteurId",
+            "Events"."aeActionId",
             "Events"."aeMessage",
             "Events"."aeMetadata",
             "Events"."aeCreatedAt",
             Count(*) Over() As "TotalCalcule"
-        From "Events"
-        Left Join "Severites" On "Events"."aeSeverity" = "Severites"."seCode"
-        Where ("p_aeUserId" Is Null Or "Events"."aeUserId" = "p_aeUserId")
-          And ("p_aeContext" Is Null Or "Events"."aeContext" = "p_aeContext")
-          And ("p_aeAction" Is Null Or "Events"."aeAction" = "p_aeAction")
-          And ("p_aeCategory" Is Null Or "Events"."aeCategory" = "p_aeCategory")
-          -- 🗲 [SUGGESTION RECALÉE ET RÉPARÉE] Tri sur seNiveau pour la sévérité incrémentale ! [Mémoria]
-          And ("p_aeSeverity" Is Null Or "Severites"."seNiveau" >= "l_nNiveauExige")
+        From public."Events"
+        Left Join public."Severites" On "Events"."aeSeveriteId" = "Severites"."seIdSeverity"
+        Where (p_aeUserId Is Null Or "Events"."aeUserId" = p_aeUserId)
+          And (p_aeSecteurId Is Null Or "Events"."aeSecteurId" = p_aeSecteurId)
+          And (p_aeActionId Is Null Or "Events"."aeActionId" = p_aeActionId)
+          And (p_aeCategorieId Is Null Or "Events"."aeCategorieId" = p_aeCategorieId)
+          And (p_aeSeveriteId Is Null Or "Severites"."seNiveau" >= l_nNiveauExige) -- Filtre incrémental d'élite.
     )
     Select
         "FiltreTotal"."aeIdEvent",
         "FiltreTotal"."aeUserId",
-        "FiltreTotal"."aeContext",
-        "FiltreTotal"."aeAction",
-        "FiltreTotal"."aeCategory",
-        "FiltreTotal"."aeSeverity",
+        "FiltreTotal"."aeCategorieId",
+        "FiltreTotal"."aeSeveriteId",
+        "FiltreTotal"."aeSecteurId",
+        "FiltreTotal"."aeActionId",
         "FiltreTotal"."aeMessage",
         "FiltreTotal"."aeMetadata",
         "FiltreTotal"."aeCreatedAt",
         "FiltreTotal"."TotalCalcule"
     From "FiltreTotal"
     Order By "FiltreTotal"."aeCreatedAt" Desc
-    Limit "p_NbLignes" Offset "p_LigneDebut";
+    Limit p_NbLignes Offset p_LigneDebut;
 End;
-$$ Language Plpgsql Stable;
+$$ Language plpgsql Stable;
+
+Comment On Function public."FiltrerJournaux"(UUID, Char(4), Char(4), Char(4), Char(4), Integer, Integer) Is 'Extracteur universel d''IHM pour le journal d''audit, gérant le filtrage par sévérité incrémentale en UUID natif pur.';

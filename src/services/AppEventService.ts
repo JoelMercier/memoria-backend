@@ -2,8 +2,8 @@
 
 import type { IAppEventService } from '@/interfaces/services/IAppEventService';
 import { AppEventCategory } from '@/constants/Categories';
-import { AppEventSeverity } from '@/constants/Severity';
-import { AppEventSecteur } from '@/constants/Secteur';
+import { AppEventSeverity } from '@/constants/Severites';
+import { AppEventSecteur } from '@/constants/Secteurs';
 import { AppEventAction } from '@/constants/Actions';
 import type { UserId, ItemId, ShareId } from '@/domain/value-objects/ids';
 import type { AppEventRepository } from '@/infrastructure/repositories/PostGres/AppEventRepository';

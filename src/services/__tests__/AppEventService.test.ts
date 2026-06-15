@@ -3,8 +3,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppEventService } from '../AppEventService'; // 🪓 IMPORT DE PROXIMITÉ LOCAL
 import { AppEventCategory } from '@/constants/Categories';
-import { AppEventSeverity } from '@/constants/Severity';
-import { AppEventSecteur } from '@/constants/Secteur';
+import { AppEventSeverity } from '@/constants/Severites';
+import { AppEventSecteur } from '@/constants/Secteurs';
 import { AppEventAction } from '@/constants/Actions';
 import { UserId, ItemId, ShareId } from '@/domain/value-objects/ids';
 import type { AppEventRepository } from '@/infrastructure/repositories/PostGres/AppEventRepository';

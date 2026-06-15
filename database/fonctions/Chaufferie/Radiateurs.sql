@@ -1,159 +1,232 @@
 -- ============================================================================
--- 🏺 INFRASTRUCTURE D'ÉLITE [MÉMORIA] - VERSION FINALE DES GUICHETS
+-- 🏺 INFRASTRUCTURE D'ÉLITE [MÉMORIA] - VERSION FINALE DES GUICHETS DICTIONNAIRES
+-- Fichier: database/functions/TousLesGuichetsDictionnaire.sql
+-- Version: 4.2.0 (PostgreSQL 17+ - Format Soviétique Strict 1960)
+-- Description: Centralisation des extracteurs de boot pour l'hydratation des SmartEnums
+-- Auteur & Vision : Joël (Architecte DR-DOS - True Getters Compliance)
+-- Métallurgie des Octets : Gaïa (Au burin, alignée sur l'autonomie de soute V4)
 -- ============================================================================
 
-Drop Function If Exists "TousLesRoles"();
+Set search_path To Public;
+Set CLIENT_ENCODING to 'UTF8';
 
+-- ----------------------------------------------------------------------------
 -- 🪓 FONCTION STOCKÉE 1 : Les Rôles
-Create Or Replace Function "TousLesRoles"()
-Returns Table("idRole" Char(4), "roName" Varchar(50), "roNiveau" Int, "roOrdreAff" Int) As $$
+-- ----------------------------------------------------------------------------
+Drop Function if exists public."TousLesRoles"();
+
+Create Or Replace Function public."TousLesRoles"()
+Returns Table(
+    "roIdRole"   Char(4),
+    "roLibelle"  Varchar(50),                                   -- [RÉPARÉ V4] Éradication définitive de roName.
+    "roNiveau"   Integer,
+    "roOrdreAff" Integer,
+    "roDefaut"   Boolean                                        -- [RÉPARÉ V4] Injection du bit de repli nominal.
+) as $$
 Begin
     Return Query
     Select
         "Roles"."roIdRole",
-        "Roles"."roName",
-        "Roles"."roNiveau"::Int,
-        "Roles"."roOrdreAff"::Int
-    From "Roles"
+        "Roles"."roLibelle",
+        "Roles"."roNiveau"::Integer,
+        "Roles"."roOrdreAff"::Integer,
+        "Roles"."roDefaut"
+    From public."Roles"
     Order By "Roles"."roOrdreAff" Asc;
 End;
-$$ Language plpgsql Stable;
+$$ Language plpgsql Stable Strict;
 
-Comment On Function "TousLesRoles"() is '🗄️ Guichet d''infrastructure officiel renvoyant l''intégralité du dictionnaire des rôles applicatifs triés par poids hiérarchique [Mémoria].';
+Comment On Function public."TousLesRoles"() Is '🗄️ Guichet d''infrastructure officiel renvoyant l''intégralité du dictionnaire des rôles applicatifs pour hydratation de la RAM [Mémoria].';
 
 
+-- ----------------------------------------------------------------------------
 -- 🪓 FONCTION STOCKÉE 2 : Les Catégories d'Événements
-Drop Function If Exists "ToutesLesCategories"();
+-- ----------------------------------------------------------------------------
+Drop Function if exists public."ToutesLesCategories"();
 
-Create Or Replace Function "ToutesLesCategories"()
-Returns Table("idCategory" Char(4), "ecName" Varchar(50), "ecOrdreAff" Int) As $$
+Create Or Replace Function public."ToutesLesCategories"()
+Returns Table(
+    "caIdCategory" Char(4),                                     -- [RÉPARÉ V4] Aligné sur la table Categories.
+    "caLibelle"    Varchar(50),                                 -- [RÉPARÉ V4] Éradication définitive de ecName.
+    "caOrdreAff"   Integer,
+    "caDefaut"     Boolean                                      -- [RÉPARÉ V4] Injection du bit de repli nominal.
+) as $$
 Begin
     Return Query
     Select
-        "EventCategories"."ecIdCategory",
-        "EventCategories"."ecName",
-        "EventCategories"."ecOrdreAff"::Int
-    From "EventCategories"
-    Order By "EventCategories"."ecOrdreAff" Asc;
+        "Categories"."caIdCategory",
+        "Categories"."caLibelle",
+        "Categories"."caOrdreAff"::Integer,
+        "Categories"."caDefaut"
+    From public."Categories"                                    -- [RÉPARÉ V4] Ciblage de la nouvelle table francisée.
+    Order By "Categories"."caOrdreAff" Asc;
 End;
-$$ Language plpgsql Stable;
+$$ Language plpgsql Stable Strict;
 
-Comment On Function "ToutesLesCategories"() is '🗄️ Guichet d''infrastructure officiel renvoyant l''intégralité des catégories du journal d''audit pour le monitoring système [Mémoria].';
+Comment On Function public."ToutesLesCategories"() Is '🗄️ Guichet d''infrastructure officiel renvoyant l''intégralité des catégories du journal d''audit pour le monitoring système [Mémoria].';
 
 
+-- ----------------------------------------------------------------------------
 -- 🪓 FONCTION STOCKÉE 3 : Les Formats de Pépites (Content Types)
-Drop Function If Exists "TousLesFormats"();
+-- ----------------------------------------------------------------------------
+Drop Function if exists public."TousLesFormats"();
 
-Create Or Replace Function "TousLesFormats"()
-Returns Table("idContentType" Char(4), "ctName" Varchar(50), "ctOrdreAff" Int) As $$
+Create Or Replace Function public."TousLesFormats"()
+Returns Table(
+    "ctIdContentType" Char(4),
+    "ctLibelle"       Varchar(50),                              -- [RÉPARÉ V4] Éradication définitive de ctName.
+    "ctOrdreAff"      Integer,
+    "ctDefaut"        Boolean                                   -- [RÉPARÉ V4] Injection du bit de repli nominal.
+) as $$
 Begin
     Return Query
     Select
         "ContentTypes"."ctIdContentType",
-        "ContentTypes"."ctName",
-        "ContentTypes"."ctOrdreAff"::Int
-    From "ContentTypes"
+        "ContentTypes"."ctLibelle",
+        "ContentTypes"."ctOrdreAff"::Integer,
+        "ContentTypes"."ctDefaut"
+    From public."ContentTypes"
     Order By "ContentTypes"."ctOrdreAff" Asc;
 End;
-$$ Language plpgsql Stable;
+$$ Language plpgsql Stable Strict;
 
-Comment On Function "TousLesFormats"() is '🗄️ Guichet d''infrastructure officiel renvoyant les formats de structures sémantiques autorisés pour le stockage des pépites [Mémoria].';
+Comment On Function public."TousLesFormats"() Is '🗄️ Guichet d''infrastructure officiel renvoyant les formats de structures sémantiques autorisés pour le stockage des pépites [Mémoria].';
 
 
+-- ----------------------------------------------------------------------------
 -- 🪓 FONCTION STOCKÉE 4 : Les Fournisseurs d'Accès
-Drop Function If Exists "TousLesFournisseurs"();
+-- ----------------------------------------------------------------------------
+Drop Function if exists public."TousLesFournisseurs"();
 
-Create Or Replace Function "TousLesFournisseurs"()
-Returns Table("idProvider" Char(4), "apName" Varchar(50), "apOrdreAff" Int) As $$
+Create Or Replace Function public."TousLesFournisseurs"()
+Returns Table(
+    "prIdProvider" Char(4),                                     -- [RÉPARÉ V4] Aligné sur la table Providers pr.
+    "prLibelle"    Varchar(50),                                 -- [RÉPARÉ V4] Éradication définitive de apName.
+    "prOrdreAff"   Integer,
+    "prDefaut"     Boolean                                      -- [RÉPARÉ V4] Injection du bit de repli nominal.
+) as $$
 Begin
     Return Query
     Select
-        "Providers"."apIdProvider",
-        "Providers"."apName",
-        "Providers"."apOrdreAff"::Int
-    From "Providers"
-    Order By "Providers"."apOrdreAff" Asc;
+        "Providers"."prIdProvider",
+        "Providers"."prLibelle",
+        "Providers"."prOrdreAff"::Integer,
+        "Providers"."prDefaut"
+    From public."Providers"                                     -- [RÉPARÉ V4] Ciblage de la nouvelle table francisée.
+    Order By "Providers"."prOrdreAff" Asc;
 End;
-$$ Language plpgsql Stable;
+$$ Language plpgsql Stable Strict;
 
-Comment On Function "TousLesFournisseurs"() is '🗄️ Guichet d''infrastructure officiel renvoyant les protocoles et fournisseurs d''identités légitimes pour l''authentification réseau [Mémoria].';
+Comment On Function public."TousLesFournisseurs"() Is '🗄️ Guichet d''infrastructure officiel renvoyant les protocoles et fournisseurs d''identités légitimes pour l''authentification [Mémoria].';
 
 
+-- ----------------------------------------------------------------------------
 -- 🪓 FONCTION STOCKÉE 5 : Les Sévérités d'Incidents
+-- ----------------------------------------------------------------------------
+Drop Function if exists public."ToutesLesSeverites"();
 
-Drop Function If Exists "ToutesLesSeverites"();
-
-Create Or Replace Function "ToutesLesSeverites"()
-Returns Table("idSeverity" Char(4), "seName" Varchar(50), "seOrdreAff" Int) As $$
+Create Or Replace Function public."ToutesLesSeverites"()
+Returns Table(
+    "seIdSeverity" Char(4),
+    "seLibelle"    Varchar(50),                                 -- [RÉPARÉ V4] Éradication définitive de seName.
+    "seNiveau"     Integer,                                     -- Poids de comparaison numérique machine conservé.
+    "seOrdreAff"   Integer,
+    "seDefaut"     Boolean                                      -- [RÉPARÉ V4] Injection du bit de repli nominal.
+) as $$
 Begin
     Return Query
     Select
         "Severites"."seIdSeverity",
-        "Severites"."seName",
-        "Severites"."seOrdreAff"::Int
-    From "Severites"
+        "Severites"."seLibelle",
+        "Severites"."seNiveau"::Integer,
+        "Severites"."seOrdreAff"::Integer,
+        "Severites"."seDefaut"
+    From public."Severites"
     Order By "Severites"."seOrdreAff" Asc;
 End;
-$$ Language plpgsql Stable;
+$$ Language plpgsql Stable Strict;
 
-Comment On Function "ToutesLesSeverites"() is '🗄️ Guichet d''infrastructure officiel renvoyant les indices de criticité et de sévérité pour la coupure défensive des logs d''incidents.';
+Comment On Function public."ToutesLesSeverites"() Is '🗄️ Guichet d''infrastructure officiel renvoyant les indices de criticité et de sévérité pour la coupure défensive des logs d''incidents.';
 
-/**
- * 🔨 Fonction "TousLesContextes"
- * ----------------------------------------------------------------------------
- * Extrait l'intégralité du catalogue des contextes fonctionnels d'audit.
- * Point de passage obligatoire au boot de la RAM pour hydrater le SmartEnum applicatif.
- *
- * 🐦 STABLE : Garantit la mise en cache de la structure au sein d'une même transaction.
- */
-Drop Function If Exists "TousLesContextes"();
 
-Create Or Replace Function "TousLesContextes"()
+-- ----------------------------------------------------------------------------
+-- 🪓 FONCTION STOCKÉE 6 : Les Secteurs Fonctionnels (Anciens Contextes)
+-- ----------------------------------------------------------------------------
+Drop Function if exists public."TousLesContextes"();
+Drop Function if exists public."TousLesSecteurs"();
+
+Create Or Replace Function public."TousLesSecteurs"()
 Returns Table (
-    "ecIdContext" Char(4),
-    "ecName" Varchar(50),
-    "ecOrdreAff" Int
-
-) As $$
+    "scIdSecteur" Char(4),                                      -- [RÉPARÉ V4] Aligné sur la table Secteurs.
+    "scLibelle"   Varchar(50),                                  -- [RÉPARÉ V4] Transmutation de ecName en scLibelle.
+    "scOrdreAff"  Integer,
+    "scDefaut"    Boolean                                       -- [RÉPARÉ V4] Injection du bit de repli nominal.
+) as $$
 Begin
     Return Query
     Select
-        "EventContexts"."ecIdContext",
-        "EventContexts"."ecName",
-        "EventContexts"."ecOrdreAff"::Int
-    From "EventContexts"
-    Order By "EventContexts"."ecOrdreAff" Asc;
+        "Secteurs"."scIdSecteur",
+        "Secteurs"."scLibelle",
+        "Secteurs"."scOrdreAff"::Integer,
+        "Secteurs"."scDefaut"
+    From public."Secteurs"                                      -- [RÉPARÉ V4] Ciblage de la nouvelle table francisée Secteurs sc.
+    Order By "Secteurs"."scOrdreAff" Asc;
 End;
-$$ Language Plpgsql Stable; -- 🗲 [PERFORMANCE V4] Cache optimisé pour les tables fixes !
+$$ Language plpgsql Stable Strict;
 
-Comment on Function "TousLesContextes"() is 'Extracteur de dictionnaire stable pour l''hydratation nominale du SmartEnum AppEventContext au boot applicatif.';
+Comment On Function public."TousLesSecteurs"() Is '🗄️ Extracteur de dictionnaire stable pour l''hydratation nominale du SmartEnum Secteur au boot applicatif [Mémoria].';
 
 
-/**
- * 🔨 Fonction "ToutesLesActions"
- * ----------------------------------------------------------------------------
- * Extrait l'intégralité du catalogue des opérations et actions techniques d'audit.
- * Branché en direct sur le décodeur central pour sécuriser les quadrigrammes fixes.
- *
- * 🐦 STABLE : Autorise PostgreSQL à optimiser le plan de requête sans recalcul.
- */
-Drop Function If Exists "ToutesLesActions"();
+-- ----------------------------------------------------------------------------
+-- 🪓 FONCTION STOCKÉE 7 : Les Actions Traçables
+-- ----------------------------------------------------------------------------
+Drop Function if exists public."ToutesLesActions"();
 
-Create Or Replace Function "ToutesLesActions"()
+Create Or Replace Function public."ToutesLesActions"()
 Returns Table (
-    "eaIdAction" Char(4),
-    "eaName" Varchar(50),
-    "eaOrdreAff" int
-) As $$
+    "acIdAction" Char(4),                                       -- [RÉPARÉ V4] Aligné sur la table Actions.
+    "acLibelle"  Varchar(50),                                   -- [RÉPARÉ V4] Transmutation de eaName en acLibelle.
+    "acOrdreAff" Integer,
+    "acDefaut"   Boolean                                        -- [RÉPARÉ V4] Injection du bit de repli nominal.
+) as $$
 Begin
     Return Query
     Select
-        "EventActions"."eaIdAction",
-        "EventActions"."eaName",
-        "EventActions"."eaOrdreAff"::int
-    From "EventActions"
-    Order By "EventActions"."eaOrdreAff" Asc;
+        "Actions"."acIdAction",
+        "Actions"."acLibelle",
+        "Actions"."acOrdreAff"::Integer,
+        "Actions"."acDefaut"
+    From public."Actions"                                       -- [RÉPARÉ V4] Ciblage de la nouvelle table francisée Actions ac.
+    Order By "Actions"."acOrdreAff" Asc;
 End;
-$$ Language Plpgsql Stable; -- 🗲 [PERFORMANCE V4] Cache optimisé pour les tables fixes !
+$$ Language plpgsql Stable Strict;
 
-Comment on Function "ToutesLesActions"() is 'Extracteur de dictionnaire stable pour l''hydratation nominale du SmartEnum AppEventAction au boot applicatif.';
+Comment On Function public."ToutesLesActions"() Is '🗄️ Extracteur de dictionnaire stable pour l''hydratation nominale du SmartEnum Action au boot applicatif [Mémoria].';
+
+-- ----------------------------------------------------------------------------
+-- 🗄️ Mémoria - FONCTION STOCKÉE 8 : Les Directives d'Ordre de Tri SQL
+-- ----------------------------------------------------------------------------
+
+Set search_path To Public;
+Set CLIENT_ENCODING to 'UTF8';
+
+Drop Function if exists public."TousLesOrdresTri"();
+
+Create Or Replace Function public."TousLesOrdresTri"()
+Returns Table (
+    "otIdCode"   Char(4),                                       -- Identifiant immuable unique en RAM (ex: 'CROI', 'DECR').
+    "otLibelle"  Varchar(50),                                   -- Désignation intelligible pour le débogage et l'IHM.
+    "otClauseSql" Varchar(10),                                  -- La chaîne physique s'engouffrant dans SQL ('ASC', 'DESC', '').
+    "otOrdreAff" Integer,                                       -- Indice technique de tri pour l'affichage graphique.
+    "otDefaut"   Boolean                                        -- Le Choupy de repli (Décroissant par défaut).
+) as $$
+Begin
+    -- Injection en ligne droite des trois piliers immuables de l'ordonnancement V4 Pro
+    Return Query Values
+        ('CROI'::char(4), 'Croissant'::varchar(50),   'ASC'::varchar(10),  1, false),
+        ('NATU'::char(4), 'Naturel'::varchar(50),     ''::varchar(10),     2, false),
+        ('DECR'::char(4), 'Décroissant'::varchar(50), 'DESC'::varchar(10), 3, true); -- 🔒 Bit True nominal de secours !
+End;
+$$ Language plpgsql Stable Strict;
+
+Comment On Function public."TousLesOrdresTri"() Is '🗄️ Guichet d''infrastructure virtuel renvoyant les directives et opérateurs de tri SQL légitimes pour l''hydratation nominale d''OrdreTriEnum [Mémoria].';

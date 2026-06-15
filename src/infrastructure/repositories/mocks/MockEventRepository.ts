@@ -1,12 +1,17 @@
 // ——— fichier : src/infrastructure/repositories/mocks/MockAppEventRepository.ts
 
-import { AppEvent }             from '@/entities/AppEvent';
-import { AppEventId, UserId }   from '@/domain/value-objects/ids';
-import { AppEventSeverity }     from '@/constants/Severity';
-import { AppEventCategory }     from '@/constants/Categories';
-import type { IAppEventData, IAppEventRepository, IAppEventListOptions, IAppEventListResult } from '@/interfaces/repositories/PostGres/IAppEventRepository';
-import type { IListOptions }         from '@/interfaces/shared/IListOptions';
-import type { IListResult }          from '@/interfaces/shared/IListResult';
+
+import type { IAppEventData,
+              IAppEventRepository,
+              IAppEventListOptions,
+              IAppEventListResult  } from '@/interfaces/repositories/PostGres/IAppEventRepository';
+import type { IListOptions         } from '@/interfaces/shared/IListOptions';
+import type { IListResult          } from '@/interfaces/shared/IListResult';
+
+import { Categorie       } from '@/constants/Categories';
+import { Severite        } from '@/constants/Severites';
+import { AppEvent        } from '@/entities/AppEvent';
+import { EventId, UserId } from '@/domain/value-objects/ids';
 
 /**
  * 🗄️ Classe MockAppEventRepository 🧮 (Le Coffre-Fort de Simulation des Logs 🤖)
@@ -19,14 +24,14 @@ import type { IListResult }          from '@/interfaces/shared/IListResult';
  * @author Vision : Joël (C++ Framework Architect - Adaptive Soute Engine)
  * @author Métallurgie des Octets : Gaïa (Au burin, calée sur les clés physiques réelles)
  */
-export class MockAppEventRepository implements IAppEventRepository {
+export class MockEventRepository implements IAppEventRepository {
   /** 🧠 Le registre virtuel immuable des événements d'audit stocké en RAM */
   private m_aoEvents: AppEvent[] = [];
 
   /**
    * 🔍 Lecture chirurgicale : Localise un log via son identifiant unique binaire 🤖.
    */
-  public async findById(p_axEventId: AppEventId): Promise<AppEvent | null> {
+  public async findById(p_axEventId: EventId): Promise<AppEvent | null> {
     return this.m_aoEvents.find((l_oEvent: AppEvent): boolean => l_oEvent.AppEventId.estEgalA(p_axEventId)) ?? null;
   }
 
@@ -47,7 +52,7 @@ export class MockAppEventRepository implements IAppEventRepository {
   /**
    * ⚠️ Extraction historique filtrée par sévérité stricte assortie d'une limite physique.
    */
-  public async findBySeverity(p_eSeverity: AppEventSeverity, p_iNbLignesMax?: number): Promise<AppEvent[] | null> {
+  public async findBySeverity(p_eSeverity: Severite, p_iNbLignesMax?: number): Promise<AppEvent[] | null> {
     const l_nLimit = p_iNbLignesMax ?? 50;
     const l_aoFiltres = this.m_aoEvents.filter((l_oEvent: AppEvent): boolean => l_oEvent.Severity === p_eSeverity);
 
@@ -58,7 +63,7 @@ export class MockAppEventRepository implements IAppEventRepository {
   /**
    * 🗂️ Extraction historique filtrée par catégorie fonctionnelle avec limite physique.
    */
-  public async findByCategory(p_eCategory: AppEventCategory, p_iNbLignesMax?: number): Promise<AppEvent[] | null> {
+  public async findByCategory(p_eCategory: Categorie, p_iNbLignesMax?: number): Promise<AppEvent[] | null> {
     const l_nLimit = p_iNbLignesMax ?? 50;
     const l_aoFiltres = this.m_aoEvents.filter((l_oEvent: AppEvent): boolean => l_oEvent.EventCategory === p_eCategory);
 

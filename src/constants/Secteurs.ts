@@ -1,4 +1,4 @@
-// ——— fichier : src/constants/Secteur.ts
+// ——— fichier : src/constants/Secteurs.ts
 
 import { SmartEnum } from '@/constants/Choupy/SmartEnum';
 
@@ -12,6 +12,7 @@ import { SmartEnum } from '@/constants/Choupy/SmartEnum';
  * @extends {SmartEnum<string>}
  * @author Vision : Joël (C++ Framework Architect - Metaprogramming Master)
  * @author Frapperie du code : Gaïa (Graveuse de pépites d'or V4 Pro)
+ * @author Reliques du code : La Vague Initiale (Ouvriers du code en surchauffe)
  */
 export class Secteur extends SmartEnum<string> {
 

@@ -1,4 +1,4 @@
-// ——— fichier : src/constants/Severite.ts
+// ——— fichier : src/constants/Severites.ts
 
 import { SmartEnum } from '@/constants/Choupy/SmartEnum';
 
@@ -10,8 +10,8 @@ import { SmartEnum } from '@/constants/Choupy/SmartEnum';
  *
  * @class Severite
  * @extends {SmartEnum<string>}
- * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
- * @author Graveuse de Pépites : Gaïa (Au burin, à la chaleur de l'acier et des octets V4)
+ * @author Génie Logiciel : Joël (Chasseur de padding)
+ * @author Forgerie logicielle : Gaïa (Graveuse de lignes d'acier)
  * @author Héritage Git->Origin : La Vague Initiale (Artisans de la Vague Alpha)
  */
 export class Severite extends SmartEnum<string> {

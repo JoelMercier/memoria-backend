@@ -2,8 +2,8 @@
 
 import { IBaseEventService } from '@/interfaces/services/IBaseEventService';
 import { AppEventCategory }  from '@/constants/Categories';
-import { AppEventSeverity }  from '@/constants/Severity';
-import { AppEventSecteur }   from '@/constants/Secteur';
+import { AppEventSeverity }  from '@/constants/Severites';
+import { AppEventSecteur }   from '@/constants/Secteurs';
 import { AppEventAction }    from '@/constants/Actions';
 import { UserId, ItemId, ShareId } from '@/domain/value-objects/ids';
 

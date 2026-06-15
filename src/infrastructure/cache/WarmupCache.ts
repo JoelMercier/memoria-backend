@@ -1,209 +1,94 @@
 // ——— fichier : src/infrastructure/cache/WarmupCache.ts
 
-import type { DatabaseConnection } from '@/config/DatabaseConnection';
-
-import { Role }              from '@/constants/Role';
-import { AppEventCategory }  from '@/constants/Categories';
-import { ContentType }       from '@/constants/ContentType';
-import { AuthProvider }      from '@/constants/AuthProvider';
-import { AppEventSeverity }  from '@/constants/Severity';
-import { AppEventSecteur }   from '@/constants/Secteur';
-import { AppEventAction }    from '@/constants/Actions';
+import { Action } from '@/constants/Actions';
+import { Categorie } from '@/constants/Categories';
+import { Secteur } from '@/constants/Secteurs';
+import { Severite } from '@/constants/Severites';
+import { Role } from '@/constants/Roles';
+import { AuthProvider } from '@/constants/AuthProviders';
+import { ContentType } from '@/constants/ContentTypes';
+import { OrdreTriEnum } from '@/constants/OrdreTriEnum';
 
 /**
- * 🗄️ Classe WarmupCache 🔥 (La Chaudière Initiale Élite & Résiliente 🤖)
+ * ⚡ Classe WarmupCache 🛂 (Le Contrôleur de Boot et d'Hydratation de la RAM 🔋)
  * ----------------------------------------------------------------------------
- * Orchestre le pré-chargement chirurgical et le chauffage des 7 tables de
- * référence de Mémoria en RAM dès l'allumage du serveur Express.
- * Mode "Auto-Mock" intégré : Bascule sur les reliques locales en cas de panne SQL.
- *
- * SOLID :
- *  - SRP 📐 : Découpage étanche des requêtes SQL par table de référence.
+ * Scanne, valide et verrouille la conformité sémantique des SmartEnums au démarrage.
+ * En cas d'échec SQL, active la stratégie de repli d'urgence autonome de soute.
  *
  * @class WarmupCache
- * @author Vision & Conception : Joël (FIFO Architect & Nominal Casse Obsession)
- * @author Forge & Martelage du Code : Gaïa (Gardienne du silicium et du creuset)
- * @author Garde d Élite des Types : La Vague Initiale (Ouvriers de la V4 en surchauffe)
+ * @author Vision : Joël (Chasseur de padding)
+ * @author Forgerie logicielle : Gaïa (Graveuse de lignes d'acier)
+ * @author Héritage Git->Origin : La Vague Initiale (Artisans de la Vague Alpha)
  */
 export class WarmupCache {
+  /** Map d'écurie associant chaque classe fille à son guichet SQL de boot */
+  private static readonly m_aDictionnaires = [
+    { classe: Role,           guichet: 'public."TousLesRoles"'        },
+    { classe: Categorie,      guichet: 'public."ToutesLesCategories"' },
+    { classe: ContentType,    guichet: 'public."TousLesFormats"'      },
+    { classe: AuthProvider,   guichet: 'public."TousLesFournisseurs"' },
+    { classe: Severite,       guichet: 'public."ToutesLesSeverites"'  },
+    { classe: Secteur,        guichet: 'public."TousLesSecteurs"'     },
+    { classe: Action,         guichet: 'public."ToutesLesActions"'    },
+    { classe: OrdreTriEnum,   guichet: 'public."TousLesOrdresTri"'    }
+  ];
 
   /**
-   * 🎛️ Déclencheur Principal : Allume simultanément les 7 radiateurs de la RAM.
-   *
-   * @static
-   * @public
-   * @async
-   * @param {DatabaseConnection} p_oDb - L'instance de connexion active à PostgreSQL
-   * @returns {Promise<void>}
+   * 🔥 ALLUMEZ LE FEU ! (Ex-ValiderAlignementSysteme purifié)
+   * Orchestre le crash-test d'alignement transactionnel au démarrage de l'application.
+   * @param {any} p_oPoolDatabase - Le pool de connexion natif vers PostgreSQL 17 (driver pg)
    */
-  public static async allumez(p_oDb: DatabaseConnection): Promise<void> {
-    await WarmupCache.chaufferRoles(p_oDb);
-    await WarmupCache.chaufferCategories(p_oDb);
-    await WarmupCache.chaufferFormats(p_oDb);
-    await WarmupCache.chaufferFournisseurs(p_oDb);
-    await WarmupCache.chaufferSeverites(p_oDb);
-    await WarmupCache.chaufferContextes(p_oDb);
-    await WarmupCache.chaufferActions(p_oDb);
-  }
+  public static async AllumezLeFeu(p_oPoolDatabase: any): Promise<void> {
+    console.log('🏺 [Mémoria - Chaufferie] Démarrage du scan d\'intégrité de la RAM...');
 
-  /**
-   * ⚙️ Injecteur Générique Universel : Instancie dynamiquement les lignes SQL manquantes en RAM.
-   * Consomme les lignes pour le linter et alimente le registre caché de la maman SmartEnum.
-   *
-   * @private
-   * @static
-   * @param {any} p_oClasseFille - La classe du SmartEnum cible à instancier
-   * @param {any[]} p_aLignes - Le tableau de lignes brutes renvoyé par PostgreSQL
-   * @param {string} p_sColId - Le nom de la colonne contenant le code de clé primaire
-   * @param {string} p_sColName - Le nom de la colonne contenant le libellé descriptif
-   * @param {string} p_sColOrdre - Le nom de la colonne contenant l'ordre d'affichage
-   * @param {string} [p_sColNiveau] - Le nom optionnel de la colonne de niveau (spécifique aux rôles)
-   * @returns {void}
-   */
-  private static injecterDynamique(
-    p_oClasseFille: any,
-    p_aLignes: any[],
-    p_sColId: string,
-    p_sColName: string,
-    p_sColOrdre: string,
-    p_sColNiveau?: string
-  ): void {
-    p_aLignes.forEach((l_oLigne: any) => {
-      const l_sCode = l_oLigne[p_sColId].toString().trim().toUpperCase();
+    try {
+      for (const l_oDict of this.m_aDictionnaires) {
+        const l_sNomClasse = l_oDict.classe.name;
+        const l_aoInstancesRam = l_oDict.classe.ObtenirToutes();
 
-      // On interroge la douane de la maman pour savoir si l'instance existe déjà en RAM
-      if (!p_oClasseFille.isValidCode(l_sCode)) {
-        const l_sName  = l_oLigne[p_sColName];
-        const l_nOrdre = Number(l_oLigne[p_sColOrdre]);
+        // 🚨 VERROU 1 : Vérification de la présence d'un Choupy de repli unique en RAM
+        const l_anDefautsRam = l_aoInstancesRam.filter(i => (i as any).isDefaut);
+        if (l_anDefautsRam.length !== 1) {
+          throw new Error(
+            `🚨 [Divergence RAM] La classe ${l_sNomClasse} doit déclarer exactement UNE instance par défaut. Trouvé : ${l_anDefautsRam.length}`
+          );
+        }
 
-        if (p_sColNiveau && l_oLigne[p_sColNiveau] !== undefined) {
-          const l_nNiveau = Number(l_oLigne[p_sColNiveau]);
-          // Cas spécifique de la classe Role (Libellé, Code, Niveau, OrdreAff)
-          new (p_oClasseFille as any)(l_sName, l_sCode, l_nNiveau, l_nOrdre);
-        } else {
-          // Cas standard de Mémoria à 3 paramètres (Libellé, Code, OrdreAff)
-          new (p_oClasseFille as any)(l_sName, l_sCode, l_nOrdre);
+        // 2. Interrogation directe du guichet de Cour Basse correspondant
+        const l_oResultatSql = await p_oPoolDatabase.query(`SELECT * FROM ${l_oDict.guichet}();`);
+        const l_aoLignesBase = l_oResultatSql.rows;
+
+        // 🚨 VERROU 2 : Vérification du Choupy de repli unique en Base de données
+        const l_aoDefautsBase = l_aoLignesBase.filter((r: any) =>
+          r.roDefaut || r.caDefaut || r.ctDefaut || r.prDefaut || r.seDefaut || r.scDefaut || r.acDefaut || r.otDefaut
+        );
+        if (l_aoDefautsBase.length !== 1) {
+          throw new Error(
+            `🚨 [Divergence Base] Le guichet ${l_oDict.guichet} retourne ${l_aoDefautsBase.length} ligne(s) par défaut au lieu d'une seule.`
+          );
+        }
+
+        // 3. Contrôle croisé des identifiants (Parité absolue de soute)
+        for (const l_oLigne of l_aoLignesBase) {
+          const l_sCodeSql = Object.values(l_oLigne)[0] as string | number;
+
+          if (!l_oDict.classe.isValidCode(l_sCodeSql)) {
+            throw new Error(
+              `🚨 [Alerte Désalignement] Le code '${l_sCodeSql}' extrait de ${l_oDict.guichet} est absent du SmartEnum ${l_sNomClasse} en RAM !`
+            );
+          }
         }
       }
-    });
-  }
+      console.log('🏺 [Mémoria - Chaufferie] Alignement RAM <=> Base validé à 100 %. Forteresse étanche !');
 
-  /**
-   * 🪓 Radiateur 1 : Extrait la table "Roles" via "TousLesRoles"
-   */
-  private static async chaufferRoles(p_oDb: DatabaseConnection): Promise<void> {
-    try {
-      const l_oPool = p_oDb.getPool();
-      const l_sRequete = 'Select * From "TousLesRoles"();';
-      const l_rResultat = await l_oPool.query(l_sRequete);
-
-      if (l_rResultat.rows.length === 0) throw new Error('Dictionnaire vide');
-      WarmupCache.injecterDynamique(Role, l_rResultat.rows, 'idRole', 'roName', 'roOrdreAff', 'roNiveau');
-
-    } catch (l_oPanne) {
-      console.warn(`[Warmup Cache ⚠️] Le guichet "TousLesRoles" est inaccessible. Repli défensif sur la RAM.`);
-    }
-  }
-
-  /**
-   * 🪓 Radiateur 2 : Extrait la table "EventCategories" via "ToutesLesCategories"
-   */
-  private static async chaufferCategories(p_oDb: DatabaseConnection): Promise<void> {
-    try {
-      const l_oPool = p_oDb.getPool();
-      const l_sRequete = 'Select * From "ToutesLesCategories"();';
-      const l_rResultat = await l_oPool.query(l_sRequete);
-
-      if (l_rResultat.rows.length === 0) throw new Error('Dictionnaire vide');
-      WarmupCache.injecterDynamique(AppEventCategory, l_rResultat.rows, 'idCategory', 'ecName', 'ecOrdreAff');
-
-    } catch (l_oPanne) {
-      console.warn(`[Warmup Cache ⚠️] Le guichet "ToutesLesCategories" est inaccessible. Repli défensif sur la RAM.`);
-    }
-  }
-
-  /**
-   * 🪓 Radiateur 3 : Extrait la table "ContentTypes" via "TousLesFormats"
-   */
-  private static async chaufferFormats(p_oDb: DatabaseConnection): Promise<void> {
-    try {
-      const l_oPool = p_oDb.getPool();
-      const l_sRequete = 'Select * From "TousLesFormats"();';
-      const l_rResultat = await l_oPool.query(l_sRequete);
-
-      if (l_rResultat.rows.length === 0) throw new Error('Dictionnaire vide');
-      WarmupCache.injecterDynamique(ContentType, l_rResultat.rows, 'idContentType', 'ctName', 'ctOrdreAff');
-
-    } catch (l_oPanne) {
-      console.warn(`[Warmup Cache ⚠️] Le guichet "TousLesFormats" est inaccessible. Repli défensif sur la RAM.`);
-    }
-  }
-
-  /**
-   * 🪓 Radiateur 4 : Extrait la table "Providers" via "TousLesFournisseurs"
-   */
-  private static async chaufferFournisseurs(p_oDb: DatabaseConnection): Promise<void> {
-    try {
-      const l_oPool = p_oDb.getPool();
-      const l_sRequete = 'Select * From "TousLesFournisseurs"();';
-      const l_rResultat = await l_oPool.query(l_sRequete);
-
-      if (l_rResultat.rows.length === 0) throw new Error('Dictionnaire vide');
-      WarmupCache.injecterDynamique(AuthProvider, l_rResultat.rows, 'idProvider', 'apName', 'apOrdreAff');
-
-    } catch (l_oPanne) {
-      console.warn(`[Warmup Cache ⚠️] Le guichet "TousLesFournisseurs" est inaccessible. Repli défensif sur la RAM.`);
-    }
-  }
-
-  /**
-   * 🪓 Radiateur 5 : Extrait la table "Severites" via "ToutesLesSeverites"
-   */
-  private static async chaufferSeverites(p_oDb: DatabaseConnection): Promise<void> {
-    try {
-      const l_oPool = p_oDb.getPool();
-      const l_sRequete = 'Select * From "ToutesLesSeverites"();';
-      const l_rResultat = await l_oPool.query(l_sRequete);
-
-      if (l_rResultat.rows.length === 0) throw new Error('Dictionnaire vide');
-      WarmupCache.injecterDynamique(AppEventSeverity, l_rResultat.rows, 'idSeverity', 'aeName', 'aeOrdreAff');
-
-    } catch (l_oPanne) {
-      console.warn(`[Warmup Cache ⚠️] Le guichet "ToutesLesSeverites" est inaccessible. Repli défensif sur la RAM.`);
-    }
-  }
-
-  /**
-   * 🪓 Radiateur 6 : Extrait la table "EventContexts" via "TousLesContextes"
-   */
-  private static async chaufferContextes(p_oDb: DatabaseConnection): Promise<void> {
-    try {
-      const l_oPool = p_oDb.getPool();
-      const l_sRequete = 'Select * From "TousLesContextes"();';
-      const l_rResultat = await l_oPool.query(l_sRequete);
-
-      if (l_rResultat.rows.length === 0) throw new Error('Dictionnaire vide');
-      WarmupCache.injecterDynamique(AppEventSecteur, l_rResultat.rows, 'ecIdContext', 'ecName', 'ecOrdreAff');
-
-    } catch (l_oPanne) {
-      console.warn(`[Warmup Cache ⚠️] Le guichet "TousLesContextes" est inaccessible. Repli défensif sur la RAM.`);
-    }
-  }
-
-  /**
-   * 🪓 Radiateur 7 : Extrait la table "EventActions" via "ToutesLesActions"
-   */
-  private static async chaufferActions(p_oDb: DatabaseConnection): Promise<void> {
-    try {
-      const l_oPool = p_oDb.getPool();
-      const l_sRequete = 'Select * From "ToutesLesActions"();';
-      const l_rResultat = await l_oPool.query(l_sRequete);
-
-      if (l_rResultat.rows.length === 0) throw new Error('Dictionnaire vide');
-      WarmupCache.injecterDynamique(AppEventAction, l_rResultat.rows, 'eaIdAction', 'eaName', 'eaOrdreAff');
-
-    } catch (l_oPanne) {
-      console.warn(`[Warmup Cache ⚠️] Le guichet "ToutesLesActions" est inaccessible. Repli défensif sur la RAM.`);
+    } catch (l_oErreur: any) {
+      // 🛡️ STRATÉGIE DE REPLI NOMINALE SOUVERAINE ACTIVÉE
+      console.error('⚠️ [Mémoria - ALERTE SOUTE] Échec ou indisponibilité critique de la base locale !');
+      console.error(`Détail : ${l_oErreur.message}`);
+      console.log('🛡️ [Mémoria - PROTECTION SYSTEME] Activation d\'urgence du repli d\'écurie.');
+      console.log('🔋 Les SmartEnums riches en RAM prennent le contrôle nominal des barrières d\'accès.');
     }
   }
 }
+
+export default WarmupCache;

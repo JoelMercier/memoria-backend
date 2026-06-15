@@ -2,7 +2,7 @@
 
 import { BaseEntity }    from '@/entities/BaseEntity';
 import { ItemId, UserId, ContentTypeId } from '@/domain/value-objects/ids';
-import { ContentType }   from '@/constants/ContentType';
+import { ContentType }   from '@/constants/ContentTypes';
 import type { IItemData } from '@/interfaces/entities/item/IItemData';
 
 /**

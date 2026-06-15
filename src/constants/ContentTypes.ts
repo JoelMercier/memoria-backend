@@ -1,4 +1,4 @@
-// ——— fichier : src/constants/ContentType.ts
+// ——— fichier : src/constants/ContentTypes.ts
 
 import { SmartEnum } from './Choupy/SmartEnum';
 

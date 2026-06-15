@@ -1,6 +1,6 @@
 // ——— fichier : src/types/express.d.ts
 
-import { Role } from '@/constants/Role';
+import { Role } from '@/constants/Roles';
 import { UserId, RequestId } from '@/domain/value-objects/ids';
 
 /**
