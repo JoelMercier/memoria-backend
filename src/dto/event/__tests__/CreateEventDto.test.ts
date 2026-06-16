@@ -2,10 +2,10 @@
 
 import { describe, expect, it } from 'vitest';
 import { CreateEventDto }       from '../CreateEventDto';
-import { AppEventCategory }     from '@/constants/Categories';
-import { AppEventSecteur }      from '@/constants/Secteurs';
-import { AppEventAction }       from '@/constants/Actions';
-import { AppEventSeverity }     from '@/constants/Severites';
+import { Categorie }     from '@/constants/Categories';
+import { Secteur   }      from '@/constants/Secteurs';
+import { Action    }       from '@/constants/Actions';
+import { Severite  }     from '@/constants/Severites';
 
 describe('CreateEventDto', () => {
 
@@ -27,12 +27,12 @@ describe('CreateEventDto', () => {
 
     expect(l_oDto.idEvent.valeur).toBe(l_oPayload.idAppEvent);
     expect(l_oDto.userId?.valeur).toBe(l_oPayload.userId);
-    expect(l_oDto.eventCategory).toBe(AppEventCategory.MONI);
-    expect(l_oDto.eventSecteur).toBe(AppEventSecteur.SYST);
-    expect(l_oDto.eventAction).toBe(AppEventAction.DEMA);
-    expect(l_oDto.severity).toBe(AppEventSeverity.WARN);
-    expect(l_oDto.message).toBe(l_oPayload.message);
-    expect(l_oDto.metadata).toEqual(l_oPayload.metadata);
+    expect(l_oDto.eventCategorie).toBe(Categorie.MONI);
+    expect(l_oDto.eventSecteur  ).toBe(Secteur  .SYST);
+    expect(l_oDto.eventAction   ).toBe(Action   .DEMA);
+    expect(l_oDto.eventSeverite ).toBe(Severite .WARN);
+    expect(l_oDto.message       ).toBe(l_oPayload.message);
+    expect(l_oDto.metadata      ).toEqual(l_oPayload.metadata);
   });
 
   it('applique automatiquement le repli de sévérité INFO si le champ est absent', () => {
@@ -40,7 +40,7 @@ describe('CreateEventDto', () => {
     delete (l_oPayload as any).severity;
 
     const l_oDto = new CreateEventDto(l_oPayload);
-    expect(l_oDto.severity).toBe(AppEventSeverity.INFO);
+    expect(l_oDto.eventSeverite).toBe(Severite.INFO);
   });
 
   it('accepte un userId à Null pour la conformité ou les purges RGPD', () => {

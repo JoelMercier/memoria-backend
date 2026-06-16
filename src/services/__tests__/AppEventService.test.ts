@@ -2,10 +2,10 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppEventService } from '../AppEventService'; // 🪓 IMPORT DE PROXIMITÉ LOCAL
-import { AppEventCategory } from '@/constants/Categories';
-import { AppEventSeverity } from '@/constants/Severites';
-import { AppEventSecteur } from '@/constants/Secteurs';
-import { AppEventAction } from '@/constants/Actions';
+import { Categorie } from '@/constants/Categories';
+import { Severite } from '@/constants/Severites';
+import { Secteur } from '@/constants/Secteurs';
+import { Action } from '@/constants/Actions';
 import { UserId, ItemId, ShareId } from '@/domain/value-objects/ids';
 import type { AppEventRepository } from '@/infrastructure/repositories/PostGres/AppEventRepository';
 
@@ -28,18 +28,19 @@ describe('AppEventService', () => {
   describe('log', () => {
     it("engendre une trace d'audit générique en forgeant son identifiant et appliquant les types nominaux", async () => {
       await l_oService.log({
-        userId: USER_ID,
-        eventCategory: AppEventCategory.AUDI,
-        eventSecteur: AppEventSecteur.SYST,
-        eventAction: AppEventAction.DEMA,
+        userId         : USER_ID,
+        eventCategorie : Categorie.GENE,
+        eventSecteur   : Secteur.SYST,
+        eventAction    : Action.DEMA,
+        eventSeverite :  Severite.INFO,
         message: 'Test de trace'
       });
 
       expect(l_oRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          aeUserId: USER_ID,
-          aeCategoryId: AppEventCategory.AUDI,
-          aeMessage: 'Test de trace'
+          aeUserId     : USER_ID,
+          aeCategoryId : Categorie.GENE,
+          aeMessage    : 'Test de trace'
         })
       );
     });
@@ -51,9 +52,9 @@ describe('AppEventService', () => {
 
       expect(l_oRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          aeUserId: USER_ID,
-          aeCategoryId: AppEventCategory.AUDI,
-          aeMessage: 'Connexion réussie'
+          aeUserId     : USER_ID,
+          aeCategoryId : Categorie.MONI,
+          aeMessage    : 'Connexion réussie'
         })
       );
     });
@@ -63,10 +64,10 @@ describe('AppEventService', () => {
 
       expect(l_oRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          aeUserId: null,
-          aeCategoryId: AppEventCategory.AUDI,
-          aeSeverityId: AppEventSeverity.WARN,
-          aeMessage: 'Échec de connexion'
+          aeUserId     : null,
+          aeCategoryId : Categorie.MONI,
+          aeSeverityId : Severite.WARN,
+          aeMessage    : 'Échec de connexion'
         })
       );
     });
@@ -76,9 +77,9 @@ describe('AppEventService', () => {
 
       expect(l_oRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          aeUserId: USER_ID,
-          aeCategoryId: AppEventCategory.ANAL,
-          aeMessage: 'Pépite créée'
+          aeUserId     : USER_ID,
+          aeCategoryId : Categorie.ANAL,
+          aeMessage    : 'Pépite créée'
         })
       );
     });
@@ -89,7 +90,7 @@ describe('AppEventService', () => {
       expect(l_oRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
           aeUserId: USER_ID,
-          aeCategoryId: AppEventCategory.ANAL,
+          aeCategoryId: Categorie.ANAL,
           aeMessage: 'Pépite partagée'
         })
       );
