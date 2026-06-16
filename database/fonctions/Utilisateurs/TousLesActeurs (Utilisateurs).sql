@@ -116,8 +116,8 @@ Returns Table (
     "usRoleId"       Character Varying,
     "usProviderId"   Character Varying,
     "usSettingsUser" JsonB,
-    "usRgpdConsent"  Boolean,                     -- [RÉPARÉ V4] Aligné au caractère près sur la table.
-    "usRgpdDate"     TimeStamp Without Time Zone, -- [RÉPARÉ V4] Aligné au caractère près sur la table.
+    "usRgpdConsent"  Boolean,
+    "usRgpdDate"     TimeStamp Without Time Zone,
     "usCreatedAt"    TimeStamp Without Time Zone,
     "usUpdatedAt"    TimeStamp Without Time Zone
 )

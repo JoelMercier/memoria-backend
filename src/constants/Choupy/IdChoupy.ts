@@ -38,12 +38,16 @@ export abstract class IdChoupy<TMarqueNominale, TContenu extends string | Buffer
 
       // Normalisation uniforme pour le calibre 16 octets (UUID v7 avec ou sans tirets)
       if (p_oCalibreExige === ChoupyEnum.DIM_16) {
+
         const l_sCleanHex = l_sTexteNettoye.toLowerCase().replace(/[^0-9a-f]/g, '');
+
         if (!IdChoupy.REGEX_HEX_COMPACT.test(l_sCleanHex)) {
           throw new Error(`[Erreur Sécurité 🚨] Format d'UUID textuel invalide : attendu 32 caractères hexadécimaux épurés.`);
         }
-        // Mutation polymorphe vers le type Buffer interne exigé par PostgreSQL
-        this.m_vDonnee = Buffer.from(l_sCleanHex, 'hex') as TContenu;
+        else {
+          // Mutation polymorphe vers le type Buffer interne exigé par PostgreSQL
+          this.m_vDonnee = Buffer.from(l_sCleanHex, 'hex') as TContenu;
+        }
       } else {
         // Pour les quadrigrammes (DIM_4), normalisation industrielle en majuscules
         this.m_vDonnee = (p_oCalibreExige === ChoupyEnum.DIM_4 ? l_sTexteNettoye.toUpperCase() : l_sTexteNettoye) as TContenu;

@@ -1,35 +1,37 @@
 // ——— fichier : src/infrastructure/repositories/PostGres/UserRepository.ts
 
-import type { QueryResultRow } from 'pg';
-import { BaseRepository } from '@/infrastructure/repositories/BaseRepositories';
-import { UserId, RoleId, ProviderId } from '@/domain/value-objects/ids';
-import { User } from '@/entities/User';
-import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
-import { UserErrorFactory } from '@/exceptions/UserErrorFactory';
-import type { IUserData } from '@/interfaces/entities/user/IUserData';
-import type { IUserRepository } from '@/interfaces/repositories/PostGres/IUserRepository';
+import type { QueryResultRow      } from 'pg';
+import type { IUserData           } from '@/interfaces/entities/user/IUserData';
+import type { IUserRepository     } from '@/interfaces/repositories/PostGres/IUserRepository';
 import type { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
-import type { IListOptions } from '@/interfaces/shared/IListOptions';
-import type { IListResult } from '@/interfaces/shared/IListResult';
-import OrdreTriEnum from '@/constants/OrdreTriEnum';
+import type { IListOptions        } from '@/interfaces/shared/IListOptions';
+import type { IListResult         } from '@/interfaces/shared/IListResult';
 
-/**
- * 🗄️ Interface IUserRow (Miroir Physique Jojo-Style des Acteurs 🔌)
- * Alignée au caractère près sur l'ordre physique décroissant anti-padding de la base.
+import { BaseRepository       } from '@/infrastructure/repositories/BaseRepositories';
+import { User                 } from '@/entities/User';
+import { DatabaseErrorFactory } from '@/exceptions/DatabaseErrorFactory';
+import { UserErrorFactory     } from '@/exceptions/UserErrorFactory';
+import { OrdreTriEnum         } from '@/constants/OrdreTriEnum';
+
+import { UserId, RoleId, ProviderId } from '@/domain/value-objects/ids';
+
+
+  /**
+   * 🗄️ Interface IUserRow (Miroir Physique Jojo-Style des Acteurs 🔌)
  */
 interface IUserRow extends QueryResultRow {
-  usIdUser       : Buffer;                                              //-- 16 octets fixes tassés en RAM.
+  usIdUser       : Buffer;                                              //-- [SCELLÉ] Maintien du format binaire compact de 16 octets !
   usCourriel     : string;
   usPasswordHash : string;
   usPseudo       : string;
-  usIdRole       : string;                                              // Char(4) dictionnaire.
-  usIdProvider   : string;                                              // Char(4) dictionnaire.
+  usRoleId       : string;
+  usProviderId   : string;
   usSettingsUser : Record<string, string>;
-  usGdprConsent  : boolean;
-  usGdprDate     : Date | null;
+  usRgpdConsent  : boolean;
+  usRgpdDate     : Date | null;
   usCreatedAt    : Date;
   usUpdatedAt    : Date | null;
-  rNbLignesTotal?: string;                                              // Volumétrie calculée par le chateau.
+  rNbLignesTotal?: string;
 }
 
 /**
@@ -55,111 +57,98 @@ export class UserRepository extends BaseRepository implements IUserRepository {
     super(p_oDb);
   }
 
-  /**
-   * Mappe une ligne PostgreSQL brute vers une entité typée User 🔄.
-   * [RÉPARÉ V4] Instanciation POO pure directe de Bloc 1 sans toDomainId paresseux !
-   *
-   * @private
-   * @param {IUserRow} p_oRow - La ligne brute PostgreSQL
-   * @returns {User} L'entité vivante du Domaine hydratée et scellée
-   */
   private LigneVersActeur(p_oRow: IUserRow): User {
     return new User({
-      idUser         : new UserId(p_oRow.usIdUser),                     // Instanciation directe étanche [Mémoria]
-      roleId         : new RoleId(p_oRow.usIdRole),
-      authProviderId : new ProviderId(p_oRow.usIdProvider),
+      idUser         : new UserId(p_oRow.usIdUser),                     //-- Hydratation par Buffer pur [Mémoria]
+      roleId         : new RoleId(p_oRow.usRoleId),
+      authProviderId : new ProviderId(p_oRow.usProviderId),
       courriel       : p_oRow.usCourriel,
       passwordHash   : p_oRow.usPasswordHash,
       pseudo         : p_oRow.usPseudo,
       settingsUser   : p_oRow.usSettingsUser,
-      rgpdConsent    : p_oRow.usGdprConsent,
-      rgpdConsentDate: p_oRow.usGdprDate ?? undefined,
+      rgpdConsent    : p_oRow.usRgpdConsent,
+      rgpdConsentDate: p_oRow.usRgpdDate ?? undefined,
       createdAt      : p_oRow.usCreatedAt,
       updatedAt      : p_oRow.usUpdatedAt ?? undefined
     });
   }
 
+
   /**
-   * 🔍 Lecture chirurgicale : Localise un actor via son identifiant nominal fort 🤖.
+   * 🔍 Lecture chirurgicale : Localise un acteur via son identifiant nominal fort 🤖.
    */
   public async findById(p_oIdUser: UserId): Promise<User | null> {
     try {
+
       const l_oResult = await this.db.query<IUserRow>(
-        'Select * From public."Users" Where "usIdUser" = "Bin-UUID"($1);',
-        [p_oIdUser]
-      );
+        'Select * From public."TrouverActeurParCle"($1);', [ p_oIdUser.binaire ] );
       return l_oResult.rows && l_oResult.rows.length > 0 ? this.LigneVersActeur(l_oResult.rows[0]) : null;
+
     } catch (l_oErreur) {
+
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
-      throw DatabaseErrorFactory.queryFailed('User.findById', l_sMsg);
+      throw DatabaseErrorFactory.queryFailed('User.findById / TrouverActeurParCle()', l_sMsg);
+
     }
   }
 
+
   /**
    * 🔍 Alignement nominal : Localise un acteur via son courriel normalisé 📧.
-   * [SCELLÉ V4] Raccordement direct sur votre turbine User_Recherche_Par_Courriel.
    */
   public async findByCourriel(p_sCourriel: string): Promise<User | null> {
     try {
+
       const l_oResult = await this.db.query<IUserRow>(
-        'Select * From "User_Recherche_Par_Courriel"($1);',
-        [p_sCourriel]
-      );
+        'Select * From public."TrouverActeurParCourriel"($1);', [ p_sCourriel ] );
       return l_oResult.rows && l_oResult.rows.length > 0 ? this.LigneVersActeur(l_oResult.rows[0]) : null;
+
     } catch (l_oErreur) {
+
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
-      throw DatabaseErrorFactory.queryFailed('User.findByCourriel', l_sMsg);
+      throw DatabaseErrorFactory.queryFailed('User.findByCourriel / TrouverActeurParCourriel', l_sMsg);
+
     }
   }
+
 
   /**
    * 🔍 Alignement nominal : Localise un acteur via son pseudonyme public.
    */
   public async findByPseudo(p_sPseudo: string): Promise<User | null> {
     try {
+
       const l_oResult = await this.db.query<IUserRow>(
-        'Select * From "Users" Where "usPseudo" = Trim($1);',
-        [p_sPseudo]
-      );
+        'Select * From public."TrouverActeurParPseudo"($1);', [ p_sPseudo ] );
       return l_oResult.rows && l_oResult.rows.length > 0 ? this.LigneVersActeur(l_oResult.rows[0]) : null;
+
     } catch (l_oErreur) {
+
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
-      throw DatabaseErrorFactory.queryFailed('User.findByPseudo', l_sMsg);
+      throw DatabaseErrorFactory.queryFailed('User.findByPseudo / TrouverActeurParPseudo', l_sMsg);
+
     }
   }
 
+
   /**
    * 📧 Vérification d'existence : Valide la présence d'un courriel.
+   * Fusion par non-nullité : appel direct à findByCourriel.
    */
   public async existsByCourriel(p_sCourriel: string): Promise<boolean> {
-    try {
-      const l_oResult = await this.db.query<{ exists: boolean }>(
-        'Select Exists(Select 1 From public."Users" Where "usCourriel" = Lower(Trim($1))) as "exists";',
-        [p_sCourriel]
-      );
-      return Boolean(l_oResult.rows?.[0]?.exists ?? false);
-    } catch (l_oErreur) {
-      const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
-      throw DatabaseErrorFactory.queryFailed('User.existsByCourriel', l_sMsg);
-    }
+    const l_oActeur = await this.findByCourriel(p_sCourriel);
+    return l_oActeur !== null;
   }
 
   /**
    * 👤 Vérification d'existence : Valide la présence d'un pseudonyme public.
-   * [SCELLÉ V4] Raccordement direct sur votre turbine binaire User_Verifie_Existence_Pseudo.
+   * Fusion par non-nullité : appel direct à findByPseudo.
    */
   public async existsByPseudo(p_sPseudo: string): Promise<boolean> {
-    try {
-      const l_oResult = await this.db.query<{ exists: boolean }>(
-        'Select "User_Verifie_Existence_Pseudo"($1) as "exists";',
-        [p_sPseudo]
-      );
-      return Boolean(l_oResult.rows?.[0]?.exists ?? false);
-    } catch (l_oErreur) {
-      const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
-      throw DatabaseErrorFactory.queryFailed('User.existsByPseudo', l_sMsg);
-    }
+    const l_oActeur = await this.findByPseudo(p_sPseudo);
+    return l_oActeur !== null;
   }
+
 
   /**
    * 🪓 Écriture concrète : Insère un nouvel acteur via la fonction stockée exclusive.
@@ -169,7 +158,7 @@ export class UserRepository extends BaseRepository implements IUserRepository {
       const l_oResult = await this.db.query<IUserRow>(
         'Select * From "CreerActeur"($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);',
         [
-          p_oData.idUser,
+          p_oData.idUser.binaire,
           p_oData.courriel,
           p_oData.passwordHash,
           p_oData.pseudo,
@@ -204,7 +193,7 @@ export class UserRepository extends BaseRepository implements IUserRepository {
       const l_oResult = await this.db.query<IUserRow>(
         'Select * From "ModifierActeur"($1, $2, $3, $4, $5, $6, $7, $8, $9);',
         [
-          p_oIdUser,
+          p_oIdUser.binaire,
           p_oData.courriel ?? null,
           p_oData.passwordHash ?? null,
           p_oData.pseudo ?? null,
@@ -219,39 +208,45 @@ export class UserRepository extends BaseRepository implements IUserRepository {
       if (!l_oResult.rows || l_oResult.rows.length === 0)
         throw UserErrorFactory.notFound(p_oIdUser);
       return this.LigneVersActeur(l_oResult.rows[0]);
+
     } catch (l_oErreur) {
+
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
-      throw DatabaseErrorFactory.queryFailed('User.update', l_sMsg);
+      throw DatabaseErrorFactory.queryFailed('User.update / ModifierActeur', l_sMsg);
+
     }
   }
 
+
   /**
-   * 🪓 Destruction physique d'infrastructure.
+   * 🛡️ Décontamination Sémantique (Ex-Delete physique obsolète)
+   * [SCELLÉ V4] Déclenche l'anonymisation irréversible RGPD. Plus aucun DELETE volant !
    */
   public async delete(p_oIdUser: UserId): Promise<boolean> {
     try {
+
       const l_oResult = await this.db.query(
-        'Delete From public."Users" Where "usIdUser" = "Bin-UUID"($1);',
-        [p_oIdUser]
-      );
+        'Select * From public."AnonymiserActeurSysteme"($1);', [p_oIdUser.binaire] );
       return (l_oResult.rowCount ?? 0) > 0;
+
     } catch (l_oErreur) {
+
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
-      throw DatabaseErrorFactory.queryFailed('User.delete', l_sMsg);
+      throw DatabaseErrorFactory.queryFailed('User.delete (AnonymiserActeurSysteme)', l_sMsg);
+      
     }
   }
 
   /**
-   * 📜 VRAI FINDALL CONSTITUTIONNEL V4 🏛️
+   * 📜 FINDALL 🏛️
    * ----------------------------------------------------------------------------
    * Extrait l'intégralité absolue de la table Users de manière globale (Mode Système/Admin).
-   * [BRIDER MEMOIRE] Exige obligatoirement ses options de pagination pour interdire les fuites.
-   * [ZÉRO SQL VOLANT] Interroge exclusivement la fonction stockée TousLesActeursDuChateau !
+   * Avec ses options de pagination et la fonction stockée TousLesActeursDuChateau
    *
    * @public
    * @async
    * @param {IListOptions} p_oOptions - Le dictionnaire de tri et limites universel obligatoires
-   * @returns {Promise<IListResult<User>>} Le lot de résultats global paginé au standard français d'élite
+   * @returns {Promise<IListResult<User>>} Le lot de résultats global paginé
    */
   public async findAll(p_oOptions: IListOptions): Promise<IListResult<User>> {
     try {
@@ -260,16 +255,14 @@ export class UserRepository extends BaseRepository implements IUserRepository {
 
       // 🪓 ALIGNEMENT DIRECTIVE DE RAM : Remplacement du texte dur par la valeur SQL de l'écurie
       const l_sOrdreTri = p_oOptions.OrdreAff instanceof OrdreTriEnum
-        ? (p_oOptions.OrdreAff as any).m_sValueSql
-        : 'DESC';
+        ? (p_oOptions.OrdreAff as any).m_sValueSql : 'DESC';
 
       // 🗲 Appel de l'extracteur global de soute sans un seul pixel de SQL volant !
       const l_oResult = await this.db.query<IUserRow>(
         'Select * From "TousLesActeursDuChateau"($1, $2, $3, $4);',
-        [l_nLimit, l_nOffset, p_oOptions.ColonneTri ?? 'usCreatedAt', l_sOrdreTri]
-      );
+        [l_nLimit, l_nOffset, p_oOptions.ColonneTri ?? 'usCreatedAt', l_sOrdreTri] );
 
-      // 🪓 [RÉPARÉ TS2339] Extraction de la volumétrie absolue calculée sur la première ligne du tableau !
+      // Extraction de la volumétrie calculée sur la première ligne du tableau !
       const l_nTotal   = Number(l_oResult.rows?.[0]?.rNbLignesTotal ?? 0);
       const l_aoLignes = l_oResult.rows.map((l_oRow) => this.LigneVersActeur(l_oRow));
 
@@ -282,7 +275,7 @@ export class UserRepository extends BaseRepository implements IUserRepository {
       };
     } catch (l_oErreur) {
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
-      throw DatabaseErrorFactory.queryFailed('User.findAll', l_sMsg);
+      throw DatabaseErrorFactory.queryFailed('User.findAll / TousLesActeursDuChateau', l_sMsg);
     }
   }
 }
