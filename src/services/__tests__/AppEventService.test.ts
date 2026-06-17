@@ -59,7 +59,7 @@ describe('AppEventService', () => {
       expect(l_oRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
           aeUserId: USER_ID,
-          aeCategorieId: Categorie.MONI,
+          aeCategorieId: Categorie.SECU, //-- [RÉPARÉ V4] Alignement géométrique et logique SECU !
           aeMessage: 'Connexion réussie'
         })
       );

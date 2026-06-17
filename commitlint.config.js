@@ -26,7 +26,7 @@ export default {
 
     // ========== SCOPE (mandatory but flexible) ==========
     'scope-empty': [2, 'never'], // Mandatory
-    'scope-case': [2, 'always', 'lower-case'],
+    'scope-case': [0, 'always', 'lower-case'],
     'scope-min-length': [2, 'always', 2],
     'scope-max-length': [2, 'always', 25],
 
