@@ -1,13 +1,12 @@
 // ——— fichier : src/interfaces/repositories/IShareRepository.ts
 
-import { ShareId, ItemId, UserId } from '@/domain/value-objects/ids';
-import type { Share }       from '@/entities/Share';
-import type { IShareData }  from '@/interfaces/entities/share/IShareData';
-import { IPhysicalRW }      from '@/interfaces/repositories/IPhysicalRW';
-import { IMemoryRW }        from '@/interfaces/repositories/IMemoryRW'; // 🗲 [ALIGNÉ V4]
-import { IListOptions } from '@/interfaces/shared/IListOptions';
-import { IListResult } from '@/interfaces/shared/IListResult';
-
+import type { ShareId, ItemId, UserId } from '@/domain/value-objects/ids';
+import type { Share }              from '@/entities/Share';
+import type { IShareData }         from '@/interfaces/entities/share/IShareData';
+import type { IPhysicalRW }             from '@/interfaces/repositories/IPhysicalRW';
+import type { IMemoryRW }               from '@/interfaces/repositories/IMemoryRW'; // 🗲 [ALIGNÉ V4]
+import type { IListOptions }            from '@/interfaces/shared/IListOptions';
+import type { IListResult }             from '@/interfaces/shared/IListResult';
 
 /**
  * 📋 Interface Cadre IShareRepositoryBase 🛡️
@@ -25,15 +24,16 @@ interface IShareRepositoryBase {
    *
    * @async
    * @param {ItemId} p_axItemId - L'identifiant fort de la pépite cible
-   * @returns {Promise<Share[]>} La liste des partages associés
+   * @param {IListOptions} p_oOptions - Options de tri et de pagination de soute
+   * @returns {Promise<IListResult<Share>>} Structure paginée contenant la meute et le compte total
    */
-  findByItemId(p_axItemId: ItemId, p_oOptions: IListOptions): Promise<IListResult<Share>>
+  findByItemId(p_axItemId: ItemId, p_oOptions: IListOptions): Promise<IListResult<Share>>;
 
   /**
    * 🔍 Localise un partage unique via son jeton de sécurité textuel (Token).
    *
    * @async
-   * @param {string} p_sJeton - Le jeton de sécurité cryptographique recherché (shJeton)
+   * @param {string} p_sJeton - Le jeton de sécurité cryptographique recherché (shAccesJeton)
    * @returns {Promise<Share | null>} L'instance du partage ou null si inexistant
    */
   findByToken(p_sJeton: string): Promise<Share | null>;
@@ -43,9 +43,19 @@ interface IShareRepositoryBase {
    *
    * @async
    * @param {UserId} p_axUserId - L'identifiant unique de l'acteur propriétaire
-   * @returns {Promise<Share[]>} Le catalogue des partages de l'acteur ou tableau vide
+   * @param {IListOptions} p_oOptions - Options de tri et de pagination de soute
+   * @returns {Promise<IListResult<Share>>} Structure paginée contenant la meute et le compte total
    */
-  findByUserId(p_axUserId: UserId, p_oOptions: IListOptions): Promise<IListResult<Share>>
+  findByUserId(p_axUserId: UserId, p_oOptions: IListOptions): Promise<IListResult<Share>>;
+
+  /**
+   * 🏛️ Extracteur universel d'administration pour le grand fichier des partages du château.
+   *
+   * @async
+   * @param {IListOptions} p_oOptions - Options de tri et de pagination globales
+   * @returns {Promise<IListResult<Share>>} Le registre complet et paginé de tous les partages du système
+   */
+  findAllShares(p_oOptions: IListOptions): Promise<IListResult<Share>>;
 }
 
 /**
