@@ -232,7 +232,7 @@ export class UserRepository extends BaseRepository implements IUserRepository {
     } catch (l_oErreur) {
 
       const l_sMsg = l_oErreur instanceof Error ? l_oErreur.message : 'unknown';
-      throw DatabaseErrorFactory.queryFailed('User.delete (AnonymiserActeurSysteme)', l_sMsg);
+      throw DatabaseErrorFactory.queryFailed('User.delete / AnonymiserActeurSysteme', l_sMsg);
       
     }
   }
