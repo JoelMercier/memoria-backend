@@ -1,9 +1,51 @@
 // ——— fichier : src/interfaces/entities/IBaseEntityData.ts
 
-import      { Buffer           } from 'node:buffer';
+import type { Buffer           } from 'node:buffer';
 import type { IdInfrastructure } from '@/constants/Choupy/IdInfrastructure';
-import type { IdBinaire        } from '@/constants/Choupy/IdBinaire';
-import { IdChoupy } from '@/constants/Choupy/IdChoupy';
+
+// 🎗 Connexion directe sur le Barillet Universel d'Élite du Domaine (Souveraineté DRY) [1.1]
+import type {
+  // --- 📝 LE BLOC D'AUDIT & ÉVÉNEMENTS (La meute de traçabilité) ---
+  ActionId,       //-- Identifiant fort de l'action technique unitaire (ex: 'CREA', 'CONN') [Mémoria].
+  CategorieId,    //-- Identifiant fort de la catégorie fonctionnelle parente (ex: 'SYST', 'SECU') [Mémoria].
+  SecteurId,      //-- Identifiant fort du secteur applicatif de soute (ex: 'AUTH', 'PEPI') [Mémoria].
+  SeveriteId,     //-- Identifiant fort du niveau de criticité de l'anomalie (ex: 'INFO', 'CRIT') [Mémoria].
+  EventId,        //-- Identifiant unique universel (UUID) de la trame de log d'audit [Mémoria].
+
+  // --- 👥 LE BLOC ACTEURS & SESSIONS (La sécurité des profils) ---
+  RoleId,         //-- Identifiant fort du rôle de l'acteur dans le château (ex: 'ADM', 'USER') [Mémoria].
+  ProviderId,     //-- Identifiant fort du fournisseur d'authentification tiers (ex: 'GOOG') [Mémoria].
+  SessionId,      //-- Identifiant unique universel (UUID) de la session active de l'acteur [Mémoria].
+  UserId,         //-- Identifiant unique universel (UUID) de l'acteur propriétaire [Mémoria].
+
+  // --- 💎 LE CORE MÉTIER MÉMORIA (L'essence des pépites et partages) ---
+  ContentTypeId,  //-- Identifiant fort du type de contenu de la pépite (ex: 'TEXT', 'IMAG') [Mémoria].
+  ItemId,         //-- Identifiant unique universel (UUID) de la pépite stockée en soute [Mémoria].
+  ShareId,        //-- Identifiant unique universel (UUID) du privilège d'accès et de partage [Mémoria].
+  TagId           //-- Identifiant unique universel (UUID) de l'étiquette de classification [Mémoria].
+} from '@/domain/value-objects/ids';
+
+import type { TStructureEnRam } from '@/types/shared/TStructureEnRam';
+
+/**
+ * 📋 Type TIdentifiantsChoupy (Le TrucBiduleMachin Universel du Pascal-Objet 🦾)
+ * ----------------------------------------------------------------------------
+ * Liste exhaustive, fermée et triée par ordre alphabétique de la forge Choupy.
+ */
+export type TIdentifiantsChoupy =
+  | ActionId
+  | CategorieId
+  | ContentTypeId
+  | EventId
+  | ItemId
+  | ProviderId
+  | RoleId
+  | SecteurId
+  | SessionId
+  | SeveriteId
+  | ShareId
+  | TagId
+  | UserId;
 
 
 /**
@@ -12,14 +54,11 @@ import { IdChoupy } from '@/constants/Choupy/IdChoupy';
  * Liste exhaustive des types physiques et d'objets autorisés pour les clés primaires.
  */
 export type AllowedIdTypes =
-
-  | string                // Pour nos codes fixes (Char(4)) et le transit Web
-  | number                // Rétrocompatibilité des index de dictionnaire numériques
-  | Buffer                // ALIGNEMENT BYTEA : Le flux binaire pur de PostgreSQL !
-
-  | IdInfrastructure<any> // L'Ancêtre Suprême de la Forge
-  | IdBinaire             // Accepte implicitement UserId, ItemId, ShareId, TagId...
-  | IdChoupy<any, any>;   // Accepte implicitement RoleId, SeverityId, EventCategoryId...
+  | string                            // Pour nos codes fixes (Char(4)) et le transit Web
+  | number                            // Rétrocompatibilité des index de dictionnaire numériques
+  | Buffer                            // ALIGNEMENT BYTEA : Le flux binaire pur de PostgreSQL !
+  | IdInfrastructure<TStructureEnRam> // L'Ancêtre Suprême de la Forge purifié de tout any.
+  | TIdentifiantsChoupy;              // Le bloc de soute unifié (TBM), connecté au Barillet du Domaine.
 
 
 /**
@@ -33,7 +72,7 @@ interface IBaseAuditData {
     /** 📅 Horodatage de la dernière modification (Optionnel pour tolérer l'Append-Only des tables d'audit). */
     updatedAt? : Date; // Remis en optionnel pour respecter la table Events de Joël !
 
-};
+}
 
 /**
  * 📊 Interface IBaseEntityData (Version Jojo Équilibre de l'Audit 🛡️)

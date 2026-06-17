@@ -74,7 +74,7 @@ export class OrdreTriEnum extends SmartEnum<string> {
     );
 
     // Si on trouve la tôle exacte (ex: 'ASC' ou ''), on la renvoie, sinon repli vers le tri Naturel casté proprement
-    return l_oInstanceTrouvee ?? (this.DeCode<OrdreTriEnum>('NATU') as any);
+    return l_oInstanceTrouvee ?? (this.DeCode<OrdreTriEnum>('NATU'));
   }
 }
 

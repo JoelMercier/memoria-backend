@@ -1,54 +1,13 @@
 // ——— fichier : src/interfaces/repositories/IAppEventRepository.ts
 
-import { Categorie       } from '@/constants/Categories';
-import { Severite        } from '@/constants/Severites';
-import { UserId, EventId,
-         SecteurId,
-         ActionId   } from '@/domain/value-objects/ids';
-import { AppEvent        } from '@/entities/AppEvent';
-import { IListOptions    } from '@/interfaces/shared/IListOptions';
-import { IBaseRepository } from '@/interfaces/repositories/IBaseRepository';
+import type { UserId, EventId,
+              SecteurId, SeveriteId,
+              CategorieId, ActionId  } from '@/domain/value-objects/ids';
+import type { AppEvent               } from '@/entities/AppEvent';
+import type { IListOptions           } from '@/interfaces/shared/IListOptions';
+import type { IBaseRepository        } from '@/interfaces/repositories/IBaseRepository';
+import type { IAppEventData          } from '@/interfaces/entities/event/IAppEventData';
 
-
-
-/**
- * 📋 Interface exclusive pour le sac de données brutes de l'événement d'audit.
- * ----------------------------------------------------------------------------
- * Alignée au bit près sur la structure physique décroissante de la table "Events".
- * Purifiée des reliques de contextes et armée sur le pôle des Secteurs V4.
- *
- * @interface IAppEventData
- * @author Directrice du Silicium : Joël (C++ Addict, Nominal Obsession)
- * @author Métallurgie des Octets : Gaïa (Au burin, redressée sur la Choupy Doctrine)
- */
-export interface IAppEventData {
-  /** 🤖 L'identifiant binaire fort obligatoire pour l'entité [Mémoria] */
-  aeIdAppEvent   : EventId;
-
-  /** 👥 L'identifiant unique de l'acteur (Peut être null pour le système ou le RGPD) */
-  aeUserId       : UserId | null;
-
-  /** 📅 La date d'enregistrement immuable calculée par la RAM du Domaine */
-  aeCreatedAt    : Date;
-
-  /** 📥 [RÉPARÉ V4] Le Secteur fonctionnel typé (Char(4) - ex: 'AUTH', 'PEPI') */
-  aeSecteurId    : SecteurId;
-
-  /** ⚙️ [RÉPARÉ V4] L'action technique typée (Char(4) - ex: 'CONN', 'CREA') */
-  aeActionId     : ActionId;
-
-  /** 📂 La catégorie fonctionnelle parente au format quadrigramme */
-  aeCategorieId   : Categorie;
-
-  /** ⚠️ L'objet sévérité riche contenant le poids numérique machine */
-  aeSeveriteId   : Severite;
-
-  /** 📦 Libellé textuel ou message intelligible de l'événement pour l'écran */
-  aeMessage      : string;
-
-  /** 🗄️ Le dictionnaire Jsonb de contexte technique (IP, user-agent) [Mémoria] */
-  aeMetadata     : Record<string, unknown>;
-}
 
 /**
  * 📋 Interface IAppEventListOptions 🧮 (Le Calibreur d'Options d'Audit 🤖)
@@ -65,9 +24,9 @@ export interface IAppEventListOptions extends IListOptions {
   /** ⚙️ Filtre optionnel sur l'action technique unitaire */
   actionId?    : ActionId;
   /** 📂 Filtre optionnel sur la catégorie fonctionnelle parente */
-  categorieId?  : Categorie;
+  categorieId? : CategorieId;
   /** ⚠️ Filtre optionnel sur le palier de sévérité critique minimal (Filtre incrémental) */
-  severiteId?  : Severite;
+  severiteId?  : SeveriteId;
 }
 
 /**
@@ -130,7 +89,7 @@ export interface IAppEventRepository extends IBaseRepository<AppEvent, IAppEvent
    * @param {number} [p_iNbLignesMax] - Le garde-fou optionnel de taille de tableau remonté
    * @returns {Promise<AppEvent[] | null>} La liste des logs de l'acteur ou null
    */
-  findByUserId(p_axUserId: UserId, p_iNbLignesMax?: number): Promise<AppEvent[] | null>;
+  findByUserId(p_axUserId: UserId, p_oOptions: IListOptions) : Promise<IAppEventListResult>;
 
   /**
    * 🪙 Extraction historique filtrée par sévérité stricte assortie d'une limite physique.
@@ -140,7 +99,8 @@ export interface IAppEventRepository extends IBaseRepository<AppEvent, IAppEvent
    * @param {number} [p_iNbLignesMax] - Le garde-fou optionnel de taille de tableau remonté
    * @returns {Promise<AppEvent[] | null>} La collection filtrée ou null
    */
-  findBySeverite(p_eSeverite: Severite, p_iNbLignesMax?: number): Promise<AppEvent[] | null>;
+
+  findBySeverite(p_axSeveriteId: SeveriteId, p_oOptions: IListOptions) : Promise<IAppEventListResult>;
 
   /**
    * 🪙 Extraction historique filtrée par catégorie fonctionnelle avec limite physique.
@@ -150,7 +110,7 @@ export interface IAppEventRepository extends IBaseRepository<AppEvent, IAppEvent
    * @param {number} [p_iNbLignesMax] - Le garde-fou optionnel de taille de tableau remonté
    * @returns {Promise<AppEvent[] | null>} La collection filtrée ou null
    */
-  findByCategorie(p_eCategory: Categorie, p_iNbLignesMax?: number): Promise<AppEvent[] | null>;
+  findByCategorie(p_axCategorieId: CategorieId, p_oOptions: IListOptions) : Promise<IAppEventListResult>;
 
   /**
    * 🪙 Extrait les alertes d'incidents critiques du système dans la limite du gabarit.
@@ -160,7 +120,8 @@ export interface IAppEventRepository extends IBaseRepository<AppEvent, IAppEvent
    * @param {number} [p_iNbLignesMax] - Le garde-fou de lignes maximales autorisées en RAM
    * @returns {Promise<AppEvent[] | null>} La collection des anomalies ou null
    */
-  findCritical(p_iNbLignesMax?: number): Promise<AppEvent[] | null>;
+  findBySeverite(p_axSeveriteId: SeveriteId, p_oOptions: IListOptions) : Promise<IAppEventListResult>
+
 
   /**
    * 👥 Rompt le lien ombilical avec l'acteur pour les logs de plus de 6 mois (Anonymisation RGPD).
@@ -179,4 +140,5 @@ export interface IAppEventRepository extends IBaseRepository<AppEvent, IAppEvent
    * @returns {Promise<number>} Le nombre de lignes d'audit supprimées sur PostgreSQL
    */
   deleteOlderThan(p_dDateCutoff: Date): Promise<number>;
+
 }

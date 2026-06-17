@@ -294,31 +294,44 @@ export class ShareRepository extends BaseRepository implements IShareRepository 
     }
   }
 
-
-
+  
   /**
    * 🏛️ Extracteur universel d'administration pour le grand fichier des partages du château.
    */
-  public async findAllShares(p_oOptions: IListOptions): Promise<IListResult<Share>> {
+  public async findAllShares(p_oOptions: IListOptions) : Promise<IListResult<Share>> {
     try {
-      // 1. Extraction et valeurs de repli militaires pour la pagination et le tri [Mémoria]
+      // 1. Extraction des paramètres réglementaires depuis vos options d'excellence V4.4
       const l_nLimit    = p_oOptions.NbLignes   ?? 50;
       const l_nOffset   = p_oOptions.LigneDebut ?? 0;
-      const l_sOrdreTri = p_oOptions.OrdreAff instanceof OrdreTriEnum ? p_oOptions.OrdreAff.code : 'DESC';
+      const l_sColonne  = p_oOptions.ColonneTri ?? 'shCreatedAt';
 
-      // 2. Appel à l'injecteur réseau via le canal officiel et typé .query<IShareRow> [Mémoria]
+      // 2. Extraction chirurgicale de la directive PostgreSQL depuis ton SmartEnum [Mémoria]
+      const l_sOrdreTri = p_oOptions.OrdreAff instanceof OrdreTriEnum
+        ? p_oOptions.OrdreAff.clauseSql
+        : OrdreTriEnum.oDecroissant.clauseSql;
+
+      // 3. Appel à l'injecteur réseau via le canal officiel typé .query<IShareRow>
       const l_oResult = await this.db.query<IShareRow>(
         'Select * From public."TousLesPartagesDuChateau"($1, $2, $3, $4);',
-        [l_nLimit, l_nOffset, p_oOptions.ColonneTri ?? 'shCreatedAt', l_sOrdreTri]
+        [l_nLimit, l_nOffset, l_sColonne, l_sOrdreTri]
       );
 
-      // 3. Extraction sécurisée du compteur de performance de soute depuis la première ligne [Mémoria]
-      const l_nTotal = Number(l_oResult.rows[0]?.rNbLignesTotal ?? 0);
+      // 4. Si la soute est vide, restitution nominale de la structure de contrôle
+      if (!l_oResult.rows || l_oResult.rows.length === 0) {
+        return {
+          LigneDebut    : l_nOffset,
+          NbLignesDem   : l_nLimit,
+          NbLignesRenv  : 0,
+          NbLignesTotal : 0,
+          Lignes        : []
+        };
+      }
 
-      // 4. Métamorphose de la meute de lignes physiques via ton convertisseur rowToShare [Mémoria]
+      // 5. Extraction sécurisée du compteur de performance global "Count(*) Over()"
+      const l_nTotal   = Number(l_oResult.rows[0]?.rNbLignesTotal ?? 0);
       const l_aoLignes = l_oResult.rows.map((row) => this.rowToShare(row));
 
-      // 5. Restituteur Universel Paginé et Tracé nominal d'excellence [Mémoria]
+      // 6. Restituteur Universel Paginé et Tracé nominal d'excellence
       return {
         LigneDebut    : l_nOffset,
         NbLignesDem   : l_nLimit,
@@ -327,14 +340,11 @@ export class ShareRepository extends BaseRepository implements IShareRepository 
         Lignes        : l_aoLignes
       };
 
-
     } catch (l_oErr) {
-      // 6. Emballage réglementaire par la manufacture d'exceptions [Mémoria]
       const l_sMsg = l_oErr instanceof Error ? l_oErr.message : 'unknown';
-      throw DatabaseErrorFactory.queryFailed('Share.findAllShares', l_sMsg);
+      throw DatabaseErrorFactory.queryFailed('Share.findAllShares / TousLesPartagesDuChateau', l_sMsg);
     }
   }
-
 
 }
 export default ShareRepository;

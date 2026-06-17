@@ -1,7 +1,7 @@
 // ——— fichier : src/types/express.d.ts
 
-import { Role } from '@/constants/Roles';
-import { UserId, RequestId } from '@/domain/value-objects/ids';
+import type { Role } from '@/constants/Roles';
+import type { UserId, RequestId } from '@/domain/value-objects/ids';
 
 /**
  * 🏛️ Extension Globale de Types Express

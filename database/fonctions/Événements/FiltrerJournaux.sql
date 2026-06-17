@@ -1,3 +1,5 @@
+-- ——— fichier : database\fonctions\Événements\FiltrerJournaux.sql
+
 -- ============================================================================
 -- 🚨 INFRASTRUCTURE : EXTRACTEUR UNIVERSEL PAGINÉ DES JOURNAUX D'AUDIT
 -- Fichier: database/functions/FiltrerJournaux.sql

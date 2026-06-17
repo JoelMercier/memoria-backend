@@ -3,10 +3,11 @@
 import type { UserId, EventId  } from '@/domain/value-objects/ids';
 import type { IBaseEntityData  } from '@/interfaces/entities/IBaseEntityData';
 
-import { Categorie } from '@/constants/Categories';
-import { Severite } from '@/constants/Severites';
-import { Secteur  } from '@/constants/Secteurs';
-import { Action   } from '@/constants/Actions';
+import type { Categorie } from '@/constants/Categories';
+import type { Severite  } from '@/constants/Severites';
+import type { Secteur   } from '@/constants/Secteurs';
+import type { Action    } from '@/constants/Actions';
+import type { JsonLégitime } from '@/types/shared/JsonLégitime';
 
 /**
  * 📦 Type IAppEventData (Version Type Absolue - Jojo-Style)
@@ -38,21 +39,21 @@ export type IAppEventData = IBaseEntityData<'Event', EventId> & {
   /**
    * 💻 Contexte fonctionnel (Smart Enum de structure V4 - Char(4)).
    *
-   * @type {AppEventContext}
+   * @type {Secteur}
    */
   secteur : Secteur;
 
   /**
    * ⚙️ Action technique précise (Smart Enum d'opération V4 - Char(4)).
    *
-   * @type {AppEventAction}
+   * @type {Action}
    */
   action : Action;
 
   /**
    * ⚠️ Niveau de gravité (Smart Enum opérationnel).
    *
-   * @type {AppEventSeverity}
+   * @type {Severite}
    */
   severite : Severite;
 
@@ -66,8 +67,8 @@ export type IAppEventData = IBaseEntityData<'Event', EventId> & {
   /**
    * 🎛️ Métadonnées contextuelles au format dictionnaire JSON.
    *
-   * @type {Record<string, any>}
+   * @type {JsonLégitime>}
    */
-  metadata : Record<string, any>;
+get metadata(): JsonLégitime;
 
 };

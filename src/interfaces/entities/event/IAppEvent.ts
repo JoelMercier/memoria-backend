@@ -1,13 +1,14 @@
 // ——— fichier : src/interfaces/entities/event/IAppEvent.ts
 
-import { Action    } from '@/constants/Actions';
-import { Categorie } from '@/constants/Categories';
-import { Secteur   } from '@/constants/Secteurs';
-import { Severite  } from '@/constants/Severites';
+import type { Action    } from '@/constants/Actions';
+import type { Categorie } from '@/constants/Categories';
+import type { Secteur   } from '@/constants/Secteurs';
+import type { Severite  } from '@/constants/Severites';
 import type { UserId,
               EventId       } from '@/domain/value-objects/ids';
 import type { IEntity       } from '@/interfaces/entities/IEntity';
 import type { IAppEventData } from '@/interfaces/entities/event/IAppEventData';
+import type { JsonLégitime  } from '@/types/shared/JsonLégitime';
 
 /**
  * 🔒 Interface IAppEvent
@@ -43,5 +44,6 @@ export interface IAppEvent extends IEntity<IAppEventData> {
   get Message(): string;
 
   /** 🎛️ Signature sémantique vers le sac de métadonnées contextuelles */
-  get Metadata(): Record<string, any>;
+  get Metadata(): JsonLégitime;
+
 }
