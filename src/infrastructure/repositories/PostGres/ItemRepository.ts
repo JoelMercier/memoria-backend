@@ -212,7 +212,7 @@ export class ItemRepository extends BaseRepository implements IItemRepository {
         [
           p_axIdItem.binaire,
           l_oExisting.idUser.binaire,
-          p_oData.contentTypeId?.valeur ?? l_oExisting.contentTypeId.code,
+          p_oData.contentTypeId?.valeur ?? l_oExisting.contentType.code,
           p_oData.title?.trim() ?? l_oExisting.title,
           p_oData.slug ?? l_oExisting.slug,
           p_oData.content ?? l_oExisting.content,
