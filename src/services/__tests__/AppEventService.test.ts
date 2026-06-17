@@ -59,7 +59,7 @@ describe('AppEventService', () => {
       expect(l_oRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
           aeUserId: USER_ID,
-          aeCategorieId: Categorie.SECU, //-- [RÉPARÉ V4] Alignement géométrique et logique SECU !
+          aeCategorieId: Categorie.SECU,
           aeMessage: 'Connexion réussie'
         })
       );
@@ -71,7 +71,7 @@ describe('AppEventService', () => {
       expect(l_oRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
           aeUserId: null,
-          aeCategorieId: Categorie.MONI,
+          aeCategorieId: Categorie.SECU, //-- [RÉPARÉ V4] Alignement sur le vrai code sécurité !
           aeSeveriteId: Severite.WARN,
           aeMessage: 'Échec de connexion'
         })

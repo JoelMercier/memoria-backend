@@ -1,19 +1,18 @@
 // ——— fichier : src/validation/zod/__tests__/AppEventValidation.test.ts
 
 import { describe, expect, it } from 'vitest';
-import { AppEventValidation }   from '../AppEventValidation'; // 🪓 IMPORT DE PROXIMITÉ LOCAL
+import { AppEventValidation } from '../AppEventValidation';
 
 describe('AppEventValidation', () => {
-
   const createValidRawData = () => ({
-    idAppEvent    : '018f3a3c-5000-7000-8000-000000000001',
-    userId        : '018f3a3c-5000-7000-8000-000000000002',
-    eventCategory : 'AUDI',
-    eventSecteur  : 'AUTH',
-    eventAction   : 'CONN',
-    severity      : 'INFO',
-    message       : 'Accès sécurisé accordé au rôle MémoriaApplicatif',
-    metadata      : { ip: '127.0.0.1' }
+    idAppEvent: '018f3a3c-5000-7000-8000-000000000001',
+    userId: '018f3a3c-5000-7000-8000-000000000002',
+    eventCategorie: 'AUDI', //-- [RÉPARÉ V4] Aligné sur le Zod franconien.
+    eventSecteur: 'AUTH',
+    eventAction: 'CONN',
+    eventSeverite: 'INFO', //-- [RÉPARÉ V4] Aligné sur le Zod franconien.
+    message: 'Accès sécurisé accordé au rôle MémoriaApplicatif',
+    metadata: { ip: '127.0.0.1' }
   });
 
   it('valide sans broncher un enregistrement brut conforme', () => {
@@ -40,8 +39,8 @@ describe('AppEventValidation', () => {
 
   it('bloque les injections de catégories ou actions pirates absentes du dictionnaire', () => {
     const l_oRaw = createValidRawData();
-    l_oRaw.eventCategory = 'HACK';
-    l_oRaw.eventAction   = 'INJE';
+    l_oRaw.eventCategorie = 'HACK'; //-- [RÉPARÉ V4] Alignement nominal.
+    l_oRaw.eventAction = 'INJE';
 
     expect(() => AppEventValidation.validateCreate(l_oRaw)).toThrow();
   });
