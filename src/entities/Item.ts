@@ -25,7 +25,7 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> {
   private readonly m_idUser: UserId;
 
   /** 🏷️ Instance de Smart Enum gérant la typologie de contenu associé */
-  private readonly m_eContentTypeId: ContentType;
+  private readonly m_eContentType: ContentType;
 
   /** ✏️ Titre principal donné à la pépite */
   private readonly m_sTitle: string;
@@ -57,7 +57,7 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> {
     // 🪓 [RÉPARÉ V4] Extraction directe et légale sans aucun cast "as any" de contrebande !
     this.m_idItem = p_oData.idItem;
     this.m_idUser = p_oData.idUser;
-    this.m_eContentTypeId = ContentType.fromSql(p_oData.contentTypeId.valeur);
+    this.m_eContentType = ContentType.fromSql(p_oData.contentTypeId.valeur);
     this.m_sTitle = p_oData.title;
     this.m_sSlug = p_oData.slug;
     this.m_sContent = p_oData.content;
@@ -92,8 +92,8 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> {
    * @public
    * @returns {ContentType} L'instance vivante du type de contenu
    */
-  public get contentTypeId(): ContentType {
-    return this.m_eContentTypeId;
+  public get contentType(): ContentType {
+    return this.m_eContentType;
   }
 
   /**
@@ -168,7 +168,7 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> {
     return {
       idItem: this.idItem, //-- Réinjection conforme Jojo-Style.
       idUser: this.idUser,
-      contentTypeId: new ContentTypeId(this.contentTypeId.code), //-- Nettoyage du .toString() redondant.
+      contentTypeId: new ContentTypeId(this.contentType.code), //-- Nettoyage du .toString() redondant.
       title: this.title,
       slug: this.slug,
       content: this.content,
