@@ -1,16 +1,18 @@
 // ——— fichier : src/services/__tests__/AppEventService.test.ts
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { AppEventService } from '../AppEventService'; // 🪓 IMPORT DE PROXIMITÉ LOCAL
-import { Categorie } from '@/constants/Categories';
-import { Severite } from '@/constants/Severites';
-import { Secteur } from '@/constants/Secteurs';
-import { Action } from '@/constants/Actions';
-import { UserId, ItemId, ShareId } from '@/domain/value-objects/ids';
 import type { AppEventRepository } from '@/infrastructure/repositories/PostGres/AppEventRepository';
 
-const USER_ID = new UserId('018f3a3c-5000-7000-8000-000000000001');
-const ITEM_ID = new ItemId('018f3a3c-5000-7000-8000-00000000000A');
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { UserId, ItemId, ShareId              } from '@/domain/value-objects/ids';
+
+import { AppEventService } from '../AppEventService'; // 🪓 IMPORT DE PROXIMITÉ LOCAL
+import { Categorie       } from '@/constants/Categories';
+import { Severite        } from '@/constants/Severites';
+import { Secteur         } from '@/constants/Secteurs';
+import { Action          } from '@/constants/Actions';
+
+const USER_ID  = new UserId( '018f3a3c-5000-7000-8000-000000000001');
+const ITEM_ID  = new ItemId( '018f3a3c-5000-7000-8000-00000000000A');
 const SHARE_ID = new ShareId('018f3a3c-5000-7000-8000-00000000000B');
 
 describe('AppEventService', () => {
@@ -30,10 +32,10 @@ describe('AppEventService', () => {
       await l_oService.log({
         userId         : USER_ID,
         eventCategorie : Categorie.GENE,
-        eventSecteur   : Secteur.SYST,
-        eventAction    : Action.DEMA,
-        eventSeverite :  Severite.INFO,
-        message: 'Test de trace'
+        eventSecteur   : Secteur  .SYST,
+        eventAction    : Action   .DEMA,
+        eventSeverite  : Severite.INFO,
+        message        : 'Test de trace'
       });
 
       expect(l_oRepository.create).toHaveBeenCalledWith(
@@ -89,9 +91,9 @@ describe('AppEventService', () => {
 
       expect(l_oRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          aeUserId: USER_ID,
-          aeCategoryId: Categorie.ANAL,
-          aeMessage: 'Pépite partagée'
+          aeUserId     : USER_ID,
+          aeCategoryId : Categorie.ANAL,
+          aeMessage    : 'Pépite partagée'
         })
       );
     });

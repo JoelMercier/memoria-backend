@@ -1,15 +1,14 @@
 // ——— fichier : src/dto/event/__tests__/CreateEventDto.test.ts
 
 import { describe, expect, it } from 'vitest';
-import { CreateEventDto }       from '../CreateEventDto';
-import { Categorie }     from '@/constants/Categories';
-import { Secteur   }      from '@/constants/Secteurs';
-import { Action    }       from '@/constants/Actions';
-import { Severite  }     from '@/constants/Severites';
+import { CreateEventDto } from '../CreateEventDto';
+import { Categorie      } from '@/constants/Categories';
+import { Secteur        } from '@/constants/Secteurs';
+import { Action         } from '@/constants/Actions';
+import { Severite       } from '@/constants/Severites';
 
 describe('CreateEventDto', () => {
 
-  // 🪓 ALIGNEMENT STRATÉGIQUE : Typage explicite du gabarit pour autoriser le type null sur l'ID de l'acteur
   const createValidPayload = () => ({
     idAppEvent    : '018f3a3c-5000-7000-8000-000000000001',
     userId        : '018f3a3c-5000-7000-8000-000000000002' as string | null,
@@ -45,7 +44,7 @@ describe('CreateEventDto', () => {
 
   it('accepte un userId à Null pour la conformité ou les purges RGPD', () => {
     const l_oPayload = createValidPayload();
-    l_oPayload.userId = null; // 🪓 [RÉPARÉ V4] Validé par le compilateur grâce au transtypage du gabarit
+    l_oPayload.userId = null;
 
     const l_oDto = new CreateEventDto(l_oPayload);
     expect(l_oDto.userId).toBeNull();

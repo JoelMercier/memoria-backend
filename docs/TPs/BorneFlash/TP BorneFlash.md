@@ -1,4 +1,4 @@
-# 🏛️ COMPTE-RENDU TECHNIQUE : TP 2 — CONCEPTION ORIENTÉE OBJET (BORNEFLASH)
+# 🏛️ Compte-Rendu Technique : TP 2 — Conception Orientée Objet (BorneFlash)
 
 ## 🎛️ Exercice 1 — Du diagramme au code (Squelette Strategy)
 
@@ -6,41 +6,64 @@
 
 ```typescript
 // --- Fichier : src/domain/Tarif.ts
+
 export interface Tarif {
+
   calculerCout(p_nEnergieKwh: number): number;
+
 }
 
 export class TarifAuKwh implements Tarif {
-  constructor(private readonly m_nPrixParKwh: number) {}
+
+  constructor(private readonly m_nPrixParKwh: number) {
+    //
+  }
+
   public calculerCout(p_nEnergieKwh: number): number {
+
     return p_nEnergieKwh * this.m_nPrixParKwh;
   }
 }
 
 export class TarifForfait implements Tarif {
-  constructor(private readonly m_nMontantFixe: number) {}
+
+  constructor(private readonly m_nMontantFixe: number) {
+    //
+  }
+
   public calculerCout(p_nEnergieKwh: number): number {
     return this.m_nMontantFixe;
   }
-}
+}```
 
+```typescript
 // --- Fichier : src/domain/SessionRecharge.ts
-import { Tarif } from './Tarif';
+
+import { Tarif } from '@/src/domaine/Tarif';
 
 export class SessionRecharge {
+
   constructor(
     public readonly idSession: string,
     public readonly energieKwh: number,
     private m_oStrategyTarif: Tarif
-  ) {}
+  ) {
+    //
+  }
+
+  public get StrategyTarif() {
+    return m_oStrategyTarif;
+  }
 
   public obtenirCout(): number {
-    return this.m_oStrategyTarif.calculerCout(this.energieKwh);
+    return this.StrategyTarif.calculerCout(this.energieKwh);
   }
 }
+```
 
+```typescript
 // --- Fichier : src/interfaces/repositories/ISessionRepository.ts
-import { SessionRecharge } from '../../domain/SessionRecharge';
+import { SessionRecharge } from '@/src/domain/SessionRecharge';
 
 export interface ISessionRepository {
   sauvegarder(p_oSession: SessionRecharge): Promise<boolean>;
@@ -50,7 +73,7 @@ export interface ISessionRepository {
 
 ### 1.2 — Localisation du Pattern Strategy
 Le pattern **Strategy** s'articule ainsi :
-*   L'interface **`Tarif`** incarne l'abstraction de la stratégie interchangeable.
+*   L'interface **`Tarif`** incarne l'abstraction de la **stratégie interchangeable**.
 *   La classe **`SessionRecharge`** joue le rôle de contexte : elle « possède » la stratégie via sa propriété privée `m_oStrategyTarif`.
 
 ### 1.3 — Script de test et d'exécution (`src/index.ts`)
@@ -76,44 +99,63 @@ On crée une nouvelle stratégie sans toucher aux deux autres implémentations :
 
 ```typescript
 export class TarifHeuresCreuses implements Tarif {
+
   constructor(
     private readonly m_nTarifCreux: number = 0.15,
     private readonly m_nTarifPlein: number = 0.25
-  ) {}
+  ) {
+    //
+  }
 
   public calculerCout(p_nEnergieKwh: number): number {
     const l_nHeureCourante = new Date().getHours();
     const l_bEstEnHeuresCreuses = l_nHeureCourante >= 22 || l_nHeureCourante < 6;
     return p_nEnergieKwh * (l_bEstEnHeuresCreuses ? this.m_nTarifCreux : this.m_nTarifPlein);
   }
+
 }
 ```
 **Analyse** : **ZÉRO** classe existante modifiée. Cela illustre parfaitement le principe **OCP (Open/Closed Principle)** : le code est ouvert à l'extension mais fermé à la modification.
 
 ### 2.2 — Implémentation SessionRepositoryEnMemoire
 ```typescript
-import { ISessionRepository } from './ISessionRepository';
-import { SessionRecharge } from '../../domain/SessionRecharge';
+import { ISessionRepository } from '@/src/domaine/ISessionRepository';
+import { SessionRecharge } from '@/src/domain/SessionRecharge';
+
+export type SessionsRecharge : SessionRecharge[];
 
 export class SessionRepositoryEnMemoire implements ISessionRepository {
-  private m_aoSessions: SessionRecharge[] = [];
+
+  private m_aoSessions: SessionsRecharge = [];
+
+  public get Sessions(): SessionsRecharge {
+    return m_aoSessions;
+  }
+
+  public set Sessions(p_aoSessions : SessionsRecharge) {
+    m_aoSessions = p_aoSessions;
+  }
 
   public async sauvegarder(p_oSession: SessionRecharge): Promise<boolean> {
-    this.m_aoSessions.push(p_oSession);
+
+    this.Sessions.push(p_oSession);
     return true;
   }
 
   public async rechercherParId(p_sIdSession: string): Promise<SessionRecharge | null> {
+
     return this.m_aoSessions.find(s => s.idSession === p_sIdSession) ?? null;
   }
+
 }
+
 ```
 **Analyse** : La logique de calcul n'a pas bougé d'une seule ligne. Cela illustre le principe **DIP (Dependency Inversion Principle)** : les modules de haut niveau ne dépendent pas des détails d'infrastructure, ils dépendent d'un contrat d'interface.
 
 ### 2.3 — Bilan Comptable des Fichiers
 *   **Fichiers créés** : 2 (`TarifHeuresCreuses.ts`, `SessionRepositoryEnMemoire.ts`).
-*   **Fichiers modifiés** : 0.
-*   **Leçon d'écurie** : Ajouter du code via de nouvelles classes d'implémentation immunise l'application contre les régressions, contrairement à la modification de structures monolithiques existantes.
+*   **Fichiers modifiés** : **0, ZÉRO**.
+*   **Leçon d'écurie** : Ajouter du code via de nouvelles classes d'implémentation immunise l'application contre les régressions, contrairement à la modification de structures existantes.
 
 ---
 
@@ -122,31 +164,41 @@ export class SessionRepositoryEnMemoire implements ISessionRepository {
 ### 3.1 — Justification du choix du Pattern
 Le pattern **Observer** résout exactement ce problème : il permet à un objet sujet (`SessionRecharge`) de notifier une liste dynamique d'abonnés (`ObservateurSession`) sans connaître la nature de leur implémentation concrète.
 
-### 3.2 & 3.3 — Écritures des Observateurs et Extension de soute
+### 3.2 & 3.3 — Écritures des Observateurs et Extension
 
 ```typescript
 export interface ObservateurSession {
+
   surSessionTerminee(p_oSession: SessionRecharge): void;
+
 }
 
+
 export class RecuEmail implements ObservateurSession {
+
   public surSessionTerminee(p_oSession: SessionRecharge): void {
     console.log(`✉️ [Email] Envoi du reçu pour la session ${p_oSession.idSession}. Total : ${p_oSession.obtenirCout()} €`);
   }
 }
 
+
 export class JournalConsole implements ObservateurSession {
+
   public surSessionTerminee(p_oSession: SessionRecharge): void {
     console.log(`📝 [Log] Session de recharge achevée : ${p_oSession.energieKwh} kWh consommés.`);
   }
 }
 
+
 // 3.3 - Ajout du troisième observateur sans aucune intrusion dans SessionRecharge
 export class MiseAJourTableauDeBord implements ObservateurSession {
+
   public surSessionTerminee(p_oSession: SessionRecharge): void {
     console.log(`📊 [IHM] Mise à jour des indicateurs graphiques de la borne.`);
   }
+
 }
+
 ```
 **Principe retrouvé** : À nouveau le principe **OCP**. L'orchestrateur de notifications est ouvert à l'injection de nouveaux canaux de communication sans altérer la méthode `terminer()`.
 
@@ -162,27 +214,36 @@ export class Borne {
 
   constructor(public readonly idBorne: string) {}
 
+  public get EtatCourant () {
+    return m_sEtatCourant;
+  }
+
+  public set EtatCourant(p_sEtatCourant : string) {
+    m_sEtatCourant = p_sEtatCourant;
+  }
+
   public demarrer(): void {
-    if (this.m_sEtatCourant !== 'Libre') {
-      throw new Error(`🚨 [Action Refusée] Impossible de démarrer : la borne est dans l'état '${this.m_sEtatCourant}'.`);
+    if (this.EtatCourant !== 'Libre') {
+      throw new Error(`🚨 [Action Refusée] Impossible de démarrer : la borne est dans l'état '${this.m_sEtatCourant}.`);
     }
-    this.m_sEtatCourant = 'Occupee';
+    this.EtatCourant = 'Occupee';
     console.log(`🟢 Session démarrée sur la borne ${this.idBorne}. État actuel : Occupée.`);
   }
 
   public terminer(): void {
-    if (this.m_sEtatCourant === 'HorsService') {
+    if (this.EtatCourant === 'HorsService') {
       console.log('⚠️ Borne hors service. Réparation requise.');
       return;
     }
-    this.m_sEtatCourant = 'Libre';
+    this.EtatCourant = 'Libre';
     console.log(`🔵 Session clôturée sur la borne ${this.idBorne}. État actuel : Libre.`);
   }
 
   public passerHorsService(): void {
-    this.m_sEtatCourant = 'HorsService';
+    this.EtatCourant = 'HorsService';
   }
 }
+
 ```
 
 #### 📋 Sortie d'exécution de test console :

@@ -1,4 +1,4 @@
-# 🏛️ FICHE DE RÉVISION : « BORNEFLASH »
+# 🏛️ Fiche synthétique : « BorneFlash »
 
 **Description :** Note de synthèse d'infrastructure décodant les mécanismes logiques du système de recharge rapide pour véhicules électriques. Ce document sert de mémoire externe absolue pour neutraliser tout interrogatoire bureaucratique du corps professoral.
 
@@ -31,8 +31,10 @@ Au moment exact où l'état bascule vers la fin de la recharge (déclenchement d
 
 ---
 
-## 🚀 3. La Phrase Magique de l'Ingénieur (Le Bouclier Anti-Plombage)
+## 🚀 3. La phrase magique de l'ingénieur
 
 *« Pourquoi avoir introduit une interface pour le calcul du tarif au lieu de coder directement les formules dans la classe principale ? »*
 
-**C'est une question d'étanchéité architecturale et de flexibilité d'infrastructure. La logique matérielle de la borne de recharge doit être totalement découplée des grilles tarifaires et des fluctuations commerciales de l'entreprise. En isolant le calcul du coût derrière l'interface abstraite `Tarif`, on honore le principe OCP : on peut injecter une formule au kWh le matin (FKW), commuter sur une stratégie d'Heures Creuses Dynamique (HCD) l'après-midi, ou greffer de nouveaux contrats partenaires sans jamais modifier ni compromettre le code physique qui gère la sécurité et l'acheminement des électrons dans le véhicule. C'est le standard minimal pour garantir la testabilité unitaire du Domaine via des doubles de test isolés.**
+**C'est une question d'étanchéité architecturale et de flexibilité d'infrastructure.** 
+La logique matérielle de la borne de recharge doit être totalement **découplée** des grilles tarifaires et des fluctuations commerciales de l'entreprise. En **isolant le calcul** du coût derrière l'interface abstraite `Tarif`, on honore le principe **OCP** : on peut injecter une formule au kWh le matin (**FKW**), commuter sur une stratégie d'Heures Creuses Dynamique (**HCD**) l'après-midi, ou greffer de nouveaux contrats partenaires **sans modifier** ni compromettre le code physique qui gère la sécurité et l'acheminement des électrons dans le véhicule.
+C'est le standard minimal pour garantir la testabilité unitaire du Domaine via des doubles de test isolés.
