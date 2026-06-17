@@ -10,7 +10,7 @@
 Set search_path To Public;
 Set CLIENT_ENCODING to 'UTF8';
 
-Drop Function if exists public."ToutesLesPepites"(ByteA, Character Varying, Character Varying, Character Varying, Character Varying, Integer, Integer);
+--Drop Function if exists public."ToutesLesPepites"(ByteA, Character Varying, Character Varying, Character Varying, Character Varying, Integer, Integer);
 Drop Function if exists public."ToutesLesPepites"(UUID, Character Varying, Character Varying, Character Varying, Character Varying, Integer, Integer);
 
 Create Or Replace Function public."ToutesLesPepites"(
@@ -59,7 +59,7 @@ Begin
         From
             public."Items"
         Where
-            "itUserId" = $1                                     -- [RÉPARÉ V4] Liaison directe au plus près de l''index.
+            "itUserId" = "Bin-UUID"($1)                                   -- [RÉPARÉ V4] Liaison directe au plus près de l''index.
             and ($2 is null or "itContentTypeId" = $2)
             and ($3 is null or "itLibelle" ilike $3)           -- [RÉPARÉ V4] Filtre calé sur le franconien itLibelle.
         Order By ' || quote_ident(p_sColonneTri) || ' ' || p_sOrdreTri || '
@@ -72,56 +72,3 @@ End;
 $$;
 
 Comment On Function public."ToutesLesPepites"(UUID, Character Varying, Character Varying, Character Varying, Character Varying, Integer, Integer) Is 'Extracteur universel dé-normalisé, filtré et paginé pour le flux applicatif d''un acteur en UUID natif pur.';
-
--- ============================================================================
--- 📦 INFRASTRUCTURE : LECTURE UNIFIÉE DES PÉPITES ET ÉTIQUETTES D'UN ACTEUR
--- Fichier: database/functions/Pépites/LirePepitesActeurUnifiees.sql
--- Version: 4.2.0 (PostgreSQL 17+ - Format Soviétique Strict 1960)
--- Description: Rapatrie les ressources d''un acteur avec liste de tags agrégée
--- Auteur & Vision : Joël (Architecte DR-DOS - True Getters Compliance)
--- Métallurgie des Octets : Gaïa (Au burin, alignée sur l'autonomie de soute V4)
--- ============================================================================
-
-Set search_path To Public;
-Set CLIENT_ENCODING to 'UTF8';
-
-Drop Function if exists public."LirePepitesActeurUnifiees"(UUID, Boolean);
-
-Create Or Replace Function public."LirePepitesActeurUnifiees"(
-    p_itUserId          UUID,                                   -- Identifiant 128 bits natif de l'acteur connecté.
-    p_bFiltreOrphelins  Boolean Default False                   -- Si Vrai, isole uniquement les pépites sans étiquettes.
-)
-Returns Table (
-    "IdPepite"        UUID,
-    "LibellePepite"   Character Varying,                        -- itLibelle réaligné.
-    "FormatId"        Char(4),                                  -- itContentTypeId réaligné.
-    "AuteurSource"    Character Varying,                        -- itAuteurSource réaligné.
-    "ChaineEtiquettes" Text                                      -- Liste compacte séparée par des virgules (ex: 'javascript,react').
-) as $$
-Begin
-    Return Query
-    Select
-        "Items"."itIdItem",
-        "Items"."itLibelle",
-        "Items"."itContentTypeId",
-        "Items"."itAuteurSource",
-        -- 🎛️ TOILAGE DE SOUTE SOUVERAIN : Agrégation textuelle ultra-rapide.
-        -- Éradique le [null] et renvoie une chaîne vide '' si la pépite n'a pas de tags.
-        Coalesce(string_agg("Tags"."tgLibelle", ',' Order By "Tags"."tgLibelle" Asc), '') as "ChaineEtiquettes"
-    From public."Items"
-    Left Join public."ItemTags" On "Items"."itIdItem" = "ItemTags"."tiItemId"   -- Jointure en UUID natif.
-    Left Join public."Tags"     On "ItemTags"."tiTagId" = "Tags"."tgIdTag"      -- Scan foudroyant des index de Cour Basse.
-    Where "Items"."itUserId" = p_itUserId
-    Group By
-        "Items"."itIdItem",
-        "Items"."itLibelle",
-        "Items"."itContentTypeId",
-        "Items"."itAuteurSource"
-    Having
-        -- 🪓 L'ARBITRAGE DU CHEF : Si le filtre orphelin est activé, on ne garde que les agrégats vides
-        (p_bFiltreOrphelins = False) Or (Count("ItemTags"."tiTagId") = 0)
-    Order By "Items"."itLibelle" Asc;
-End;
-$$ Language plpgsql Stable Strict;
-
-Comment On Function public."LirePepitesActeurUnifiees"(UUID, Boolean) Is '📦 API d''élite extrayant le tas des pépites d''un acteur avec fusion de leurs étiquettes en une seule ligne de texte compacte.';

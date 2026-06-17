@@ -1,8 +1,9 @@
 // ——— fichier : src/entities/Item.ts
 
-import { BaseEntity }    from '@/entities/BaseEntity';
-import { ItemId, UserId, ContentTypeId } from '@/domain/value-objects/ids';
-import { ContentType }   from '@/constants/ContentTypes';
+import { BaseEntity } from '@/entities/BaseEntity';
+import type { ItemId, UserId } from '@/domain/value-objects/ids';
+import { ContentTypeId } from '@/domain/value-objects/ids';
+import { ContentType } from '@/constants/ContentTypes';
 import type { IItemData } from '@/interfaces/entities/item/IItemData';
 
 /**
@@ -17,33 +18,32 @@ import type { IItemData } from '@/interfaces/entities/item/IItemData';
  * @author Métallurgie des Octets : Gaïa (Au burin, éradication des parenthèses de contrebande)
  */
 export class Item extends BaseEntity<'item', IItemData, ItemId> {
-
   /** 🔔 Identifiant unique immuable de la pépite (Clé Primaire) */
-  private readonly m_idItem        : ItemId;
+  private readonly m_idItem: ItemId;
 
   /** 👥 Identifiant unique du propriétaire de l'élément */
-  private readonly m_idUser        : UserId;
+  private readonly m_idUser: UserId;
 
   /** 🏷️ Instance de Smart Enum gérant la typologie de contenu associé */
-  private readonly m_eContentType  : ContentType;
+  private readonly m_eContentTypeId: ContentType;
 
   /** ✏️ Titre principal donné à la pépite */
-  private readonly m_sTitle        : string;
+  private readonly m_sTitle: string;
 
   /** 🛤️ Permalien normalisé (Slug) unique */
-  private readonly m_sSlug         : string;
+  private readonly m_sSlug: string;
 
   /** 📄 Corps textuel enrichi ou brut stockant la mémoire */
-  private readonly m_sContent      : string;
+  private readonly m_sContent: string;
 
   /** ✍️ Signature de l'auteur original ou provenance de la pépite */
-  private readonly m_sSourceAuthor : string;
+  private readonly m_sSourceAuthor: string;
 
   /** 🖼️ URL ou chemin de la miniature de couverture (Optionnelle) */
-  private readonly m_sThumbnailUrl : string | null | undefined;
+  private readonly m_sThumbnailUrl: string | null | undefined;
 
   /** 🎛️ Métadonnées d'infrastructure dynamiques et structurées */
-  private readonly m_rMetadata     : Record<string, unknown>;
+  private readonly m_rMetadata: Record<string, unknown>;
 
   /**
    * Instancie une pépite immuable à partir de son contrat de données.
@@ -54,16 +54,16 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> {
   public constructor(p_oData: IItemData) {
     super(p_oData);
 
-    // 🪓 [RÉPARÉ V4] Extraction chirurgicale via la clé dynamique calculée par la maman !
-    this.m_idItem        = (p_oData as any).idItem;
-    this.m_idUser        = p_oData.idUser;
-    this.m_eContentType  = ContentType.fromSql(p_oData.contentTypeId.valeur);
-    this.m_sTitle        = p_oData.title;
-    this.m_sSlug         = p_oData.slug;
-    this.m_sContent      = p_oData.content;
+    // 🪓 [RÉPARÉ V4] Extraction directe et légale sans aucun cast "as any" de contrebande !
+    this.m_idItem = p_oData.idItem;
+    this.m_idUser = p_oData.idUser;
+    this.m_eContentTypeId = ContentType.fromSql(p_oData.contentTypeId.valeur);
+    this.m_sTitle = p_oData.title;
+    this.m_sSlug = p_oData.slug;
+    this.m_sContent = p_oData.content;
     this.m_sSourceAuthor = p_oData.sourceAuthor;
     this.m_sThumbnailUrl = p_oData.thumbnailUrl;
-    this.m_rMetadata     = p_oData.metadata || {};
+    this.m_rMetadata = p_oData.metadata || {};
   }
 
   /**
@@ -92,8 +92,8 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> {
    * @public
    * @returns {ContentType} L'instance vivante du type de contenu
    */
-  public get contentType(): ContentType {
-    return this.m_eContentType;
+  public get contentTypeId(): ContentType {
+    return this.m_eContentTypeId;
   }
 
   /**
@@ -166,17 +166,18 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> {
    */
   public toData(): IItemData {
     return {
-      idUser        : this.idUser,
-      contentTypeId : new ContentTypeId(this.m_eContentType.code.toString()),
-      title         : this.title,
-      slug          : this.slug,
-      content       : this.content,
-      sourceAuthor  : this.sourceAuthor,
-      thumbnailUrl  : this.thumbnailUrl,
-      metadata      : this.metadata,
-      createdAt     : this.createdAt,
-      updatedAt     : this.updatedAt
-    } as IItemData;
+      idItem: this.idItem, //-- Réinjection conforme Jojo-Style.
+      idUser: this.idUser,
+      contentTypeId: new ContentTypeId(this.contentTypeId.code), //-- Nettoyage du .toString() redondant.
+      title: this.title,
+      slug: this.slug,
+      content: this.content,
+      sourceAuthor: this.sourceAuthor,
+      thumbnailUrl: this.thumbnailUrl,
+      metadata: this.metadata,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt
+    };
   }
 
   /**

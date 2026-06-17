@@ -1,11 +1,11 @@
 // ——— fichier : src/interfaces/repositories/PostGres/IItemRepository.ts
 
-import { UserId, ItemId, ContentTypeId } from '@/domain/value-objects/ids';
-import type { Item }      from '@/entities/Item';
+import type { UserId, ItemId, ContentTypeId } from '@/domain/value-objects/ids';
+import type { Item } from '@/entities/Item';
 import type { IItemData } from '@/interfaces/entities/item/IItemData';
 import type { IPhysicalRW } from '@/interfaces/repositories/IPhysicalRW';
 import type { IListOptions } from '@/interfaces/shared/IListOptions';
-import type { IListResult }  from '@/interfaces/shared/IListResult'; 
+import type { IListResult } from '@/interfaces/shared/IListResult';
 
 /**
  * 🎛️ Interface IItemRepositoryListOptions 📐
@@ -20,13 +20,13 @@ import type { IListResult }  from '@/interfaces/shared/IListResult';
  */
 export interface IItemRepositoryListOptions extends IListOptions {
   /** 👥 Filtre optionnel pour cibler l'acteur propriétaire de la soute */
-  itemOwnerId?  : UserId;
+  itemOwnerId?: UserId;
 
   /** 🔌 Le format typé fixe remplace définitivement l'ancien concept textuel */
   contentTypeId?: ContentTypeId;
 
   /** 🔍 Chaîne textuelle libre pour la recherche par mot-clé (ILIKE) sur le titre */
-  MotsCles?     : string;
+  MotsCles?: string;
 }
 
 /**
@@ -41,7 +41,6 @@ export interface IItemRepositoryListOptions extends IListOptions {
  * @author Graveuse de Pépites : Gaïa (Au burin, coulée dans le bronze V4)
  */
 export interface IItemRepository extends IPhysicalRW<Item, IItemData, ItemId> {
-
   /**
    * 🛤️ Localise et extrait une Pépite unique via son permalien textuel (Slug).
    *
@@ -72,5 +71,19 @@ export interface IItemRepository extends IPhysicalRW<Item, IItemData, ItemId> {
    * @param {IItemRepositoryListOptions} p_oOptions - Le dictionnaire de configuration de tri, filtres et limites
    * @returns {Promise<IListResult<Item>>} Le lot de résultats paginé et structuré en français d'élite
    */
-  listByUser(p_axUserId: UserId, p_oOptions: IItemRepositoryListOptions): Promise<IListResult<Item>>;
+  listByUser(
+    p_axUserId: UserId,
+    p_oOptions: IItemRepositoryListOptions
+  ): Promise<IListResult<Item>>;
+
+  /**
+   * 🗑️ Destruction physique d'infrastructure restreinte à l'espace de l'acteur.
+   * [SCELLÉ JOJO-STYLE V4] Surcharge par arité optionnelle pour compatibilité IPhysicalRW.
+   *
+   * @async
+   * @param {ItemId} p_axIdItem - L'identifiant unique fort de la pépite à éradiquer
+   * @param {UserId} [p_axUserId] - L'identifiant optionnel du propriétaire (Verrou de sécurité)
+   * @returns {Promise<boolean>} Vrai si la suppression physique est confirmée par le tas
+   */
+  delete(p_axIdItem: ItemId, p_axUserId?: UserId): Promise<boolean>;
 }
