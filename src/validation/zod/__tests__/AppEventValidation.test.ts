@@ -7,10 +7,10 @@ describe('AppEventValidation', () => {
   const createValidRawData = () => ({
     idAppEvent: '018f3a3c-5000-7000-8000-000000000001',
     userId: '018f3a3c-5000-7000-8000-000000000002',
-    eventCategorie: 'AUDI', //-- [RÉPARÉ V4] Aligné sur le Zod franconien.
+    eventCategorie: 'GENE',
     eventSecteur: 'AUTH',
     eventAction: 'CONN',
-    eventSeverite: 'INFO', //-- [RÉPARÉ V4] Aligné sur le Zod franconien.
+    eventSeverite: 'INFO',
     message: 'Accès sécurisé accordé au rôle MémoriaApplicatif',
     metadata: { ip: '127.0.0.1' }
   });

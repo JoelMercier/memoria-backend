@@ -5,7 +5,7 @@ import { ItemValidation } from '../ItemValidation';
 
 describe('ItemValidation', () => {
   const createValidItemPayload = () => ({
-    contentType: 'TEXT', //-- Code valide du SmartEnum ContentType
+    contentType: 'NOTE', //-- Code valide du SmartEnum ContentType
     title: "Une magnifique pépite d'or de soute",
     slug: 'une-magnifique-pepite-d-or-de-soute',
     content: 'Contenu hautement confidentiel de la V4 Pro',

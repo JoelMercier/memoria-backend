@@ -16,7 +16,7 @@
  */
 
 /** 🏛️ Exportation des classes actives de validation (Portiers de sécurité) */
-export { AppEventValidation } from '@/validation/zod/AppEventValidation'; // 🪓 [RACCORDÉ V4] Intégration de la douane d'audit
+export { AppEventValidation } from '@/validation/zod/AppEventValidation';
 export { AuthValidation } from '@/validation/zod/AuthValidation';
 export { ItemValidation } from '@/validation/zod/ItemValidation';
 export { ShareValidation } from '@/validation/zod/ShareValidation';
@@ -27,7 +27,7 @@ export { UserValidation } from '@/validation/zod/UserValidation';
 export type {
   CreateAppEventSchemaType,
   UpdateAppEventSchemaType
-} from '@/validation/zod/AppEventValidation'; // 🪓 [RACCORDÉ V4]
+} from '@/validation/zod/AppEventValidation';
 
 /** 🔑 Contrats de structure pour le module d'Authentification */
 export type { LoginSchemaType, RefreshTokenSchemaType } from '@/validation/zod/AuthValidation';
