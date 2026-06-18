@@ -41,6 +41,6 @@ Begin
     From public."Events"
     Where "Events"."aeIdEvent" = p_aeIdEvent;                   -- 🎯 Tir laser sur l'index UNIQUE !
 End;
-$$ Language plpgsql Stable;
+$$ Language plpgsql Stable  Security Definer; -- 🔒 Autorise le rôle Mémoria à lire l'estimation.;
 
 Comment On Function public."ObtenirEvenementParId"(UUID) Is 'Recherche chirurgicale et ultra-rapide d''une trame d''audit par sa clé primaire unique.';

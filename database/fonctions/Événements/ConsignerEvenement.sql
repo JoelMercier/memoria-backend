@@ -78,6 +78,6 @@ Begin
         "aeMessage",
         "aeMetadata";                                           -- [RÉPARÉ V4] Éradication définitive d'aeUpdatedAt.
 End;
-$$;
+$$  Security Definer; -- 🔒 Autorise le rôle Mémoria à lire l'estimation.
 
 Comment On Function public."ConsignerEvenement"(UUID, UUID, Char(4), Char(4), Char(4), Char(4), Text, JsonB) Is 'Fondeur d''écriture append-only sécurisé pour les journaux d''audit système en UUID natif pur.';

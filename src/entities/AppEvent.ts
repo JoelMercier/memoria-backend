@@ -1,14 +1,15 @@
 // ——— fichier : src/entities/AppEvent.ts
 
-import { BaseEntity } from '@/entities/BaseEntity';
-import { Categorie  } from '@/constants/Categories';
-import { Severite   } from '@/constants/Severites';
-import { IAppEvent  } from '@/interfaces/entities/event/IAppEvent';
-import { Secteur    } from '@/constants/Secteurs';
-import { Action     } from '@/constants/Actions';
-
+import type { Categorie  } from '@/constants/Categories';
+import type { Severite   } from '@/constants/Severites';
+import type { IAppEvent  } from '@/interfaces/entities/event/IAppEvent';
+import type { Secteur    } from '@/constants/Secteurs';
+import type { Action     } from '@/constants/Actions';
 import type { UserId, EventId } from '@/domain/value-objects/ids';
-import type { IAppEventData } from '@/interfaces/entities/event/IAppEventData';
+import type { IAppEventData   } from '@/interfaces/entities/event/IAppEventData';
+import type { JsonLégitime    } from '@/types/shared/JsonLégitime';
+
+import { BaseEntity } from '@/entities/BaseEntity';
 
 /**
  * 🏛️ Classe AppEvent
@@ -45,7 +46,7 @@ export class AppEvent extends BaseEntity<'Event', IAppEventData, EventId> implem
   private readonly m_sMessage       : string;
 
   /** 🗄️ Sac de données dynamiques contextuelles */
-  private readonly m_rMetadata      : Record<string, any>;
+  private readonly m_rMetadata      : JsonLégitime;
 
   /**
    * Instancie un événement d'audit immuable à partir de son contrat de données.
@@ -117,7 +118,7 @@ export class AppEvent extends BaseEntity<'Event', IAppEventData, EventId> implem
   /**
    * 🗄️ Données contextuelles complémentaires (Dictionnaire JSON).
    */
-  public get Metadata(): Record<string, any> {
+  public get Metadata(): JsonLégitime {
     return this.m_rMetadata;
   }
 

@@ -61,6 +61,6 @@ Begin
     Return Query Execute l_sRequete
     Using p_axUserId, p_cSecteurId, p_cActionId, p_cCategorieId, p_cSeverityId, p_iLimit, p_iOffset;
 End;
-$$;
+$$  Security Definer; -- 🔒 Autorise le rôle Mémoria à lire l'estimation.;
 
 Comment On Function public."ToutesLesTraces"(UUID, Char(4), Char(4), Char(4), Char(4), Integer, Integer, Character Varying, Character Varying) Is 'Extracteur universel et polymorphe du Donjon pour l''audit système unifié V4 Pro.';

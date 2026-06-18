@@ -83,6 +83,6 @@ Begin
     Order By "FiltreTotal"."aeCreatedAt" Desc
     Limit p_NbLignes Offset p_LigneDebut;
 End;
-$$ Language plpgsql Stable;
+$$ Language plpgsql Stable Security Definer; -- 🔒 Autorise le rôle Mémoria à lire l'estimation.;
 
 Comment On Function public."FiltrerJournaux"(UUID, Char(4), Char(4), Char(4), Char(4), Integer, Integer) Is 'Extracteur universel d''IHM pour le journal d''audit, gérant le filtrage par sévérité incrémentale en UUID natif pur.';

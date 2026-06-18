@@ -48,6 +48,6 @@ Begin
 
     Return Query Execute l_sRequete Using p_iLimit, p_iOffset;
 End;
-$$;
+$$  Security Definer; -- 🔒 Autorise le rôle Mémoria à lire l'estimation.
 
 Comment On Function public."ToutesLesTracesDuChateau"(Integer, Integer, Character Varying, Character Varying) Is 'Extracteur universel d''administration pour la table Events paginé en UUID natif pur.';
