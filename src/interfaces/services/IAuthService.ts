@@ -1,14 +1,14 @@
 // ——— fichier : src/interfaces/services/IAuthService.ts
 
-import { IBaseService }    from '@/interfaces/services/IBaseService';
-import type { IUser }      from '@/interfaces/entities/user/IUser';
-import { LoginDto }        from '@/dto/user/auth/LoginDto';
-import { RefreshTokenDto } from '@/dto/user/auth/RefreshTokenDto';
-import { CreateUserDto }   from '@/dto/user/CreateUserDto';
-import { IUserRepository } from '@/interfaces/repositories/PostGres/IUserRepository'; // 🗲 [RÉPARÉ CASSE]
-import type { User }       from '@/entities/User';
-import type { UserId }     from '@/domain/value-objects/ids';
-import type { IUserData }  from '@/interfaces/entities/user/IUserData';
+import type { IBaseService    } from '@/interfaces/services/IBaseService';
+import type { IUser           } from '@/interfaces/entities/user/IUser';
+import type { LoginDto        } from '@/dto/user/auth/LoginDto';
+import type { RefreshTokenDto } from '@/dto/user/auth/RefreshTokenDto';
+import type { CreateUserDto   } from '@/dto/user/CreateUserDto';
+import type { IUserRepository } from '@/interfaces/repositories/PostGres/IUserRepository';
+import type { User            } from '@/entities/User';
+import type { UserId          } from '@/domain/value-objects/ids';
+import type { IUserData       } from '@/interfaces/entities/user/IUserData';
 
 /**
  * 📦 Interface IAuthResult

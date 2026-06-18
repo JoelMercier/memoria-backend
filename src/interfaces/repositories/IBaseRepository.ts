@@ -1,8 +1,8 @@
 // ——— fichier : src/interfaces/repositories/IBaseRepository.ts
 
-import type { AllowedIdTypes } from '@/interfaces/entities/IBaseEntityData';
-import type { IListOptions }  from '@/interfaces/shared/IListOptions'; // 🗲 [ALIGNÉ TRANSVERSE]
-import type { IListResult }   from '@/interfaces/shared/IListResult';   // 🗲 [FRANÇAIS D'ÉLITE]
+import type { AllowedIdTypes } from '@/types/shared/AllowedIdTypes.ts';
+import type { IListOptions   } from '@/interfaces/shared/IListOptions';
+import type { IListResult    } from '@/interfaces/shared/IListResult';
 
 /**
  * 📜 Interface IBaseRepository (Version Jojo Libérée V4)

@@ -1,7 +1,7 @@
 // ——— fichier : src/interfaces/repositories/IMemoryRepository.ts
 
-import { IBaseRepository } from '@/interfaces/repositories/IBaseRepository';
-import { AllowedIdTypes }  from '@/interfaces/entities/IBaseEntityData';
+import type { IBaseRepository } from '@/interfaces/repositories/IBaseRepository';
+import type { AllowedIdTypes } from '@/types/shared/AllowedIdTypes';
 
 /**
  * 🗄️ Interface IMemoryRepository 🛡️
@@ -21,5 +21,11 @@ import { AllowedIdTypes }  from '@/interfaces/entities/IBaseEntityData';
  */
 export interface IMemoryRepository<TEntity, TData, TId extends AllowedIdTypes = string>
   extends IBaseRepository<TEntity, TData, TId> {
-  // Marqueur de l'axe Support Volatile - Prêt pour le polymorphisme et les Mocks
+
+  /**
+   * 🎛️ Accesseur exclusif sur le registre de stockage brut en RAM.
+   * Fournit une visibilité totale sur le dictionnaire interne pour la tuyauterie des tests.
+   */
+  get memoryRegistry(): Map<TId, TData>;
+ 
 }

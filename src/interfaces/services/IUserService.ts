@@ -5,9 +5,9 @@ import type { DeleteAccountDto  } from '@/dto/user/DeleteAccountDto';
 import type { UpdateProfileDto  } from '@/dto/user/UpdateProfileDto';
 import type { User              } from '@/entities/User';
 import type { IUserData         } from '@/interfaces/entities/user/IUserData';
-import      { IBaseService      } from '@/interfaces/services/IBaseService';
-import      { UserId            } from '@/domain/value-objects/ids';
-import      { IUserRepository   } from '@/interfaces/repositories/PostGres/IUserRepository';
+import type { IBaseService      } from '@/interfaces/services/IBaseService';
+import type { UserId            } from '@/domain/value-objects/ids';
+import type { IUserRepository   } from '@/interfaces/repositories/PostGres/IUserRepository';
 
 /**
  * 📜 Interface IUserService

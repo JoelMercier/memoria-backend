@@ -57,10 +57,10 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
    */
   public constructor(p_oData: IUserData) {
     super(p_oData);
-    this.m_idUser = p_oData.idUser;
-    this.m_sCourriel = p_oData.courriel;
+    this.m_idUser        = p_oData.idUser;
+    this.m_sCourriel     = p_oData.courriel;
     this.m_sPasswordHash = p_oData.passwordHash;
-    this.m_sPseudo = p_oData.pseudo;
+    this.m_sPseudo       = p_oData.pseudo;
 
     // 🪓 TRADUCTION INDUSTRIELLE : Extraction via le Smart Enum avec fallback sécurisé sans aucun "any" menteur !
     const l_oPotentialRole = Role.fromSql ? Role.fromSql(p_oData.roleId.valeur) : null;
@@ -69,11 +69,10 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
         `[Erreur Silicium 🚨] Impossible de résoudre le rôle d'infrastructure pour l'utilisateur.`
       );
     }
-    this.m_eRole = l_oPotentialRole;
-    this.m_eAuthProvider = AuthProvider.fromSql(p_oData.authProviderId.valeur);
-
-    this.m_rSettingsUser = p_oData.settingsUser || {};
-    this.m_bRgpdConsent = p_oData.rgpdConsent;
+    this.m_eRole            = l_oPotentialRole;
+    this.m_eAuthProvider    = AuthProvider.fromSql(p_oData.authProviderId.valeur);
+    this.m_rSettingsUser    = p_oData.settingsUser || {};
+    this.m_bRgpdConsent     = p_oData.rgpdConsent;
     this.m_dRgpdConsentDate = p_oData.rgpdConsentDate ?? null;
   }
 
@@ -187,17 +186,17 @@ export class User extends BaseEntity<'user', IUserData, UserId> implements IUser
    */
   public toData(): IUserData {
     return {
-      idUser: this.idUser,
-      courriel: this.courriel,
-      passwordHash: this.passwordHash,
-      pseudo: this.pseudo,
-      roleId: new RoleId(this.role.code.toString()),
-      authProviderId: new ProviderId(this.authProvider.code.toString()),
-      settingsUser: this.settingsUser,
-      rgpdConsent: this.rgpdConsent,
+      idUser         : this.idUser,
+      courriel       : this.courriel,
+      passwordHash   : this.passwordHash,
+      pseudo         : this.pseudo,
+      roleId         : new RoleId(this.role.code.toString()),
+      authProviderId : new ProviderId(this.authProvider.code.toString()),
+      settingsUser   : this.settingsUser,
+      rgpdConsent    : this.rgpdConsent,
       rgpdConsentDate: this.rgpdConsentDate ?? new Date(),
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt
+      createdAt      : this.createdAt,
+      updatedAt      : this.updatedAt
     };
   }
 

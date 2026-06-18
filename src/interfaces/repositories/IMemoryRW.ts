@@ -1,7 +1,8 @@
 // ——— fichier : src/interfaces/repositories/IMemoryRW.ts
 
-import { IMemoryRepository } from '@/interfaces/repositories/IMemoryRepository';
-import { AllowedIdTypes }    from '@/interfaces/entities/IBaseEntityData';
+import type { IMemoryRepository } from '@/interfaces/repositories/IMemoryRepository';
+import type { AllowedIdTypes    } from '@/types/shared/AllowedIdTypes.ts';
+
 
 /**
  * 🛡️ Interface IMemoryRW (Read-Write Volatile) 🛡️
@@ -22,4 +23,11 @@ import { AllowedIdTypes }    from '@/interfaces/entities/IBaseEntityData';
 export interface IMemoryRW<TEntity, TData, TId extends AllowedIdTypes = string>
   extends IMemoryRepository<TEntity, TData, TId> {
   // Contrat cadre étanche pour les extensions de stockage en mémoire vive avec mutation
+
+  /**
+   * 🎛️ Accesseur exclusif sur le registre de stockage brut en RAM.
+   * Fournit une visibilité totale sur le dictionnaire interne pour la tuyauterie des tests.
+   */
+  get memoryRegistry(): Map<TId, TData>;
+ 
 }

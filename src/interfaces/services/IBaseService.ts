@@ -3,7 +3,6 @@
 import type { IBaseRepository        } from '@/interfaces/repositories/IBaseRepository';
 import type { IEntity                } from '@/interfaces/entities/IEntity';
 import type { AllowedIdTypes         } from '@/types/shared/AllowedIdTypes';
-import type { IdentifiantsSouverains } from '@/types/shared/IdentifiantsSouverains';
 
 
 /**
@@ -18,13 +17,11 @@ import type { IdentifiantsSouverains } from '@/types/shared/IdentifiantsSouverai
  * @template TData       - La structure de données passive associée (descendant d'IBaseEntityData)
  * @template TId         - Le type fort de clé primaire de soute (descendant d'AllowedIdTypes)
  * @template TRepository - Le contrat de persistance, devant s'emboîter sur les trois types précédents
- *
- * @author Directeur du Silicium : Joël (C++ Framework Architect - Cross-Locking Engine)
- * @author Métallurgie des Octets : Gaïa (Au burin, calée sur l'armure lourde tridimensionnelle)
  */
 export interface IBaseService<
-  TEntity     extends IEntity<IdentifiantsSouverains, AllowedIdTypes >,
-  TData       ,//extends IBaseEntityData<string, AllowedIdTypes>,
+
+  TEntity     extends IEntity<TData, TId>,
+  TData       ,
   TId         extends AllowedIdTypes,
   TRepository extends IBaseRepository<TEntity, TData, TId>
 > {

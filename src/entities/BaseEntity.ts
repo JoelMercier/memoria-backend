@@ -1,8 +1,8 @@
 // ——— fichier : src/entities/BaseEntity.ts
 
-import type { AllowedIdTypes,
-              IBaseEntityData } from '@/interfaces/entities/IBaseEntityData';
+import type { IBaseEntityData } from '@/interfaces/entities/IBaseEntityData';
 import type { IEntity         } from '@/interfaces/entities/IEntity';
+import type { AllowedIdTypes  } from '@/types/shared/AllowedIdTypes';
 
 /**
  * 🏛️ Classe Abstraite BaseEntity (Version Générique Absolue)
