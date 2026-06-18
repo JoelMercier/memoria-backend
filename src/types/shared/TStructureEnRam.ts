@@ -8,6 +8,6 @@ import type { Buffer } from 'node:buffer';
  * pour le transport et la manipulation des données d'infrastructure de Mémoria V4.
  *
  * @type TStructureEnRam
- * @author Directrice du Silicium : Joël (Nettoyeur de diamants kilométriques)
+ * @author Direction du Silicium : Joël (Nettoyeur de diamants kilométriques)
  */
 export type TStructureEnRam = string | Buffer;

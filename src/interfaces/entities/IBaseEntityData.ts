@@ -1,7 +1,5 @@
 // ——— fichier : src/interfaces/entities/IBaseEntityData.ts
 
-import type { Buffer           } from 'node:buffer';
-import type { IdInfrastructure } from '@/constants/Choupy/IdInfrastructure';
 
 // 🎗 Connexion directe sur le Barillet Universel d'Élite du Domaine (Souveraineté DRY) [1.1]
 import type {
@@ -25,7 +23,8 @@ import type {
   TagId           //-- Identifiant unique universel (UUID) de l'étiquette de classification [Mémoria].
 } from '@/domain/value-objects/ids';
 
-import type { TStructureEnRam } from '@/types/shared/TStructureEnRam';
+import type { AllowedIdTypes } from '@/types/shared/AllowedIdTypes';
+
 
 /**
  * 📋 Type TIdentifiantsChoupy (Le TrucBiduleMachin Universel du Pascal-Objet 🦾)
@@ -46,19 +45,6 @@ export type TIdentifiantsChoupy =
   | ShareId
   | TagId
   | UserId;
-
-
-/**
- * 📋 Type AllowedIdTypes (Version Jojo Alignement Binaire Pur 🔬)
- * ----------------------------------------------------------------------------
- * Liste exhaustive des types physiques et d'objets autorisés pour les clés primaires.
- */
-export type AllowedIdTypes =
-  | string                            // Pour nos codes fixes (Char(4)) et le transit Web
-  | number                            // Rétrocompatibilité des index de dictionnaire numériques
-  | Buffer                            // ALIGNEMENT BYTEA : Le flux binaire pur de PostgreSQL !
-  | IdInfrastructure<TStructureEnRam> // L'Ancêtre Suprême de la Forge purifié de tout any.
-  | TIdentifiantsChoupy;              // Le bloc de soute unifié (TBM), connecté au Barillet du Domaine.
 
 
 /**

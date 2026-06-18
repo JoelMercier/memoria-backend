@@ -4,6 +4,7 @@ import type { ContentType    } from '@/constants/ContentTypes';
 import type { UserId, ItemId } from '@/domain/value-objects/ids';
 import type { IEntity        } from '@/interfaces/entities/IEntity';
 import type { IItemData      } from '@/interfaces/entities/item/IItemData';
+import type { JsonLégitime   } from '@/types/shared/JsonLégitime';
 
 /**
  * 📜 Interface IItem
@@ -42,5 +43,5 @@ export interface IItem extends IEntity<IItemData> {
   get thumbnailUrl(): string | null | undefined;
 
   /** 🎛️ Accesseur vers les métadonnées d'infrastructure dynamiques */
-  get metadata(): Record<string, unknown>;
+  get metadata(): JsonLégitime;
 }

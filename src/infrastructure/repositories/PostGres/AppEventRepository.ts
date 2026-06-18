@@ -9,7 +9,7 @@ import type { IAppEventRepository,
               IAppEventListOptions,
               IAppEventListResult  } from '@/interfaces/repositories/PostGres/IAppEventRepository';
 import type { IAppEventData        } from '@/interfaces/entities/event/IAppEventData';
-import type { CategorieId, SeveriteId           } from '@/domain/value-objects/ids';
+import type { CategorieId, SeveriteId } from '@/domain/value-objects/ids';
 
 import { Action               } from '@/constants/Actions';
 import { Categorie            } from '@/constants/Categories';

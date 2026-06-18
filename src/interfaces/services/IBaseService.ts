@@ -1,8 +1,10 @@
 // ——— fichier : src/interfaces/services/IBaseService.ts
 
-import { IBaseRepository } from '@/interfaces/repositories/IBaseRepository';
-import { IEntity }         from '@/interfaces/entities/IEntity';
-import { /* IBaseEntityData, */ AllowedIdTypes } from '@/interfaces/entities/IBaseEntityData';
+import type { IBaseRepository        } from '@/interfaces/repositories/IBaseRepository';
+import type { IEntity                } from '@/interfaces/entities/IEntity';
+import type { AllowedIdTypes         } from '@/types/shared/AllowedIdTypes';
+import type { IdentifiantsSouverains } from '@/types/shared/IdentifiantsSouverains';
+
 
 /**
  * 🏛️ Interface IBaseService 🛡️
@@ -21,10 +23,10 @@ import { /* IBaseEntityData, */ AllowedIdTypes } from '@/interfaces/entities/IBa
  * @author Métallurgie des Octets : Gaïa (Au burin, calée sur l'armure lourde tridimensionnelle)
  */
 export interface IBaseService<
-  TEntity     extends IEntity<any, any>,
+  TEntity     extends IEntity<IdentifiantsSouverains, AllowedIdTypes >,
   TData       ,//extends IBaseEntityData<string, AllowedIdTypes>,
   TId         extends AllowedIdTypes,
-  TRepository extends IBaseRepository<TEntity, TData, TId> // 🗲 [VERROU CROISÉ] L'emboîtable parfait !
+  TRepository extends IBaseRepository<TEntity, TData, TId>
 > {
   /**
    * Accesseur unique et immuable vers le dépôt d'infrastructure principal du service.

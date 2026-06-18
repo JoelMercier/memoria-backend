@@ -1,6 +1,7 @@
 // ——— fichier : src\interfaces\entities\IEntity.ts
 
-import type { AllowedIdTypes } from '@/interfaces/entities/IBaseEntityData';
+import type { AllowedIdTypes } from "@/types/shared/AllowedIdTypes";
+
 
 /**
  * 📜 Interface IEntity (Version Jojo Libérée)
@@ -15,7 +16,7 @@ import type { AllowedIdTypes } from '@/interfaces/entities/IBaseEntityData';
  */
 export interface IEntity< TData,
   // @ts-expect-error - TId est déclaré pour l'extensibilité des classes héritières mais non lu directement ici
-  TId extends AllowedIdTypes = string
+  TId extends AllowedIdTypes  = string
 > {
 
   /** 📅 Horodatage immuable de la création de l'enregistrement en base de données. */

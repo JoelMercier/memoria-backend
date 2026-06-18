@@ -1,7 +1,8 @@
 // ——— fichier : src/dto/share/PublicShareDto.ts
 
-import type { ContentType } from '@/constants/ContentTypes';
-import type { IItem       } from '@/interfaces/entities/item/IItem';
+import type { ContentType  } from '@/constants/ContentTypes';
+import type { IItem        } from '@/interfaces/entities/item/IItem';
+import type { JsonLégitime } from '@/types/shared/JsonLégitime';
 
 /**
  * 📦 Classe PublicShareDto
@@ -33,7 +34,7 @@ export class PublicShareDto {
   public readonly thumbnailUrl?: string | null;
 
   /** 🎛️ Métadonnées d'infrastructure dynamiques autorisées */
-  public readonly metadata     : Record<string, unknown>;
+  public readonly metadata     : JsonLégitime;
 
   /** 📅 Horodatage de création originel dans le système */
   public readonly createdAt?   : Date;
