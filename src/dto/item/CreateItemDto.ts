@@ -1,8 +1,10 @@
 // ——— fichier : src/dto/item/CreateItemDto.ts
 
-import { TagId               } from '@/domain/value-objects/ids';
-import { type CreateItemSchemaType,
-         ItemValidation       } from '@/validation/zod/ItemValidation';
+import type { JsonLégitime          } from '@/types/shared/JsonLégitime';
+import type { CreateItemSchemaType  } from '@/validation/zod/ItemValidation';
+
+import { TagId          } from '@/domain/value-objects/ids';
+import { ItemValidation } from '@/validation/zod/ItemValidation';
 
 /**
  * 📦 Classe CreateItemDto (Version Pure Hexagonale)
@@ -37,7 +39,7 @@ export class CreateItemDto {
   public readonly thumbnailUrl? : string | null;
 
   /** 🎛️ Métadonnées d'infrastructure dynamiques */
-  public readonly metadata      : Record<string, unknown>;
+  public readonly metadata      : JsonLégitime;
 
   /** 🏷️ Collection optionnelle de cailloux de couleur (Tags rattachés) */
   public readonly tagIds?       : TagId[];

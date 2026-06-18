@@ -1,13 +1,14 @@
 // ——— fichier : src/infrastructure/repositories/mocks/MockItemRepository.ts
 
-import { Item }                       from '@/entities/Item';
-import { ItemId, UserId }             from '@/domain/value-objects/ids';
-import type { IItemData }             from '@/interfaces/entities/item/IItemData';
-import type { IListResult }           from '@/interfaces/shared/IListResult';
-import { IListOptions }               from '@/interfaces/shared/IListOptions';
-import { IMockItemRepository }        from '@/interfaces/repositories/Mocks/IMockItemRepository';
-import { IItemRepositoryListOptions } from '@/interfaces/repositories/PostGres/IItemRepository';
-import OrdreTriEnum                   from '@/constants/OrdreTriEnum';
+import type { ItemId, UserId             } from '@/domain/value-objects/ids';
+import type { IItemData                  } from '@/interfaces/entities/item/IItemData';
+import type { IListResult                } from '@/interfaces/shared/IListResult';
+import type { IListOptions               } from '@/interfaces/shared/IListOptions';
+import type { IMockItemRepository        } from '@/interfaces/repositories/Mocks/IMockItemRepository';
+import type { IItemRepositoryListOptions } from '@/interfaces/repositories/PostGres/IItemRepository';
+
+import { OrdreTriEnum } from '@/constants/OrdreTriEnum';
+import { Item         } from '@/entities/Item';
 
 /**
  * 🗄️ Classe MockItemRepository 🧮 (Le Simulateur de Pépites en RAM 🤖)
@@ -59,13 +60,14 @@ export class MockItemRepository implements IMockItemRepository {
   }
 
   /**
-   * 🔍 Localise une pépite via son titre pour un acteur propriétaire.
+   * 🔍 Localise une pépite via son libellé pour un acteur propriétaire.
+   * [RÉPARÉ V4] Éradication définitive de findByTitle au profit de findByLibelle [1.1].
    */
-  public async findByTitle(p_oUserId: UserId, p_sTitle: string): Promise<Item | null> {
-    const l_sRecherche: string = p_sTitle.toLowerCase().trim();
+  public async findByLibelle(p_oUserId: UserId, p_sLibelle: string): Promise<Item | null> {
+    const l_sRecherche: string = p_sLibelle.toLowerCase().trim();
     return (
       this.getItems().find((l_oUserItem: Item): boolean =>
-        l_oUserItem.idUser.estEgalA(p_oUserId) && l_oUserItem.title.toLowerCase().trim() === l_sRecherche
+        l_oUserItem.idUser.estEgalA(p_oUserId) && l_oUserItem.libelle.toLowerCase().trim() === l_sRecherche
       ) ?? null
     );
   }
@@ -82,7 +84,7 @@ export class MockItemRepository implements IMockItemRepository {
 
     if (p_oOptions.MotsCles) {
       const l_sMotCle: string = p_oOptions.MotsCles.toLowerCase().trim();
-      l_aoFiltres = l_aoFiltres.filter((l_oItem: Item): boolean => l_oItem.title.toLowerCase().includes(l_sMotCle));
+      l_aoFiltres = l_aoFiltres.filter((l_oItem: Item): boolean => l_oItem.libelle.toLowerCase().includes(l_sMotCle));
     }
 
     return this.appliquerPaginationRAM(l_aoFiltres, p_oOptions);
@@ -103,6 +105,7 @@ export class MockItemRepository implements IMockItemRepository {
 
   /**
    * 🪓 Mutation en mémoire vive : Applique les modifications partielles d'une pépite.
+   * [DÉBRYLLÉ V4] Typage propre, suppression du cast sauvage, respect de l'immuabilité [1.1].
    */
   public async update(p_oIdItem: ItemId, p_oData: Partial<IItemData>): Promise<Item> {
     const l_iIdx: number = this.getItems().findIndex((l_oItem: Item): boolean => l_oItem.idItem.estEgalA(p_oIdItem));
@@ -111,12 +114,17 @@ export class MockItemRepository implements IMockItemRepository {
       throw new Error(`[Mock 🚨] Item unique ID ${p_oIdItem.toString()} introuvable pour l'update.`);
     }
 
+    // Récupération propre de l'état actuel sous forme de structure de données IItemData [1.1]
     const l_oCourant : IItemData = this.getItems()[l_iIdx].toData();
-    const l_oMute    = new Item({
+
+    // Fusion propre et sécurisée respectant le franconien de soute [1.1]
+    const l_oDonneesMutées: IItemData = {
       ...l_oCourant,
       ...p_oData,
       updatedAt : new Date()
-    } as any);
+    };
+
+    const l_oMute = new Item(l_oDonneesMutées);
 
     this.getItems()[l_iIdx] = l_oMute;
     return l_oMute;
@@ -139,14 +147,16 @@ export class MockItemRepository implements IMockItemRepository {
   }
 
   /**
-   * 🧮 Utilitaire privé émulant la pagination et le tri universel en RAM.
+   * ½ Utility privée émulant la pagination et le tri universel en RAM.
    */
   private appliquerPaginationRAM(p_aoSource: Item[], p_oOptions: IListOptions): IListResult<Item> {
-    const l_nTotal = p_aoSource.length;
-    const l_nLimit = p_oOptions.NbLignes ?? 50;
+    const l_nTotal  = p_aoSource.length;
+    const l_nLimit  = p_oOptions.NbLignes ?? 50;
     const l_nOffset = p_oOptions.LigneDebut ?? 0;
 
-    const l_sCleTri = p_oOptions.ColonneTri === 'itCreatedAt' ? 'createdAt' : 'title';
+    // [RÉPARÉ V4] Aligné sur la propriété vivante 'libelle' au lieu de 'title' banni [1.1]
+    const l_sCleTri = p_oOptions.ColonneTri === 'itCreatedAt' ? 'createdAt' : 'libelle';
+
     p_aoSource.sort((l_oA: any, l_oB: any): number => {
       const l_vA = l_oA[l_sCleTri];
       const l_vB = l_oB[l_sCleTri];

@@ -1,5 +1,7 @@
 // ——— fichier : src/validation/zod/ItemValidation.ts
 
+import type { JsonLégitime } from '@/types/shared/JsonLégitime'; // 📥 Importation du type fort de soute [1.1].
+
 import { z } from 'zod';
 import { ContentType } from '@/constants/ContentTypes';
 
@@ -29,7 +31,16 @@ const slugSchema    = z
  */
 const auteurSourceSchema = z.string().trim().max(50).default('N.C'); // 💎 [REPARÉ V4] Adieu 'sourceAuthor' !
 const thumbnailUrlSchema = z.string().url().max(255).nullable().optional();
-const metadataSchema     = z.record(z.string(), z.unknown()).default({});
+
+
+/**
+ * 📦 [SCELLÉ V4] Schéma de validation pour un conteneur JSON légitime et flexible.
+ * Force l'inférence stricte du type constitutionnel JsonLégitime [1.1].
+ */
+const metadataSchema = z.custom<JsonLégitime>(
+  (val) => val !== undefined && typeof val === 'object' && val !== null,
+  { message: 'Format de métadonnées JsonLégitime invalide' }
+).default({});
 
 /**
  * 🆔 Schéma pour la liste des identifiants de tags associés (Value Objects au format texte).

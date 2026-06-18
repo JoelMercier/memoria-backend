@@ -24,7 +24,7 @@ export interface IMockItemRepository extends IMemoryRW<Item, IItemData, ItemId> 
   findBySlug(p_axUserId: UserId, p_sSlug: string): Promise<Item | null>;
 
   /** 📝 Recherche une pépite unique par son titre exact sur l'espace d'un acteur. */
-  findByTitle(p_axUserId: UserId, p_sTitle: string): Promise<Item | null>;
+  findByLibelle(p_axUserId: UserId, p_sTitle: string): Promise<Item | null>;
 
   /** 📊 Énumère le coffre-fort d'un acteur de manière segmentée (Français d'élite). */
   listByUser(p_axUserId: UserId, p_oOptions: IItemRepositoryListOptions): Promise<IListResult<Item>>;

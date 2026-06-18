@@ -1,10 +1,12 @@
 // ——— fichier : src/dto/item/ResponseItemDto.ts
 
-import type { ContentType } from '@/constants/ContentTypes';
-import { UserId, ItemId }   from '@/domain/value-objects/ids';
+import type { ContentType    } from '@/constants/ContentTypes';
+import type { UserId, ItemId } from '@/domain/value-objects/ids';
+import type { Item           } from '@/entities/Item';
+import type { ITag           } from '@/interfaces/entities/tag/ITag';
+import type { JsonLégitime   } from '@/types/shared/JsonLégitime';
+
 import { ResponseTagDto }   from '@/dto/tag/ResponseTagDto';
-import { Item }             from '@/entities/Item'; // 🗲 [ALIGNÉ V4] Passage sur la classe concrète du Domaine !
-import type { ITag }        from '@/interfaces/entities/tag/ITag';
 
 /**
  * 📦 Classe ResponseItemDto 💎
@@ -28,7 +30,7 @@ export class ResponseItemDto {
   public readonly contentType : ContentType;
 
   /** 📝 Titre principal de la pépite */
-  public readonly title : string;
+  public readonly libelle : string;
 
   /** 🛤️ Permalien normalisé (Slug) associé à la ressource */
   public readonly slug : string;
@@ -43,7 +45,7 @@ export class ResponseItemDto {
   public readonly thumbnailUrl? : string | null;
 
   /** 🎛️ Métadonnées d'infrastructure dynamiques et structurées */
-  public readonly metadata : Record<string, unknown>;
+  public readonly metadata : JsonLégitime;
 
   /** 📅 Horodatage de création dans le système de persistance */
   public readonly createdAt? : Date;
@@ -69,7 +71,7 @@ export class ResponseItemDto {
     this.contentType  = p_oItem.contentType;
 
     // Propriétés nominales de l'entité vivante
-    this.title        = p_oItem.title;
+    this.libelle      = p_oItem.libelle;
     this.slug         = p_oItem.slug;
     this.content      = p_oItem.content;
     this.sourceAuthor = p_oItem.sourceAuthor;
