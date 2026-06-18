@@ -1,9 +1,8 @@
 // ——— fichier : src/dto/item/UpdateItemDto.ts
 
-import type { ContentType } from '@/constants/ContentTypes';
-import { TagId               } from '@/domain/value-objects/ids';
-import { type UpdateItemSchemaType,
-         ItemValidation       } from '@/validation/zod/ItemValidation';
+import      { TagId                } from '@/domain/value-objects/ids';
+import      { ItemValidation       } from '@/validation/zod/ItemValidation';
+import type { UpdateItemSchemaType } from '@/validation/zod/ItemValidation';
 
 /**
  * 📦 Classe UpdateItemDto
@@ -12,16 +11,18 @@ import { type UpdateItemSchemaType,
  * Zéro dépendance externe vers Zod dans les types de propriétés.
  * Armé avec les cailloux de couleur (Value Objects) et calé sur nos types stricts.
  *
+ * Version: 4.2.1 (Alignement Franconien & Purge Anglo-Saxonne) [1.1]
+ *
  * @class UpdateItemDto
  * @author Joël, Gaïa & Co
  */
 export class UpdateItemDto {
 
-  /** 🏷️ Type de contenu optionnel issu de nos constantes sémantiques */
-  public readonly contentType?: ContentType;
+  /** 🔌 [RÉPARÉ V4] Quadrigramme physique fixe de soute optionnel (Char(4)) [1.1] */
+  public readonly contentTypeId?: string;
 
-  /** 📝 Titre principal optionnel de la pépite */
-  public readonly title?: string;
+  /** 💎 [RÉPARÉ V4] Libellé principal nominal optionnel (Adieu 'title') [1.1] */
+  public readonly libelle?: string;
 
   /** 🛤️ Permalien normalisé (Slug) optionnel */
   public readonly slug?: string;
@@ -29,8 +30,8 @@ export class UpdateItemDto {
   /** 📄 Corps du texte ou payload brut optionnel */
   public readonly content?: string;
 
-  /** ✍️ Auteur original ou source de provenance optionnelle */
-  public readonly sourceAuthor?: string;
+  /** 💎 [RÉPARÉ V4] Origine ou auteur de provenance optionnelle (Adieu 'sourceAuthor') [1.1] */
+  public readonly auteurSource?: string;
 
   /** 🖼️ URL optionnelle de la miniature d'illustration */
   public readonly thumbnailUrl?: string | null;
@@ -53,18 +54,17 @@ export class UpdateItemDto {
     const l_oRawBody : Record<string, unknown> = (data && typeof data === 'object') ? (data as Record<string, unknown>) : {};
     const validated  : UpdateItemSchemaType = ItemValidation.validateUpdate(l_oRawBody);
 
-    // Cast chirurgical pour s'adapter à notre instance de SmartEnum (sans Enum de transport)
-    this.contentType  = validated.contentType ? (validated.contentType as unknown as ContentType) : undefined;
-
-    this.title        = validated.title;
-    this.slug         = validated.slug;
-    this.content      = validated.content;
-    this.sourceAuthor = validated.sourceAuthor;
-    this.thumbnailUrl = validated.thumbnailUrl;
-    this.metadata     = validated.metadata;
+    // 🛡️ Réalignement chirurgical sur le métal franconien renvoyé par le validateur Zod [1.1]
+    this.contentTypeId = validated.contentTypeId; // 🔌 Alignement direct sur la clé fixe optionnelle.
+    this.libelle       = validated.libelle;       // 💎 Substitution définitive de title [1.1].
+    this.slug          = validated.slug;
+    this.content       = validated.content;
+    this.auteurSource  = validated.auteurSource;  // 💎 Substitution définitive de sourceAuthor [1.1].
+    this.thumbnailUrl  = validated.thumbnailUrl;
+    this.metadata      = validated.metadata;
 
     // Scellage nominal de la collection optionnelle d'identifiants de tags
-    this.tagIds       = validated.tagIds
+    this.tagIds        = validated.tagIds
       ? validated.tagIds.map((id: string) => new TagId(id))
       : undefined;
   }

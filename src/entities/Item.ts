@@ -1,16 +1,20 @@
 // ——— fichier : src/entities/Item.ts
 
-import { BaseEntity } from '@/entities/BaseEntity';
 import type { ItemId, UserId } from '@/domain/value-objects/ids';
+import type { IItemData      } from '@/interfaces/entities/item/IItemData';
+import type { JsonLégitime   } from '@/types/shared/JsonLégitime';
+
+import { BaseEntity    } from '@/entities/BaseEntity';
 import { ContentTypeId } from '@/domain/value-objects/ids';
-import { ContentType } from '@/constants/ContentTypes';
-import type { IItemData } from '@/interfaces/entities/item/IItemData';
+import { ContentType   } from '@/constants/ContentTypes';
 
 /**
  * 🏛️ Classe Item (Pépites) 📦
  * ----------------------------------------------------------------------------
  * Modèle métier immuable représentant une pépite de contenu.
  * Protégé par la notation hongroise, documenté et pourvu de vrais getters C++ Style.
+ *
+ * Version: 4.2.1 (Alignement Franconien & Purge Anglo-Saxonne) [1.1]
  *
  * @class Item
  * @extends {BaseEntity<'item', IItemData, ItemId>}
@@ -27,8 +31,8 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> {
   /** 🏷️ Instance de Smart Enum gérant la typologie de contenu associé */
   private readonly m_eContentType: ContentType;
 
-  /** ✏️ Titre principal donné à la pépite */
-  private readonly m_sTitle: string;
+  /** 💎 [RÉPARÉ V4] Libellé principal nominal de la pépite (Substitution de m_sTitle) [1.1] */
+  private readonly m_sLibelle: string;
 
   /** 🛤️ Permalien normalisé (Slug) unique */
   private readonly m_sSlug: string;
@@ -36,14 +40,14 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> {
   /** 📄 Corps textuel enrichi ou brut stockant la mémoire */
   private readonly m_sContent: string;
 
-  /** ✍️ Signature de l'auteur original ou provenance de la pépite */
-  private readonly m_sSourceAuthor: string;
+  /** 💎 [RÉPARÉ V4] Origine ou auteur de provenance (Substitution de m_sSourceAuthor) [1.1] */
+  private readonly m_sAuteurSource: string;
 
   /** 🖼️ URL ou chemin de la miniature de couverture (Optionnelle) */
   private readonly m_sThumbnailUrl: string | null | undefined;
 
   /** 🎛️ Métadonnées d'infrastructure dynamiques et structurées */
-  private readonly m_rMetadata: Record<string, unknown>;
+  private readonly m_rMetadata: JsonLégitime;
 
   /**
    * Instancie une pépite immuable à partir de son contrat de données.
@@ -54,16 +58,16 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> {
   public constructor(p_oData: IItemData) {
     super(p_oData);
 
-    // 🪓 [RÉPARÉ V4] Extraction directe et légale sans aucun cast "as any" de contrebande !
-    this.m_idItem = p_oData.idItem;
-    this.m_idUser = p_oData.idUser;
-    this.m_eContentType = ContentType.fromSql(p_oData.contentTypeId.valeur);
-    this.m_sTitle = p_oData.title;
-    this.m_sSlug = p_oData.slug;
-    this.m_sContent = p_oData.content;
-    this.m_sSourceAuthor = p_oData.sourceAuthor;
+    // 🪓 [RÉPARÉ V4] Extraction directe et légale sans aucun cast "as any" de contrebande ! [1.1]
+    this.m_idItem        = p_oData.idItem;
+    this.m_idUser        = p_oData.idUser;
+    this.m_eContentType  = ContentType.fromSql(p_oData.contentTypeId.valeur); // 🔌 Respect de votre précieux .valeur [1.1].
+    this.m_sLibelle      = p_oData.libelle;       // 💎 Alignement franconien physique [1.1].
+    this.m_sSlug         = p_oData.slug;
+    this.m_sContent      = p_oData.content;
+    this.m_sAuteurSource = p_oData.auteurSource;  // 💎 Alignement franconien physique [1.1].
     this.m_sThumbnailUrl = p_oData.thumbnailUrl;
-    this.m_rMetadata = p_oData.metadata || {};
+    this.m_rMetadata     = p_oData.metadata || {};
   }
 
   /**
@@ -97,13 +101,13 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> {
   }
 
   /**
-   * ✏️ VRAI GETTER : Récupère le titre de la pépite.
+   * 💎 [RÉPARÉ V4] VRAI GETTER : Récupère le libellé de la pépite.
    *
    * @public
-   * @returns {string} Le texte du titre
+   * @returns {string} Le texte nominal du libellé [1.1]
    */
-  public get title(): string {
-    return this.m_sTitle;
+  public get libelle(): string {
+    return this.m_sLibelle;
   }
 
   /**
@@ -127,13 +131,13 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> {
   }
 
   /**
-   * ✍️ VRAI GETTER : Récupère l'auteur d'origine de la source.
+   * ✍️ [RÉPARÉ V4] VRAI GETTER : Récupère l'auteur d'origine de la source.
    *
    * @public
-   * @returns {string} Le nom ou l'adresse d'origine
+   * @returns {string} Le nom ou l'adresse d'origine franconienne [1.1]
    */
   public get sourceAuthor(): string {
-    return this.m_sSourceAuthor;
+    return this.m_sAuteurSource;
   }
 
   /**
@@ -150,9 +154,9 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> {
    * 🗄️ VRAI GETTER : Récupère le dictionnaire des métadonnées complémentaires.
    *
    * @public
-   * @returns {Record<string, unknown>} L'objet de métadonnées
+   * @returns {JsonLégitime} L'objet de métadonnées
    */
-  public get metadata(): Record<string, unknown> {
+  public get metadata(): JsonLégitime {
     return this.m_rMetadata;
   }
 
@@ -169,10 +173,10 @@ export class Item extends BaseEntity<'item', IItemData, ItemId> {
       idItem: this.idItem, //-- Réinjection conforme Jojo-Style.
       idUser: this.idUser,
       contentTypeId: new ContentTypeId(this.contentType.code), //-- Nettoyage du .toString() redondant.
-      title: this.title,
+      libelle: this.libelle,              // 💎 Raccordement franconien [1.1].
       slug: this.slug,
       content: this.content,
-      sourceAuthor: this.sourceAuthor,
+      auteurSource: this.sourceAuthor,    // 💎 Raccordement franconien [1.1].
       thumbnailUrl: this.thumbnailUrl,
       metadata: this.metadata,
       createdAt: this.createdAt,
