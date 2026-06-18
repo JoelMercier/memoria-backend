@@ -1,7 +1,8 @@
 // ——— fichier : src/interfaces/entities/item/IItemData.ts
 
 import type { UserId, ItemId, ContentTypeId } from '@/domain/value-objects/ids';
-import type { IBaseEntityData }               from '@/interfaces/entities/IBaseEntityData';
+import type { IBaseEntityData               } from '@/interfaces/entities/IBaseEntityData';
+import type { JsonLégitime                  } from '@/types/shared/JsonLégitime';
 
 /**
  * 📊 Interface IItemData 📦 (Le Contrat de Structure de la Pépite en Persistance)
@@ -30,7 +31,7 @@ export interface IItemData extends IBaseEntityData<'item', ItemId> {
   contentTypeId : ContentTypeId;
 
   /** ✏️ Titre principal ou libellé de la Pépite. */
-  title : string;
+  libelle : string;
 
   /** 🔗 Clé textuelle normalisée (Slug) dédiée aux routes d'URL. */
   slug : string;
@@ -39,13 +40,13 @@ export interface IItemData extends IBaseEntityData<'item', ItemId> {
   content : string;
 
   /** ✍️ Nom ou pseudonyme de l'auteur d'origine de la source. */
-  sourceAuthor : string;
+  auteurSource : string;
 
   /** 🖼️ URL absolue ou relative de l'image miniature de couverture (Optionnelle). */
   thumbnailUrl? : string | null;
 
   /** 🗄️ Dictionnaire d'extension de métadonnées libres au format JSON. */
-  metadata : Record<string, unknown>;
+  metadata : JsonLégitime;
 
   /** 📅 Horodatage immuable de la création de la ressource en base (Exigé par BaseEntity). */
   createdAt : Date;

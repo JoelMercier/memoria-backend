@@ -1,7 +1,7 @@
 // ——— fichier : src/interfaces/repositories/IPhysicalRW.ts
 
-import { IPhysicalRepository } from '@/interfaces/repositories/IPhysicalRepository';
-import { AllowedIdTypes }      from '@/interfaces/entities/IBaseEntityData';
+import type { IPhysicalRepository } from '@/interfaces/repositories/IPhysicalRepository';
+import type { AllowedIdTypes      } from '@/interfaces/entities/IBaseEntityData';
 
 /**
  * 🛡️ Interface IPhysicalRW (Read-Write - Ancien IWriteableRepository)

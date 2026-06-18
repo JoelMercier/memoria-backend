@@ -1,9 +1,18 @@
 -- ——— fichier : database/fonctions/Pépites/TrouverPepiteParLibelle.sql
 
-Drop Function if Exists "TrouverPepiteParLibelle"( p_axIdActeur Uuid, p_sLibellePepite Character Varying );
+-- ============================================================================
+-- 🚨 INFRASTRUCTURE : TIR LASER ANTI-DOUBLON VIA INDEX COMPOSITE UNIQUE
+-- Version: 4.2.1 (PostgreSQL 17+ - Format Soviétique Strict 1960)
+-- Description: Recherche exacte ultra-rapide sur l'index unique de soute.
+-- ============================================================================
+
+Set search_path To Public;
+Set CLIENT_ENCODING to 'UTF8';
+
+Drop Function if Exists public."TrouverPepiteParLibelle"(Uuid, Character Varying);
 
 Create Or Replace Function public."TrouverPepiteParLibelle"(
-    p_axIdActeur     Uuid,             -- Paramètre : Clé binaire 128 bits du propriétaire.
+    p_axIdActeur     Uuid,             -- Paramètre : Identifiant 128 bits natif de l'acteur.
     p_sLibellePepite Character Varying -- Paramètre : Titre nominal brut recherché.
 )
 Returns Table (
@@ -18,9 +27,7 @@ Returns Table (
     "itThumbnailUrl"  Character Varying,
     "itMetadata"      JsonB,
     "itContent"       Text
-)
-Language plpgsql
-as $$
+) As $$
 Begin
     Return Query
     Select
@@ -36,9 +43,12 @@ Begin
         "itMetadata",
         "itContent"
     From public."Items"
-    where "itUserId" = "Bin-UUID"(p_axIdActeur)
-      and "itLibelle" = Trim(p_sLibellePepite); -- Index unique composite "Items_itUserId_itLibelle_Udx" !
+    Where "itUserId"  = p_axIdActeur          -- [RÉPARÉ] Comparaison binaire directe 128 bits pour mordre dans l'index !
+      and "itLibelle" = Trim(p_sLibellePepite); -- [SCELLÉ] Alignement strict sur l'index composite unique.
 End;
-$$;
+$$ Language plpgsql Security Definer; -- 🔒 [DECRET JOEL] Sûreté d'exécution garantie pour l'anti-doublon !
 
+-- ----------------------------------------------------------------------------
+-- 📝 4. La documentation du dictionnaire (Rule 7 : Alignement vertical du 'is')
+-- ----------------------------------------------------------------------------
 Comment On Function public."TrouverPepiteParLibelle"(Uuid, Character Varying) is 'Tir laser anti-doublon extrayant une pépite via l''index composite unique de son libellé.';

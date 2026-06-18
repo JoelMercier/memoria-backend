@@ -1,11 +1,21 @@
 -- ——— fichier : database/fonctions/Pépites/CreerPepite.sql
 
+-- ============================================================================
+-- 🚨 INFRASTRUCTURE : INJECTEUR NOMINAL D'ÉCRITURE DES PÉPITES D'OR
+-- Version: 4.2.1 (PostgreSQL 17+ - Format Soviétique Strict 1960)
+-- Description: Insertion atomique sécurisée sous le régime Security Definer.
+-- ============================================================================
+
+Set search_path To Public;
+Set CLIENT_ENCODING to 'UTF8';
+
 Drop Function If Exists public."CreerPepite"(Uuid, Uuid, Character Varying, Character Varying, Character Varying, Text, Character Varying, Character Varying, JsonB);
+Drop Function If Exists public."CreerPepite"(Uuid, Uuid, Character, Character Varying, Character Varying, Text, Character Varying, Character Varying, JsonB);
 
 Create Or Replace Function public."CreerPepite"(
-    p_axIdPepite    Uuid,              -- Paramètre : Clé binaire 128 bits de la pépite (ByteA).
+    p_axIdPepite    Uuid,              -- Paramètre : Clé binaire 128 bits de la pépite.
     p_axIdActeur    Uuid,              -- Paramètre : Clé binaire 128 bits de l'acteur propriétaire.
-    p_ctContentType Character Varying, -- Paramètre : Code technique du type de contenu.
+    p_ctContentType Character(4),      -- [RÉPARÉ V4] Alignement strict sur le type Char(4) fixe [1.1].
     p_sLibelle      Character Varying, -- Paramètre : Titre nominal nettoyé.
     p_sSlug         Character Varying, -- Paramètre : Permalien unique calculé en RAM.
     p_sContent      Text,              -- Paramètre : Corps textuel lourd de la ressource.
@@ -25,9 +35,7 @@ Returns Table (
     "itThumbnailUrl"  Character Varying,
     "itMetadata"      JsonB,
     "itContent"       Text
-)
-Language plpgsql
-as $$
+) As $$
 Begin
     Return Query
     Insert Into public."Items" (
@@ -45,8 +53,8 @@ Begin
         p_sThumbnailUrl,
         p_oMetadata
     )
-    Returning *; -- Crache la ligne physique indexée en tas au format Jojo-Style.
+    Returning *; -- Crache la ligne physique indexée en tas au format Jojo-Style [1.1].
 End;
-$$;
+$$ Language plpgsql Security Definer; -- 🔒 [DECRET JOEL] Indispensable pour passer le mur du rôle restreint [1.1] !
 
-Comment On Function public."CreerPepite" is 'Mutation nominale insérant une pépite d''or en soute basse avec forçage de l''idempotence.';
+Comment On Function public."CreerPepite"(Uuid, Uuid, Character, Character Varying, Character Varying, Text, Character Varying, Character Varying, JsonB) Is 'Mutation nominale insérant une pépite d''or en soute basse avec élévation sécurisée de privilèges [1.1].';

@@ -1,14 +1,23 @@
 -- ——— fichier : database/fonctions/Pépites/TrouverPepiteParSlug.sql
 
-Drop Function if Exists "TrouverPepiteParSlug"( p_axIdActeur Uuid, p_sSlugPepite Character Varying);
+-- ============================================================================
+-- 🚨 INFRASTRUCTURE : RECHERCHE CHIRURGICALE VIA INDEX COMPOSITE DE PERMALIEN
+-- Version: 4.2.1 (PostgreSQL 17+ - Format Soviétique Strict 1960)
+-- Description: Extraction instantanée par index unique composite de slug.
+-- ============================================================================
+
+Set search_path To Public;
+Set CLIENT_ENCODING to 'UTF8';
+
+Drop Function if Exists public."TrouverPepiteParSlug"(Uuid, Character Varying);
 
 Create Or Replace Function public."TrouverPepiteParSlug"(
-    p_axIdActeur  Uuid,             -- Paramètre : Clé binaire 128 bits du propriétaire (ByteA en RAM).
+    p_axIdActeur  Uuid,             -- Paramètre : Identifiant 128 bits natif de l'acteur.
     p_sSlugPepite Character Varying -- Paramètre : Version URL-friendly unique nettoyée.
 )
 Returns Table (
-    "itIdItem"        Uuid,                        -- 16 octets fixes (Colosse).
-    "itUserId"        Uuid,                        -- 16 octets fixes (Colosse).
+    "itIdItem"        Uuid,                        -- 16 octets fixes (UUID natif).
+    "itUserId"        Uuid,                        -- 16 octets fixes (UUID natif).
     "itCreatedAt"     TimeStamp Without Time Zone, --  8 octets fixes (Horodateur).
     "itUpdatedAt"     TimeStamp Without Time Zone, --  8 octets fixes (Horodateur).
     "itContentTypeId" Character(4),                --  4 octets fixes (Code léger).
@@ -18,9 +27,7 @@ Returns Table (
     "itThumbnailUrl"  Character Varying,
     "itMetadata"      JsonB,
     "itContent"       Text
-)
-Language plpgsql
-as $$
+) As $$
 Begin
     Return Query
     Select
@@ -36,9 +43,12 @@ Begin
         "itMetadata",
         "itContent"
     From public."Items"
-    where "itUserId" = p_axIdActeur
-      and "itSlug"   = Lower(Trim(p_sSlugPepite)); -- Index unique composite "Items_itUserId_itSlug_Udx" !
+    Where "itUserId" = p_axIdActeur
+      and "itSlug"   = Lower(Trim(p_sSlugPepite)); -- [SCELLÉ] Alignement strict sur l'index composite unique de slug.
 End;
-$$;
+$$ Language plpgsql Security Definer; -- 🔒 [DECRET JOEL] Sûreté d'exécution garantie pour l'extraction !
 
-Comment On Function public."TrouverPepiteParSlug"(Uuid, Character Varying)    is 'Tir laser chirurgical extrayant une pépite via l''index composite unique du permalien.';
+-- ----------------------------------------------------------------------------
+-- 📝 4. La documentation du dictionnaire (Rule 7 : Alignement vertical du 'is')
+-- ----------------------------------------------------------------------------
+Comment On Function public."TrouverPepiteParSlug"(Uuid, Character Varying) is 'Tir laser chirurgical extrayant une pépite via l''index composite unique du permalien.';

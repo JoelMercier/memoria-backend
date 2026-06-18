@@ -1,8 +1,8 @@
 // ——— fichier : src/interfaces/repositories/IPhysicalRepository.ts
 
-import { IBaseRepository }     from '@/interfaces/repositories/IBaseRepository';
-import { AllowedIdTypes }      from '@/interfaces/entities/IBaseEntityData';
-import { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
+import type { IBaseRepository     } from '@/interfaces/repositories/IBaseRepository';
+import type { AllowedIdTypes      } from '@/interfaces/entities/IBaseEntityData';
+import type { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
 
 /**
  * 🗄️ Interface IPhysicalRepository 🛡️

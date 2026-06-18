@@ -4,19 +4,20 @@ import { z } from 'zod';
 import { ContentType } from '@/constants/ContentTypes';
 
 /**
- * 🏷️ Schéma de validation Zod pour le code du Smart Enum ContentType.
+ * 🔌 Schéma de validation Zod pour le code du Smart Enum ContentType.
  * Utilise la configuration 'message' native attendue par la surcharge de z.enum.
+ * [SCELLÉ V4] Aligné sur le quadrigramme fixe Char(4) de la soute.
  */
-const contentTypeSchema = z.enum(ContentType.codes(), {
-  message: 'Type de contenu (ContentType) invalide'
+const contentTypeIdSchema = z.enum(ContentType.codes(), {
+  message: 'Type de contenu (ContentTypeId) invalide'
 });
 
 /**
- * ✏️ Schémas de validation pour les champs textuels principaux de la Pépite.
+ * ✏️ Schémas de validation pour les champs textuels principaux de la Pépite d'Or.
  */
-const titleSchema = z.string().trim().min(1, 'Le titre est requis').max(255);
+const libelleSchema = z.string().trim().min(1, 'Le libellé est requis').max(255); // 💎 [REPARÉ V4] Adieu 'title' !
 const contentSchema = z.string().min(1, 'Le contenu est requis');
-const slugSchema = z
+const slugSchema    = z
   .string()
   .trim()
   .min(1)
@@ -26,9 +27,9 @@ const slugSchema = z
 /**
  * ✍️ Schémas pour les métadonnées de provenance, de couverture et d'extension.
  */
-const sourceAuthorSchema = z.string().trim().max(50).default('N.C');
+const auteurSourceSchema = z.string().trim().max(50).default('N.C'); // 💎 [REPARÉ V4] Adieu 'sourceAuthor' !
 const thumbnailUrlSchema = z.string().url().max(255).nullable().optional();
-const metadataSchema = z.record(z.string(), z.unknown()).default({});
+const metadataSchema     = z.record(z.string(), z.unknown()).default({});
 
 /**
  * 🆔 Schéma pour la liste des identifiants de tags associés (Value Objects au format texte).
@@ -39,28 +40,28 @@ const tagIdsSchema = z.array(z.string().trim().min(1, 'Identifiant de tag invali
  * 📦 Schéma de validation Zod pour la création d'une Pépite (Item).
  */
 const createItemSchema = z.object({
-  contentType: contentTypeSchema,
-  title: titleSchema,
-  slug: slugSchema.optional(),
-  content: contentSchema,
-  sourceAuthor: sourceAuthorSchema,
-  thumbnailUrl: thumbnailUrlSchema,
-  metadata: metadataSchema,
-  tagIds: tagIdsSchema
+  contentTypeId : contentTypeIdSchema, // 💎 Alignement structurel.
+  libelle       : libelleSchema,       // 💎 Franconien pur.
+  slug          : slugSchema.optional(),
+  content       : contentSchema,
+  auteurSource  : auteurSourceSchema,  // 💎 Franconien pur.
+  thumbnailUrl  : thumbnailUrlSchema,
+  metadata      : metadataSchema,
+  tagIds        : tagIdsSchema
 });
 
 /**
  * 📦 Schéma de validation Zod pour la mise à jour d'une Pépite (Item).
  */
 const updateItemSchema = z.object({
-  contentType: contentTypeSchema.optional(),
-  title: titleSchema.optional(),
-  slug: slugSchema.optional(),
-  content: contentSchema.optional(),
-  sourceAuthor: sourceAuthorSchema.optional(),
-  thumbnailUrl: thumbnailUrlSchema,
-  metadata: metadataSchema.optional(),
-  tagIds: tagIdsSchema
+  contentTypeId : contentTypeIdSchema.optional(),
+  libelle       : libelleSchema.optional(),
+  slug          : slugSchema.optional(),
+  content       : contentSchema.optional(),
+  auteurSource  : auteurSourceSchema.optional(),
+  thumbnailUrl  : thumbnailUrlSchema,
+  metadata      : metadataSchema.optional(),
+  tagIds        : tagIdsSchema
 });
 
 /** 📋 Type inféré extrait du schéma de création d'Item */
@@ -72,7 +73,8 @@ export type UpdateItemSchemaType = z.infer<typeof updateItemSchema>;
 /**
  * 🏛️ Classe ItemValidation
  * -------------------------
- * Portier de sécurité gérant la validation stricte des payloads des Mots-clés (Tags).
+ * Portier de sécurité gérant la validation stricte des payloads des Pépites (Items).
+ * [RÉPARÉ V4] Purge définitive des scories de copier-coller dans la documentation [1.1].
  *
  * @class ItemValidation
  * @author Directrice du Silicium : Joël (DR-DOS maniac, Nominal Casse Obsession)
@@ -85,8 +87,8 @@ export class ItemValidation {
    *
    * @static
    * @function validateCreate
-   * @param {Record<string, unknown>} data - Les données brutes de la soute
-   * @returns {CreateItemSchemaType} Le DTO d'item validé
+   * @param {Record<string, unknown>} data - Les données brutes arrivant de la soute API
+   * @returns {CreateItemSchemaType} Le DTO d'item validé et nettoyé
    */
   public static validateCreate(data: Record<string, unknown>): CreateItemSchemaType {
     return createItemSchema.parse(data);
@@ -97,8 +99,8 @@ export class ItemValidation {
    *
    * @static
    * @function validateUpdate
-   * @param {Record<string, unknown>} data - Les données brutes de la soute
-   * @returns {UpdateItemSchemaType} Le DTO d'item validé
+   * @param {Record<string, unknown>} data - Les données brutes arrivant de la soute API
+   * @returns {UpdateItemSchemaType} Le DTO d'item validé et nettoyé
    */
   public static validateUpdate(data: Record<string, unknown>): UpdateItemSchemaType {
     return updateItemSchema.parse(data);
