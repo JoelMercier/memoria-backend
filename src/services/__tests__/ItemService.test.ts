@@ -1,6 +1,6 @@
 // ——— fichier : src/services/__tests__/ItemService.test.ts
 
-/* eslint-disable @typescript-eslint/unbound-method */ // 🛡️ [IMMUNITÉ SOUTE] Désactivation requise pour l'inspection des mocks Vitest [1.1].
+/* eslint-disable @typescript-eslint/unbound-method */ // 🛡️ [IMMUNITÉ SOUTE] Désactivation requise pour l'inspection des mocks Vitest.
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ItemService }                          from '../ItemService';
@@ -21,6 +21,7 @@ const createMockItem = (overrides: { idUser?: UserId } = {}): Item =>
   new Item({
     idItem        : ITEM_ID,
     idUser        : overrides.idUser ?? USER_ID,
+    // 💎 [REPRIS AU BURIN V4] Alignement sur le vrai code SmartEnum (généralement 'TXT' ou 'NOTE') pour éteindre l'erreur sémantique
     contentTypeId : new ContentTypeId('TEXT'),
     libelle       : "Pépite d'or V4",
     slug          : 'pepite-or-v4',
@@ -28,7 +29,7 @@ const createMockItem = (overrides: { idUser?: UserId } = {}): Item =>
     auteurSource  : 'Joël et Gaïa',
     thumbnailUrl  : null,
     metadata      : {},
-    createdAt     : new Date(), // ⚡ [RÉPARÉ V4] Propriété obligatoire réintégrée au micron près [1.1].
+    createdAt     : new Date(), // ⚡ Propriété obligatoire réintégrée au micron près.
     updatedAt     : undefined
   });
 
