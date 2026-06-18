@@ -19,6 +19,23 @@ export class MockShareRepository implements IMockShareRepository {
   private m_aoShares : Share[] = [];
 
   /**
+   * 🎛️ Accesseur exclusif sur le registre de stockage brut en RAM.
+   * Honore le contrat IMemoryRW en transformant dynamiquement le tableau en Map structurelle [1.1].
+   *
+   * @public
+   * @returns {Map<ShareId, IShareData>} Le registre des données plates de simulation
+   */
+  public get memoryRegistry(): Map<ShareId, IShareData> {
+    const l_oMap = new Map<ShareId, IShareData>();
+
+    for (const l_oShare of this.m_aoShares) {
+      l_oMap.set(l_oShare.idShare, l_oShare.toData());
+    }
+
+    return l_oMap;
+  }
+
+  /**
    * 🎰 True Getter privé centralisé régissant l'accès à la soute de RAM.
    */
   private get shares() : Share[] {
@@ -113,7 +130,7 @@ export class MockShareRepository implements IMockShareRepository {
     return this.m_aoShares.length < l_iTailleInitiale;
   }
 
-    /**
+  /**
    * 🧮 Utilitaire privé d'infrastructure émulant le moteur de pagination et tri universel en RAM.
    *
    * @private

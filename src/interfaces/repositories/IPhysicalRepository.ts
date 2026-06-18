@@ -1,7 +1,7 @@
 // ——— fichier : src/interfaces/repositories/IPhysicalRepository.ts
 
 import type { IBaseRepository     } from '@/interfaces/repositories/IBaseRepository';
-import type { AllowedIdTypes      } from '@/interfaces/entities/IBaseEntityData';
+import type { AllowedIdTypes      } from '@/types/shared/AllowedIdTypes';
 import type { IDatabaseConnection } from '@/interfaces/database/IDatabaseConnection';
 
 /**

@@ -1,13 +1,13 @@
 // ——— fichier : src/infrastructure/repositories/mocks/MockUserRepository.ts
 
-import { User }                 from '@/entities/User';
-import { UserId }               from '@/domain/value-objects/ids';
-import type { IUserData }       from '@/interfaces/entities/user/IUserData';
-import type { IListOptions }         from '@/interfaces/shared/IListOptions';
-import type { IListResult }          from '@/interfaces/shared/IListResult';
-import OrdreTriEnum                 from '@/constants/OrdreTriEnum';
-import { IMockUserRepository } from '@/interfaces/repositories/Mocks/IMockUserRepository';
+import type { UserId              } from '@/domain/value-objects/ids';
+import type { IUserData           } from '@/interfaces/entities/user/IUserData';
+import type { IListOptions        } from '@/interfaces/shared/IListOptions';
+import type { IListResult         } from '@/interfaces/shared/IListResult';
+import type { IMockUserRepository } from '@/interfaces/repositories/Mocks/IMockUserRepository';
 
+import { OrdreTriEnum } from '@/constants/OrdreTriEnum';
+import { User         } from '@/entities/User';
 
 /**
  * 🗄️ Classe MockUserRepository 🧮 (Le Banc de Test des Acteurs 🤖)
@@ -24,6 +24,23 @@ import { IMockUserRepository } from '@/interfaces/repositories/Mocks/IMockUserRe
 export class MockUserRepository implements IMockUserRepository {
   /** 🧠 La table virtuelle simulant le stockage physique contigu en mémoire vive */
   private m_aoUsers: User[] = [];
+
+  /**
+   * 🎛️ Accesseur exclusif sur le registre de stockage brut en RAM.
+   * Honore le contrat IMemoryRW en transformant dynamiquement le tableau en Map structurelle [1.1].
+   *
+   * @public
+   * @returns {Map<UserId, IUserData>} Le registre des données plates de simulation
+   */
+  public get memoryRegistry(): Map<UserId, IUserData> {
+    const l_oMap = new Map<UserId, IUserData>();
+
+    for (const l_oUser of this.m_aoUsers) {
+      l_oMap.set(l_oUser.idUser, l_oUser.toData());
+    }
+
+    return l_oMap;
+  }
 
   /**
    * 🎰 Accesseur privé centralisé régissant l'accès à la soute de RAM.
@@ -205,6 +222,7 @@ export class MockUserRepository implements IMockUserRepository {
     const l_nOffset = p_oOptions.LigneDebut ?? 0;
 
     const l_sCleTri = p_oOptions.ColonneTri === 'usPseudo' ? 'pseudo' : 'idUser';
+
     p_aoSource.sort((l_oA: any, l_oB: any): number => {
       const l_vA = l_oA[l_sCleTri];
       const l_vB = l_oB[l_sCleTri];

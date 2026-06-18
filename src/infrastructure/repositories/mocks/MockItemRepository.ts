@@ -26,6 +26,23 @@ export class MockItemRepository implements IMockItemRepository {
   private m_aoItems: Item[] = [];
 
   /**
+   * 🎛️ Accesseur exclusif sur le registre de stockage brut en RAM.
+   * Honore le contrat IMemoryRW en transformant dynamiquement le tableau en Map structurelle [1.1].
+   *
+   * @public
+   * @returns {Map<ItemId, IItemData>} Le registre des données plates de simulation
+   */
+  public get memoryRegistry(): Map<ItemId, IItemData> {
+    const l_oMap = new Map<ItemId, IItemData>();
+
+    for (const l_oItem of this.m_aoItems) {
+      l_oMap.set(l_oItem.idItem, l_oItem.toData());
+    }
+
+    return l_oMap;
+  }
+
+  /**
    * 🎰 Accesseur privé centralisé régissant l'accès à la soute de RAM.
    *
    * @private

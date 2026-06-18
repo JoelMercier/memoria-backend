@@ -1,14 +1,13 @@
 // ——— fichier : src/infrastructure/repositories/mocks/MockTagRepository.ts
 
-import type { ITagData }     from '@/interfaces/entities/tag/ITagData';
-import type { IListOptions } from '@/interfaces/shared/IListOptions';
-import type { IListResult }  from '@/interfaces/shared/IListResult';
+import type { ITagData           } from '@/interfaces/entities/tag/ITagData';
+import type { IListOptions       } from '@/interfaces/shared/IListOptions';
+import type { IListResult        } from '@/interfaces/shared/IListResult';
+import type { IMockTagRepository } from '@/interfaces/repositories/Mocks/IMockTagRepository';
+import type { TagId, UserId      } from '@/domain/value-objects/ids';
 
-import { Tag                } from '@/entities/Tag';
-import { TagId, UserId      } from '@/domain/value-objects/ids';
-import { OrdreTriEnum       } from '@/constants/OrdreTriEnum';
-import { IMockTagRepository } from '@/interfaces/repositories/Mocks/IMockTagRepository';
-
+import { Tag          } from '@/entities/Tag';
+import { OrdreTriEnum } from '@/constants/OrdreTriEnum';
 
 /**
  * 🗄️ Classe MockTagRepository 🧮 (Le Banc de Test des Étiquettes 🤖)
@@ -24,6 +23,23 @@ import { IMockTagRepository } from '@/interfaces/repositories/Mocks/IMockTagRepo
 export class MockTagRepository implements IMockTagRepository {
   /** 🧠 La table virtuelle simulant le stockage physique contigu en mémoire vive */
   private m_aoTags: Tag[] = [];
+
+  /**
+   * 🎛️ Accesseur exclusif sur le registre de stockage brut en RAM.
+   * Honore le contrat IMemoryRW en transformant dynamiquement le tableau en Map structurelle [1.1].
+   *
+   * @public
+   * @returns {Map<TagId, ITagData>} Le registre des données plates de simulation
+   */
+  public get memoryRegistry(): Map<TagId, ITagData> {
+    const l_oMap = new Map<TagId, ITagData>();
+
+    for (const l_oTag of this.m_aoTags) {
+      l_oMap.set(l_oTag.idTag, l_oTag.toData());
+    }
+
+    return l_oMap;
+  }
 
   /**
    * 🎰 Accesseur privé centralisé régissant l'accès à la soute de RAM.
@@ -182,28 +198,34 @@ export class MockTagRepository implements IMockTagRepository {
 
   /**
    * 🧮 Utilitaire privé d'infrastructure émulant le moteur de pagination et tri universel en RAM.
+   *
+   * @private
+   * @param {Tag[]} p_aoSource - Le tableau brut filtré à paginer
+   * @param {IListOptions} p_oOptions - Les limites et tris d'IHM de surface
+   * @returns {IListResult<Tag>} Le conteneur nominal d'acier en français d'élite
    */
   private appliquerPaginationRAM(p_aoSource: Tag[], p_oOptions: IListOptions): IListResult<Tag> {
-    const l_nTotal = p_aoSource.length;
-    const l_nLimit = p_oOptions.NbLignes ?? 50;
-    const l_nOffset = p_oOptions.LigneDebut ?? 0;
+    const l_nTotal    = p_aoSource.length;
+    const l_nLimit    = p_oOptions.NbLignes   ?? 50;
+    const l_nOffset   = p_oOptions.LigneDebut ?? 0;
 
-    const l_sCleTri = p_oOptions.ColonneTri === 'tgName' ? 'tagName' : 'idTag';
+    const l_sCleTri   = p_oOptions.ColonneTri === 'tgCreatedAt' ? 'createdAt' : 'tagName';
+
     p_aoSource.sort((l_oA: any, l_oB: any): number => {
-      const l_vA = l_oA[l_sCleTri];
-      const l_vB = l_oB[l_sCleTri];
-      const l_sOrdre = p_oOptions.OrdreAff instanceof OrdreTriEnum ? p_oOptions.OrdreAff.code : 'ASC';
+      const l_vA     = l_oA[l_sCleTri];
+      const l_vB     = l_oB[l_sCleTri];
+      const l_sOrdre = p_oOptions.OrdreAff instanceof OrdreTriEnum ? p_oOptions.OrdreAff.code : 'DESC';
       return l_sOrdre === 'DESC' ? (l_vA > l_vB ? -1 : 1) : (l_vA < l_vB ? -1 : 1);
     });
 
-    const l_aoPage = p_aoSource.slice(l_nOffset, l_nOffset + l_nLimit);
+    const l_aoPage    = p_aoSource.slice(l_nOffset, l_nOffset + l_nLimit);
 
     return {
-      LigneDebut:    l_nOffset,
-      NbLignesDem:   l_nLimit,
-      NbLignesRenv:  l_aoPage.length,
-      NbLignesTotal: l_nTotal,
-      Lignes:        l_aoPage
+      LigneDebut    : l_nOffset,
+      NbLignesDem   : l_nLimit,
+      NbLignesRenv  : l_aoPage.length,
+      NbLignesTotal : l_nTotal,
+      Lignes        : l_aoPage
     };
   }
 }
