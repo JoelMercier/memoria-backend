@@ -15,7 +15,7 @@ import type { IItem       } from '@/interfaces/entities/item/IItem';
 export class PublicShareDto {
 
   /** 📝 Titre principal de la pépite partagée */
-  public readonly title        : string;
+  public readonly libelle      : string;
 
   /** 🛤️ Permalien normalisé (Slug) associé à la ressource */
   public readonly slug         : string;
@@ -47,7 +47,7 @@ export class PublicShareDto {
    * @param {IItem} item - L'entité pépite source (interface riche)
    */
   private constructor(item: IItem) {
-    this.title        = item.title;
+    this.libelle      = item.libelle;
     this.slug         = item.slug;
     this.contentType  = item.contentType;
     this.content      = item.content;

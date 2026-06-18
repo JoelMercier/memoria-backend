@@ -1,8 +1,10 @@
 // ——— fichier : src/dto/item/UpdateItemDto.ts
 
+import type { UpdateItemSchemaType } from '@/validation/zod/ItemValidation';
+import type { JsonLégitime         } from '@/types/shared/JsonLégitime';
+
 import      { TagId                } from '@/domain/value-objects/ids';
 import      { ItemValidation       } from '@/validation/zod/ItemValidation';
-import type { UpdateItemSchemaType } from '@/validation/zod/ItemValidation';
 
 /**
  * 📦 Classe UpdateItemDto
@@ -37,7 +39,7 @@ export class UpdateItemDto {
   public readonly thumbnailUrl?: string | null;
 
   /** 🎛️ Métadonnées d'infrastructure dynamiques optionnelles */
-  public readonly metadata?: Record<string, unknown>;
+  public readonly metadata?: JsonLégitime;
 
   /** 🏷️ Collection optionnelle de cailloux de couleur (Tags rattachés) */
   public readonly tagIds?: TagId[];
