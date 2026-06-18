@@ -1,52 +1,53 @@
 // ——— fichier : src/services/__tests__/AppEventService.test.ts
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Mocked } from 'vitest';
+import type { Mocked }                         from 'vitest';
 
 import type { AppEventRepository } from '@/infrastructure/repositories/PostGres/AppEventRepository';
 import { UserId, ItemId, ShareId } from '@/domain/value-objects/ids';
 
 import { AppEventService } from '../AppEventService';
-import { Categorie } from '@/constants/Categories';
-import { Severite } from '@/constants/Severites';
-import { Secteur } from '@/constants/Secteurs';
-import { Action } from '@/constants/Actions';
+import { Categorie }       from '@/constants/Categories';
+import { Severite }        from '@/constants/Severites';
+import { Secteur }         from '@/constants/Secteurs';
+import { Action }          from '@/constants/Actions';
 
-const USER_ID = new UserId('018f3a3c-5000-7000-8000-000000000001');
-const ITEM_ID = new ItemId('018f3a3c-5000-7000-8000-00000000000A');
+const USER_ID  = new UserId('018f3a3c-5000-7000-8000-000000000001');
+const ITEM_ID  = new ItemId('018f3a3c-5000-7000-8000-00000000000A');
 const SHARE_ID = new ShareId('018f3a3c-5000-7000-8000-00000000000B');
 
 describe('AppEventService', () => {
   // 🏛️ Utilisation de Partial pour n'implémenter que les méthodes requises
-  let l_oRepository: Mocked<Partial<AppEventRepository>>;
-  let l_oService: AppEventService;
+  let l_oRepository : Mocked<Partial<AppEventRepository>>;
+  let l_oService    : AppEventService;
 
   beforeEach(() => {
     // 🪓 Initialisation propre et typée sans aucun unknown
     l_oRepository = {
-      create: vi.fn()
+      create : vi.fn()
     };
 
     // Hydratation conforme du service avec notre contrat partiel
     l_oService = new AppEventService(l_oRepository as AppEventRepository);
-  }); // <-- [RÉPARÉ V4] La fermeture manquante est ressoudée ici !
+  });
 
   describe('log', () => {
     it("engendre une trace d'audit générique en forgeant son identifiant et appliquant les types nominaux", async () => {
       await l_oService.log({
-        userId: USER_ID,
-        eventCategorie: Categorie.GENE,
-        eventSecteur: Secteur.SYST,
-        eventAction: Action.DEMA,
-        eventSeverite: Severite.INFO,
-        message: 'Test de trace'
+        userId         : USER_ID,
+        eventCategorie : Categorie.GENE,
+        eventSecteur   : Secteur.SYST,
+        eventAction    : Action.DEMA,
+        eventSeverite  : Severite.INFO,
+        message        : 'Test de trace'
       });
 
+      //-- [RÉPARÉ V4] Fin définitive des préfixes "ae" dans les assertions du Domaine [Mémoria] !
       expect(l_oRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          aeUserId: USER_ID,
-          aeCategorieId: Categorie.GENE,
-          aeMessage: 'Test de trace'
+          userId    : USER_ID,
+          categorie : Categorie.GENE,
+          message   : 'Test de trace'
         })
       );
     });
@@ -58,9 +59,9 @@ describe('AppEventService', () => {
 
       expect(l_oRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          aeUserId: USER_ID,
-          aeCategorieId: Categorie.SECU,
-          aeMessage: 'Connexion réussie'
+          userId    : USER_ID,
+          categorie : Categorie.SECU,
+          message   : 'Connexion réussie'
         })
       );
     });
@@ -70,10 +71,10 @@ describe('AppEventService', () => {
 
       expect(l_oRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          aeUserId: null,
-          aeCategorieId: Categorie.SECU, //-- [RÉPARÉ V4] Alignement sur le vrai code sécurité !
-          aeSeveriteId: Severite.WARN,
-          aeMessage: 'Échec de connexion'
+          userId    : null,
+          categorie : Categorie.SECU,
+          severite  : Severite.WARN,
+          message   : 'Échec de connexion'
         })
       );
     });
@@ -83,9 +84,9 @@ describe('AppEventService', () => {
 
       expect(l_oRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          aeUserId: USER_ID,
-          aeCategorieId: Categorie.ANAL,
-          aeMessage: 'Pépite créée'
+          userId    : USER_ID,
+          categorie : Categorie.ANAL,
+          message   : 'Pépite créée'
         })
       );
     });
@@ -95,9 +96,9 @@ describe('AppEventService', () => {
 
       expect(l_oRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          aeUserId: USER_ID,
-          aeCategorieId: Categorie.ANAL,
-          aeMessage: 'Pépite partagée'
+          userId    : USER_ID,
+          categorie : Categorie.ANAL,
+          message   : 'Pépite partagée'
         })
       );
     });
