@@ -1,9 +1,11 @@
 // ——— fichier : src/dto/user/UserExportDto.ts
 
-import type { IItem         } from '@/interfaces/entities/item/IItem';
-import type { IShare        } from '@/interfaces/entities/share/IShare';
-import type { ITag          } from '@/interfaces/entities/tag/ITag';
-import type { IUser         } from '@/interfaces/entities/user/IUser';
+import type { Item         } from '@/entities/Item';
+import type { IShare       } from '@/interfaces/entities/share/IShare';
+import type { ITag         } from '@/interfaces/entities/tag/ITag';
+import type { IUser        } from '@/interfaces/entities/user/IUser';
+import type { JsonLégitime } from '@/types/shared/JsonLégitime';
+
 
 /**
  * 📦 Structure plate d'exportation pour une étiquette (Tag).
@@ -28,7 +30,7 @@ interface IExportedItem {
   /** 🏷️ Code sémantique du type de contenu (ex: 'TEXT') */
   contentType  : string;
   /** 📝 Titre principal de la pépite */
-  title        : string;
+  libelle      : string;
   /** Track normalisé d'accès visuel */
   slug         : string;
   /** 📄 Corps textuel ou charge utile brute */
@@ -38,7 +40,7 @@ interface IExportedItem {
   /** 🖼️ URL de la miniature d'illustration */
   thumbnailUrl : string | null | undefined;
   /** 🎛️ Métadonnées d'infrastructure dynamiques */
-  metadata     : Record<string, unknown>;
+  metadata     : JsonLégitime;
   /** ⏱️ Horodatage de création en soute */
   createdAt    : Date | undefined;
   /** ⏱️ Horodatage de révision technique */
@@ -105,7 +107,7 @@ interface IExportedUser {
  */
 export interface IItemWithTags {
   /** 📦 L'entité pépite concernée */
-  item : IItem;
+  item : Item;
   /** 🏷️ La liste des tags rattachés */
   tags : ITag[];
 }
@@ -177,7 +179,7 @@ export class UserExportDto {
       ({ item, tags: itemTags }): IExportedItem => ({
         id           : item.idItem.valeur,
         contentType  : item.contentType.code,
-        title        : item.title,
+        libelle      : item.libelle,
         slug         : item.slug,
         content      : item.content,
         sourceAuthor : item.sourceAuthor,

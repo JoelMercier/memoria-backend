@@ -1,6 +1,6 @@
 // ——— fichier : src/services/UserExportService.ts
 
-import type { IItemWithTags      } from '@/dto/user/UserExportDto';
+import type { IItemWithTags      } from '@/dto/user/UserExportDto';
 import type { IItemRepository    } from '@/interfaces/repositories/PostGres/IItemRepository';
 import type { IItemTagRepository } from '@/interfaces/repositories/PostGres/IItemTagRepository';
 import type { IShareRepository   } from '@/interfaces/repositories/PostGres/IShareRepository';

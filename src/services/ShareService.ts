@@ -4,7 +4,6 @@ import type { CreateShareDto } from '@/dto/share/CreateShareDto';
 import type { UpdateShareDto } from '@/dto/share/UpdateShareDto';
 import type { Item } from '@/entities/Item';
 import type { Share } from '@/entities/Share';
-import type { IItem } from '@/interfaces/entities/item/IItem';
 import type { IShareData } from '@/interfaces/entities/share/IShareData';
 import type { IItemRepository } from '@/interfaces/repositories/PostGres/IItemRepository';
 import type { IShareRepository } from '@/interfaces/repositories/PostGres/IShareRepository';
@@ -229,7 +228,7 @@ export class ShareService implements IShareService {
   /**
    * 🌐 Passerelle publique : Localise une pépite via son jeton anonyme d'URL.
    */
-  public async findItemByToken(p_sToken: string): Promise<IItem> {
+  public async findItemByToken(p_sToken: string): Promise<Item> {
     // 🪓 ALIGNEMENT SOUVERAIN V4 : Passage obligatoire par l'accesseur public de dépôt
     const l_oShare: Share | null = await this.repository.findByToken(p_sToken);
     if (!l_oShare) {

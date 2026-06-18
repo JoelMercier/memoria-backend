@@ -1,8 +1,7 @@
 // ——— fichier : src/interfaces/entities/item/IItem.ts
 
-import type { ContentType } from '@/constants/ContentTypes';
-import { UserId,
-         ItemId              } from '@/domain/value-objects/ids';
+import type { ContentType    } from '@/constants/ContentTypes';
+import type { UserId, ItemId } from '@/domain/value-objects/ids';
 import type { IEntity        } from '@/interfaces/entities/IEntity';
 import type { IItemData      } from '@/interfaces/entities/item/IItemData';
 
@@ -28,7 +27,7 @@ export interface IItem extends IEntity<IItemData> {
   get contentType(): ContentType;
 
   /** 📝 Accesseur vers le titre principal */
-  get title(): string;
+  get libelle(): string;
 
   /** 🛤️ Accesseur vers le permalien normalisé (Slug) */
   get slug(): string;

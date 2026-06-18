@@ -2,14 +2,14 @@
 
 import type { CreateShareDto   } from '@/dto/share/CreateShareDto';
 import type { UpdateShareDto   } from '@/dto/share/UpdateShareDto';
-import type { IItem            } from '@/interfaces/entities/item/IItem';
 import type { IListOptions     } from '@/interfaces/shared/IListOptions';
 import type { IListResult      } from '@/interfaces/shared/IListResult';
 import type { IShareData       } from '@/interfaces/entities/share/IShareData';
 import type { UserId, ShareId  } from '@/domain/value-objects/ids';
-import { Share                 } from '@/entities/Share';
-import { IBaseService          } from '@/interfaces/services/IBaseService';
-import { IShareRepository      } from '@/interfaces/repositories/PostGres/IShareRepository';
+import type { Share            } from '@/entities/Share';
+import type { IBaseService     } from '@/interfaces/services/IBaseService';
+import type { IShareRepository } from '@/interfaces/repositories/PostGres/IShareRepository';
+import type { Item             } from '@/entities/Item';
 
 /**
  * 📜 Interface IShareService
@@ -79,5 +79,5 @@ export interface IShareService extends IBaseService<Share, IShareData, ShareId, 
    * @param {string} p_sToken - La chaîne du jeton cryptographique compact d'accès public
    * @returns {Promise<IItem>} L'entité de la pépite rattachée pour affichage anonyme
    */
-  findItemByToken(p_sToken: string): Promise<IItem>;
+  findItemByToken(p_sToken: string): Promise<Item>;
 }
